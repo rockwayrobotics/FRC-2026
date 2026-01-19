@@ -54,6 +54,10 @@ public class Vision extends SubsystemBase {
    * @param cameraIndex The index of the camera to use.
    */
   public Rotation2d getTargetX(int cameraIndex) {
+    System.out.println("TargetX tag count:" + inputs[cameraIndex].tagIds.length);
+    for (int tagId : inputs[cameraIndex].tagIds) {
+      System.out.println("Tag ID: " + tagId);
+    }
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 

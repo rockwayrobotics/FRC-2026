@@ -13,8 +13,13 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCameraBack;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraFront;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -161,6 +166,17 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
+    var field = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    // Red alliance hub is at the y position of ID 10 and the x position of ID 8.
+    Translation2d redHub =
+        new Translation2d(
+            field.getTagPose(8).get().toPose2d().getX(),
+            field.getTagPose(10).get().toPose2d().getY());
+    // Blue alliance hub is at the y position of ID 25 and the x position of ID 18.
+    Translation2d blueHub =
+        new Translation2d(
+            field.getTagPose(18).get().toPose2d().getX(),
+            field.getTagPose(25).get().toPose2d().getY());
     controller
         .y()
         .whileTrue(
@@ -168,7 +184,16 @@ public class RobotContainer {
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> vision.getTargetX(0)));
+                () -> {
+                  Rotation2d targetAngle;
+                  if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+                    targetAngle = redHub.minus(drive.getPose().getTranslation()).getAngle();
+                  } else {
+                    targetAngle = blueHub.minus(drive.getPose().getTranslation()).getAngle();
+                  }
+                  return targetAngle;
+                  // return vision.getTargetX(0).times(-1);
+                }));
   }
 
   /**
