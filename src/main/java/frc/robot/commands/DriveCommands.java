@@ -7,6 +7,8 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -128,6 +130,76 @@ public class DriveCommands {
               double omega =
                   angleController.calculate(
                       drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+
+              // Convert to field relative speeds & send command
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega);
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds,
+                      isFlipped
+                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          : drive.getRotation()));
+            },
+            drive)
+
+        // Reset PID controller when command starts
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
+
+  /**
+   * Field relative drive command using joystick for linear control and PID for angular control.
+   * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
+   * absolute rotation with a joystick.
+   */
+  public static Command joystickDrivePointAtHub(
+      Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
+
+    var field = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    // Red alliance hub is at the y position of ID 10 and the x position of ID 8.
+    Translation2d redHub =
+        new Translation2d(
+            field.getTagPose(8).get().toPose2d().getX(),
+            field.getTagPose(10).get().toPose2d().getY());
+    // Blue alliance hub is at the y position of ID 25 and the x position of ID 18.
+    Translation2d blueHub =
+        new Translation2d(
+            field.getTagPose(18).get().toPose2d().getX(),
+            field.getTagPose(25).get().toPose2d().getY());
+
+    // Create PID controller
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+
+    // Construct command
+    return Commands.run(
+            () -> {
+              // Get linear velocity
+              Translation2d linearVelocity =
+                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+
+              Rotation2d targetAngle;
+              if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+                targetAngle = redHub.minus(drive.getPose().getTranslation()).getAngle();
+              } else {
+                targetAngle = blueHub.minus(drive.getPose().getTranslation()).getAngle();
+              }
+
+              // Calculate angular speed
+              double omega =
+                  angleController.calculate(
+                      drive.getRotation().getRadians(), targetAngle.getRadians());
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
