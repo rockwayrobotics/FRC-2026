@@ -13,6 +13,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants.CAN;
+import lombok.Builder;
 
 public class DriveConstants {
   public static final double maxSpeedMetersPerSec = 4.8;
@@ -22,10 +24,10 @@ public class DriveConstants {
   public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
   public static final Translation2d[] moduleTranslations =
       new Translation2d[] {
-        new Translation2d(trackWidth / 2.0, wheelBase / 2.0), //fl 2
-        new Translation2d(trackWidth / 2.0, -wheelBase / 2.0), //fr 3
-        new Translation2d(-trackWidth / 2.0, wheelBase / 2.0), //bl 1
-        new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0) //br 4(0)
+        new Translation2d(trackWidth / 2.0, wheelBase / 2.0), // fl 2
+        new Translation2d(trackWidth / 2.0, -wheelBase / 2.0), // fr 3
+        new Translation2d(-trackWidth / 2.0, wheelBase / 2.0), // bl 1
+        new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0) // br 4(0)
       };
 
   // Zeroed rotation values for each module, see setup instructions
@@ -33,16 +35,6 @@ public class DriveConstants {
   public static final Rotation2d frontRightZeroRotation = new Rotation2d(0.0);
   public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.0);
   public static final Rotation2d backRightZeroRotation = new Rotation2d(0.0);
-
-  public static final int frontLeftDriveCanId = 3;
-  public static final int backLeftDriveCanId = 4;
-  public static final int frontRightDriveCanId = 5;
-  public static final int backRightDriveCanId = 2;
-
-  public static final int frontLeftTurnCanId = 9;
-  public static final int backLeftTurnCanId = 7;
-  public static final int frontRightTurnCanId = 6;
-  public static final int backRightTurnCanId = 8;
 
   // Drive motor configuration
   public static final int driveMotorCurrentLimit = 50;
@@ -105,4 +97,96 @@ public class DriveConstants {
               driveMotorCurrentLimit,
               1),
           moduleTranslations);
+
+  public static final SwerveModuleConfig[] swerveModuleConfigsComp = {
+    // FL
+    SwerveModuleConfig.builder()
+        .driveMotorId(CAN.FL_DRIVE_COMP)
+        .turnMotorId(CAN.FL_TURN_COMP)
+        .encoderChannel(0)
+        .encoderOffset(Rotation2d.fromRadians(0)) // 1.439 + Math.PI / 4))
+        .turnInverted(true)
+        .encoderInverted(false)
+        .build(),
+    // FR
+    SwerveModuleConfig.builder()
+        .driveMotorId(CAN.FR_DRIVE_COMP)
+        .turnMotorId(CAN.FR_TURN_COMP)
+        .encoderChannel(1)
+        .encoderOffset(Rotation2d.fromRadians(0)) // -3.127 - Math.PI / 4))
+        .turnInverted(true)
+        .encoderInverted(false)
+        .build(),
+    // BL
+    SwerveModuleConfig.builder()
+        .driveMotorId(CAN.BL_DRIVE_COMP)
+        .turnMotorId(CAN.BL_TURN_COMP)
+        .encoderChannel(2)
+        .encoderOffset(Rotation2d.fromRadians(0)) // 2.651 + 3 * Math.PI / 4))
+        .turnInverted(true)
+        .encoderInverted(false)
+        .build(),
+    // BR
+    SwerveModuleConfig.builder()
+        .driveMotorId(CAN.BR_DRIVE_COMP)
+        .turnMotorId(CAN.BR_TURN_COMP)
+        .encoderChannel(3)
+        .encoderOffset(Rotation2d.fromRadians(0)) // -1.94 - 3 * Math.PI / 4))
+        .turnInverted(true)
+        .encoderInverted(false)
+        .build()
+  };
+
+  public static final SwerveModuleConfig[] swerveModuleConfigsDev = {
+    // FL
+    SwerveModuleConfig.builder()
+        .driveMotorId(CAN.FL_DRIVE_DEV)
+        .turnMotorId(CAN.FL_TURN_DEV)
+        .encoderChannel(0) // 2
+        .encoderOffset(Rotation2d.fromRadians(0))
+        // .encoderOffset(Rotation2d.fromRadians(0))
+        .encoderOffset(Rotation2d.fromRadians(1.467 + Math.PI / 4))
+        .turnInverted(true)
+        .encoderInverted(false)
+        .build(),
+    // FR
+    SwerveModuleConfig.builder()
+        .driveMotorId(CAN.FR_DRIVE_DEV)
+        .turnMotorId(CAN.FR_TURN_DEV)
+        .encoderChannel(1)
+        // .encoderOffset(Rotation2d.fromRadians(0))
+        .encoderOffset(Rotation2d.fromRadians(0.517 - Math.PI / 4))
+        .turnInverted(true)
+        .encoderInverted(false)
+        .build(),
+    // BL
+    SwerveModuleConfig.builder()
+        .driveMotorId(CAN.BL_DRIVE_DEV)
+        .turnMotorId(CAN.BL_TURN_DEV)
+        .encoderChannel(3)
+        // .encoderOffset(Rotation2d.fromRadians(0))
+        .encoderOffset(Rotation2d.fromRadians(-3.002 + 3 * Math.PI / 4))
+        .turnInverted(true)
+        .encoderInverted(false)
+        .build(),
+    // BR
+    SwerveModuleConfig.builder()
+        .driveMotorId(CAN.BR_DRIVE_DEV)
+        .turnMotorId(CAN.BR_TURN_DEV)
+        .encoderChannel(2)
+        // .encoderOffset(Rotation2d.fromRadians(0))
+        .encoderOffset(Rotation2d.fromRadians(0.7755 - 3 * Math.PI / 4))
+        .turnInverted(true)
+        .encoderInverted(false)
+        .build()
+  };
+
+  @Builder
+  public record SwerveModuleConfig(
+      int driveMotorId,
+      int turnMotorId,
+      int encoderChannel,
+      Rotation2d encoderOffset,
+      boolean turnInverted,
+      boolean encoderInverted) {}
 }
