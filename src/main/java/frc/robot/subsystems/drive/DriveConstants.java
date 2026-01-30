@@ -17,15 +17,15 @@ import edu.wpi.first.math.util.Units;
 public class DriveConstants {
   public static final double maxSpeedMetersPerSec = 4.8;
   public static final double odometryFrequency = 100.0; // Hz
-  public static final double trackWidth = Units.inchesToMeters(26.5);
-  public static final double wheelBase = Units.inchesToMeters(26.5);
+  public static final double trackWidth = Units.inchesToMeters(23.50);
+  public static final double wheelBase = Units.inchesToMeters(23.50);
   public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
   public static final Translation2d[] moduleTranslations =
       new Translation2d[] {
-        new Translation2d(trackWidth / 2.0, wheelBase / 2.0),
-        new Translation2d(trackWidth / 2.0, -wheelBase / 2.0),
-        new Translation2d(-trackWidth / 2.0, wheelBase / 2.0),
-        new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0)
+        new Translation2d(trackWidth / 2.0, wheelBase / 2.0), //fl 2
+        new Translation2d(trackWidth / 2.0, -wheelBase / 2.0), //fr 3
+        new Translation2d(-trackWidth / 2.0, wheelBase / 2.0), //bl 1
+        new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0) //br 4(0)
       };
 
   // Zeroed rotation values for each module, see setup instructions
@@ -34,22 +34,19 @@ public class DriveConstants {
   public static final Rotation2d backLeftZeroRotation = new Rotation2d(0.0);
   public static final Rotation2d backRightZeroRotation = new Rotation2d(0.0);
 
-  // Device CAN IDs
-  public static final int pigeonCanId = 9;
-
-  public static final int frontLeftDriveCanId = 1;
-  public static final int backLeftDriveCanId = 3;
+  public static final int frontLeftDriveCanId = 3;
+  public static final int backLeftDriveCanId = 4;
   public static final int frontRightDriveCanId = 5;
-  public static final int backRightDriveCanId = 7;
+  public static final int backRightDriveCanId = 2;
 
-  public static final int frontLeftTurnCanId = 2;
-  public static final int backLeftTurnCanId = 4;
+  public static final int frontLeftTurnCanId = 9;
+  public static final int backLeftTurnCanId = 7;
   public static final int frontRightTurnCanId = 6;
   public static final int backRightTurnCanId = 8;
 
   // Drive motor configuration
   public static final int driveMotorCurrentLimit = 50;
-  public static final double wheelRadiusMeters = Units.inchesToMeters(1.5);
+  public static final double wheelRadiusMeters = Units.inchesToMeters(2);
   public static final double driveMotorReduction =
       (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth
   // and 22 spur teeth
@@ -57,7 +54,7 @@ public class DriveConstants {
 
   // Drive encoder configuration
   public static final double driveEncoderPositionFactor =
-      2 * Math.PI / driveMotorReduction; // Rotor Rotations ->
+      50 * 17 * 45 / 14 / 27 / 15; // L2 Gearing for SDS Mk4i
   // Wheel Radians
   public static final double driveEncoderVelocityFactor =
       (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM ->
@@ -76,7 +73,7 @@ public class DriveConstants {
   // Turn motor configuration
   public static final boolean turnInverted = false;
   public static final int turnMotorCurrentLimit = 20;
-  public static final double turnMotorReduction = 9424.0 / 203.0;
+  public static final double turnMotorReduction = 150 / 7;
   public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
 
   // Turn encoder configuration
