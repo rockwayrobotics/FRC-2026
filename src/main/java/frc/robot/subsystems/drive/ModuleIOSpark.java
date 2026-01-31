@@ -146,6 +146,7 @@ public class ModuleIOSpark implements ModuleIO {
     turnPositionQueue =
         SparkOdometryThread.getInstance()
             .registerSignal(turnSpark, turnEncoder::getVirtualPosition);
+    turnSpark.getEncoder().setPosition(turnEncoder.getVirtualPosition());
   }
 
   @Override
@@ -180,6 +181,7 @@ public class ModuleIOSpark implements ModuleIO {
         new DoubleSupplier[] {turnSpark::getAppliedOutput, turnSpark::getBusVoltage},
         (values) -> inputs.turnAppliedVolts = values[0] * values[1]);
     ifOk(turnSpark, turnSpark::getOutputCurrent, (value) -> inputs.turnCurrentAmps = value);
+    ifOk(turnSpark, turnController::getSetpoint, (value) -> inputs.turnSetpoint = value);
     inputs.turnConnected = turnConnectedDebounce.calculate(!sparkStickyFault);
 
     // Update odometry inputs

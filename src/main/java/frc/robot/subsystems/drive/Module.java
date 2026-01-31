@@ -68,8 +68,10 @@ public class Module {
 
   /** Runs the module with the specified output while controlling to zero degrees. */
   public void runCharacterization(double output) {
+    Rotation2d heading = moduleTranslations[this.index].getAngle().plus(Rotation2d.kCW_90deg);
     io.setDriveOpenLoop(output);
-    io.setTurnPosition(Rotation2d.kZero);
+    io.setTurnPosition(heading);
+    // Do not go straight: io.setTurnPosition(Rotation2d.kZero);
   }
 
   /** Disables all outputs to motors. */
