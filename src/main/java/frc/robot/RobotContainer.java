@@ -7,8 +7,8 @@
 
 package frc.robot;
 
-import static frc.robot.subsystems.vision.VisionConstants.backCameraName;
-import static frc.robot.subsystems.vision.VisionConstants.frontCameraName;
+import static frc.robot.subsystems.vision.VisionConstants.camera_back;
+import static frc.robot.subsystems.vision.VisionConstants.camera_front;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraBack;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraFront;
 
@@ -67,8 +67,8 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVision(frontCameraName, robotToCameraFront),
-                new VisionIOPhotonVision(backCameraName, robotToCameraBack));
+                new VisionIOPhotonVision(camera_front, robotToCameraFront),
+                new VisionIOPhotonVision(camera_back, robotToCameraBack));
         break;
 
       case SIM:
@@ -83,8 +83,8 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(frontCameraName, robotToCameraFront, drive::getPose),
-                new VisionIOPhotonVisionSim(backCameraName, robotToCameraBack, drive::getPose));
+                new VisionIOPhotonVisionSim(camera_front, robotToCameraFront, drive::getPose),
+                new VisionIOPhotonVisionSim(camera_back, robotToCameraBack, drive::getPose));
         break;
 
       default:
