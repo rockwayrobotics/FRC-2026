@@ -74,6 +74,16 @@ public class Module {
     // Do not go straight: io.setTurnPosition(Rotation2d.kZero);
   }
 
+  public void runCharacterizationSetpoint(double speedMetersPerSecond) {
+    Rotation2d heading = moduleTranslations[this.index].getAngle().plus(Rotation2d.kCW_90deg);
+    io.setDriveVelocity(speedMetersPerSecond / wheelRadiusMeters);
+    io.setTurnPosition(heading);
+  }
+
+  public void runCharacterizationTurnSetpoint(Rotation2d rotationinRadians) {
+    io.setTurnPosition(rotationinRadians);
+  }
+
   /** Disables all outputs to motors. */
   public void stop() {
     io.setDriveOpenLoop(0.0);

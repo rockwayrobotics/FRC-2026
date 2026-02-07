@@ -223,6 +223,22 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
+  public static Command turnSetpoint(Drive drive, Rotation2d rotationinRadians) {
+    return Commands.run(
+        () -> {
+          drive.runCharacterizationTurnSetpoint(rotationinRadians);
+        },
+        drive);
+  }
+
+  public static Command speedSetpoint(Drive drive, double speedMetersPerSecond) {
+    return Commands.run(
+        () -> {
+          drive.runCharacterizationSetpoint(speedMetersPerSecond);
+        },
+        drive);
+  }
+
   /**
    * Measures the velocity feedforward constants for the drive motors.
    *

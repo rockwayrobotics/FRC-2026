@@ -167,6 +167,12 @@ public class RobotContainer {
         .whileTrue(
             DriveCommands.joystickDrivePointAtHub(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
+
+    controller.leftBumper().whileTrue(DriveCommands.speedSetpoint(drive, 2));
+
+    controller.rightBumper().whileTrue(DriveCommands.speedSetpoint(drive, 1));
+    controller.povLeft().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kCCW_90deg));
+    controller.povRight().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kPi));
   }
 
   /**

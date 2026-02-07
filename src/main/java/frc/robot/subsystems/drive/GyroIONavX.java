@@ -31,6 +31,20 @@ public class GyroIONavX implements GyroIO {
     inputs.connected = navX.isConnected();
     inputs.yawPosition = Rotation2d.fromDegrees(-navX.getAngle());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(-navX.getRawGyroZ());
+    // Velocity is very unreliable. The Z-value basically decreases slowly while moving (in any direction)
+    // and then snaps back to 0 when stopped. The X and Y values sort of make some sense some of the
+    // time but sometimes don't see anything when moving.
+    // Mostly these seem most sensitive to starting or stopping, but not very good at measuring
+    // steady speed.
+    inputs.velocityX = navX.getVelocityX();
+    inputs.velocityY = navX.getVelocityY();
+    inputs.velocityZ = navX.getVelocityZ();
+
+    // Robot-centric velocity seems to be useless at the moment, all axes provide the same
+    // value. Maybe we need to configure something.
+    inputs.robotCentricVelocityX = navX.getRobotCentricVelocityX();
+    inputs.robotCentricVelocityY = navX.getRobotCentricVelocityY();
+    inputs.robotCentricVelocityZ = navX.getRobotCentricVelocityZ();
 
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();

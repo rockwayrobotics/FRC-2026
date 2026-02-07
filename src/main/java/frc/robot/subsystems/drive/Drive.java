@@ -206,6 +206,18 @@ public class Drive extends SubsystemBase {
     }
   }
 
+  public void runCharacterizationSetpoint(double speedMetersPerSecond) {
+    for (int i = 0; i < 4; i++) {
+      modules[i].runCharacterizationSetpoint(speedMetersPerSecond);
+    }
+  }
+
+  public void runCharacterizationTurnSetpoint(Rotation2d rotationinRadians) {
+    for (int i = 0; i < 4; i++) {
+      modules[i].runCharacterizationTurnSetpoint(rotationinRadians);
+    }
+  }
+
   /** Stops the drive. */
   public void stop() {
     runVelocity(new ChassisSpeeds());

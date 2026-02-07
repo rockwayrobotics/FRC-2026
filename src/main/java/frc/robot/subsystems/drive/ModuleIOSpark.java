@@ -60,6 +60,7 @@ public class ModuleIOSpark implements ModuleIO {
       new Debouncer(0.5, Debouncer.DebounceType.kFalling);
   private final Debouncer turnConnectedDebounce =
       new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private int resetCounter = 0;
 
   public ModuleIOSpark(SwerveModuleConfig module) {
     zeroRotation = module.encoderOffset();
@@ -151,6 +152,12 @@ public class ModuleIOSpark implements ModuleIO {
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
+    // Reset the relative encoder every 1 second to match the absolute encoder.
+    resetCounter++;
+    if (resetCounter > 49) {
+      turnSpark.getEncoder().setPosition(turnEncoder.getVirtualPosition());
+      resetCounter = 0;
+    }
     // Update drive inputs
     sparkStickyFault = false;
     ifOk(driveSpark, driveEncoder::getPosition, (value) -> inputs.drivePositionRad = value);
@@ -160,6 +167,10 @@ public class ModuleIOSpark implements ModuleIO {
         new DoubleSupplier[] {driveSpark::getAppliedOutput, driveSpark::getBusVoltage},
         (values) -> inputs.driveAppliedVolts = values[0] * values[1]);
     ifOk(driveSpark, driveSpark::getOutputCurrent, (value) -> inputs.driveCurrentAmps = value);
+    ifOk(
+        driveSpark,
+        driveController::getSetpoint,
+        (value) -> inputs.driveSetpoint = value * wheelRadiusMeters);
     inputs.driveConnected = driveConnectedDebounce.calculate(!sparkStickyFault);
 
     // Update turn inputs
@@ -167,11 +178,14 @@ public class ModuleIOSpark implements ModuleIO {
     ifOk(
         turnSpark,
         turnEncoder::getVirtualPosition,
-        (value) -> inputs.turnPosition = new Rotation2d(value));
+        (value) ->
+            inputs.turnPosition = new Rotation2d(MathUtil.inputModulus(value, 0, Math.PI * 2)));
     ifOk(
         turnSpark,
         () -> turnSpark.getEncoder().getPosition(),
-        (value) -> inputs.turnRelativePosition = new Rotation2d(value));
+        (value) ->
+            inputs.turnRelativePosition =
+                new Rotation2d(MathUtil.inputModulus(value, 0, Math.PI * 2)));
     ifOk(
         turnSpark,
         () -> turnSpark.getEncoder().getVelocity(),
@@ -181,7 +195,10 @@ public class ModuleIOSpark implements ModuleIO {
         new DoubleSupplier[] {turnSpark::getAppliedOutput, turnSpark::getBusVoltage},
         (values) -> inputs.turnAppliedVolts = values[0] * values[1]);
     ifOk(turnSpark, turnSpark::getOutputCurrent, (value) -> inputs.turnCurrentAmps = value);
-    ifOk(turnSpark, turnController::getSetpoint, (value) -> inputs.turnSetpoint = value);
+    ifOk(
+        turnSpark,
+        turnController::getSetpoint,
+        (value) -> inputs.turnSetpoint = MathUtil.inputModulus(value, 0, Math.PI * 2));
     inputs.turnConnected = turnConnectedDebounce.calculate(!sparkStickyFault);
 
     // Update odometry inputs
