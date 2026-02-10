@@ -113,11 +113,6 @@ public class Vision extends SubsystemBase {
         robotPoses.add(observation.pose());
         if (rejectPose) {
           robotPosesRejected.add(observation.pose());
-          System.out.println("Tag Count:" + observation.tagCount());
-          System.out.println("Ambiguity:" + observation.ambiguity());
-          System.out.println("X:" + observation.pose().getX());
-          System.out.println("Y:" + observation.pose().getY());
-          System.out.println("Z:" + observation.pose().getZ());
         } else {
           robotPosesAccepted.add(observation.pose());
         }
