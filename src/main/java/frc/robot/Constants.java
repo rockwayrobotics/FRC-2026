@@ -49,5 +49,20 @@ public final class Constants {
     public static final int BL_TURN_COMP = 6;
     public static final int BR_DRIVE_COMP = 9;
     public static final int BR_TURN_COMP = 5;
+
+    // Augers
+    public static final int AUGER = 10;
+    // Intake
+    public static final int INTAKE_RETRACTION = 11;
+    public static final int INTAKE_FIXED_ROLLER = 12;
+    public static final int INTAKE_EXTENDING_ROLLERS = 13;
+    // Climb
+    public static final int CLIMB = 14;
+    // Shooter
+    public static final int FLYWHEEL_LEADER = 15;
+    public static final int FLYWHEEL_FOLLOWER_1 = 16;
+    public static final int FLYWHEEL_FOLLOWER_2 = 17;
+    public static final int VARIABLE_HOOD = 18;
+    public static final int KICKER = 19;
   }
 }
