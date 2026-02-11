@@ -16,4 +16,21 @@ public class Augers extends SubsystemBase {
     augersIO.updateInputs(augersInputs);
     Logger.processInputs("Augers", augersInputs);
   }
+
+  private void setVoltage(double voltage) {
+    Logger.recordOutput("Augers/SetVoltage", voltage);
+    augersIO.setVoltage(voltage);
+  }
+
+  public void feed() {
+    setVoltage(AugersConstants.FEED_VOLTAGE);
+  }
+
+  public void reverse() {
+    setVoltage(AugersConstants.REVERSE_VOLTAGE);
+  }
+
+  public void stop() {
+    setVoltage(0.0);
+  }
 }

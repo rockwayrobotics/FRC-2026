@@ -24,6 +24,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.augers.Augers;
+import frc.robot.subsystems.augers.AugersIO;
+import frc.robot.subsystems.augers.AugersSim;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -49,6 +52,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
   private final Led led;
+  private final Augers augers;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -74,6 +78,8 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(camera_front, robotToCameraFront),
                 new VisionIOPhotonVision(camera_back, robotToCameraBack));
+
+        augers = new Augers(new AugersSim()); // FIXME: Simulated augers for now until connected
         break;
 
       case SIM:
@@ -90,6 +96,8 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(camera_front, robotToCameraFront, drive::getPose),
                 new VisionIOPhotonVisionSim(camera_back, robotToCameraBack, drive::getPose));
+
+        augers = new Augers(new AugersSim());
         break;
 
       default:
@@ -102,6 +110,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        augers = new Augers(new AugersIO() {});
         break;
     }
 
@@ -142,6 +151,10 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
+
+    // FIXME: Default command is to stop the augers. If we want them to run continuously,
+    // then we should have a command for that which is scheduled.
+    augers.setDefaultCommand(Commands.run(() -> augers.stop(), augers));
 
     // Lock to 0° when A button is held
     controller
