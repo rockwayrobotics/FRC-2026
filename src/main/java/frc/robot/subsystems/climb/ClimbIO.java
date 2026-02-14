@@ -9,4 +9,6 @@ public interface ClimbIO {
   }
 
   public default void updateInputs(ClimbIOInputs inputs) {}
+
+  public default void setVoltage(double voltage) {}
 }

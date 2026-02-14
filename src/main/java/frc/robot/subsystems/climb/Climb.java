@@ -16,4 +16,9 @@ public class Climb extends SubsystemBase {
     climbIO.updateInputs(climbInputs);
     Logger.processInputs("Climb", climbInputs);
   }
+
+  private void setVoltage(double voltage) {
+    Logger.recordOutput("Augers/SetVoltage", voltage);
+    climbIO.setVoltage(voltage);
+  }
 }
