@@ -34,6 +34,9 @@ import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeSim;
 import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -53,6 +56,7 @@ public class RobotContainer {
   private final Vision vision;
   private final Led led;
   private final Augers augers;
+  private final Intake intake;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -80,6 +84,7 @@ public class RobotContainer {
                 new VisionIOPhotonVision(camera_back, robotToCameraBack));
 
         augers = new Augers(new AugersSim()); // FIXME: Simulated augers for now until connected
+        intake = new Intake(new IntakeSim()); // same as ^
         break;
 
       case SIM:
@@ -98,6 +103,7 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(camera_back, robotToCameraBack, drive::getPose));
 
         augers = new Augers(new AugersSim());
+        intake = new Intake(new IntakeSim());
         break;
 
       default:
@@ -111,6 +117,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         augers = new Augers(new AugersIO() {});
+        intake = new Intake(new IntakeIO() {});
         break;
     }
 
@@ -186,9 +193,15 @@ public class RobotContainer {
             DriveCommands.joystickDrivePointAtHub(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
 
-    controller.leftBumper().whileTrue(DriveCommands.speedSetpoint(drive, 2));
+    // controller
+    //     .leftBumper()
+    //     .whileTrue(
+    //         Commands.runIntake(intake));
+    // controller
+    //     .rightBumper()
+    //     .whileTrue(
+    //     Commands.runIntakeBackwards(intake));
 
-    controller.rightBumper().whileTrue(DriveCommands.speedSetpoint(drive, 1));
     controller.povLeft().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kCCW_90deg));
     controller.povRight().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kPi));
     LEDPattern base =

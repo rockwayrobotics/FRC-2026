@@ -54,7 +54,6 @@ public final class Constants {
     public static final int AUGER = 10;
     // Intake
     public static final int INTAKE_RETRACTION = 11;
-    public static final int INTAKE_FIXED_ROLLER = 12;
     public static final int INTAKE_EXTENDING_ROLLERS = 13;
     // Climb
     public static final int CLIMB = 14;

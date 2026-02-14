@@ -133,6 +133,7 @@ public class DriveConstants {
         .driveMotorId(CAN.FL_DRIVE_DEV)
         .turnMotorId(CAN.FL_TURN_DEV)
         .encoderChannel(0) // 2
+        .absoluteEncoder(true)
         // .encoderOffset(Rotation2d.fromRadians(0))
         .encoderOffset(Rotation2d.fromRadians(1.451 + Math.PI / 4)) // Saturday
         // .encoderOffset(Rotation2d.fromRadians(1.431 + Math.PI / 4)) // Friday night
@@ -144,6 +145,7 @@ public class DriveConstants {
         .driveMotorId(CAN.FR_DRIVE_DEV)
         .turnMotorId(CAN.FR_TURN_DEV)
         .encoderChannel(1)
+        .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
         .encoderOffset(Rotation2d.fromRadians(0.5425 - Math.PI / 4))
         .turnInverted(true)
@@ -154,6 +156,7 @@ public class DriveConstants {
         .driveMotorId(CAN.BL_DRIVE_DEV)
         .turnMotorId(CAN.BL_TURN_DEV)
         .encoderChannel(3)
+        .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
         .encoderOffset(Rotation2d.fromRadians(-3.0377 + 3 * Math.PI / 4))
         .turnInverted(true)
@@ -164,6 +167,7 @@ public class DriveConstants {
         .driveMotorId(CAN.BR_DRIVE_DEV)
         .turnMotorId(CAN.BR_TURN_DEV)
         .encoderChannel(2)
+        .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
         .encoderOffset(Rotation2d.fromRadians(0.815 - 3 * Math.PI / 4)) // Saturday
         // .encoderOffset(Rotation2d.fromRadians(0.792 - 3 * Math.PI / 4)) // Friday night
@@ -177,6 +181,7 @@ public class DriveConstants {
       int driveMotorId,
       int turnMotorId,
       int encoderChannel,
+      boolean absoluteEncoder,
       Rotation2d encoderOffset,
       boolean turnInverted,
       boolean encoderInverted) {}
