@@ -12,4 +12,10 @@ public interface ShooterIO {
   }
 
   public default void updateInputs(ShooterIOInputs inputs) {}
+
+  public default void setVoltageShooter(double voltage) {}
+
+  public default void setVoltageKicker(double voltage) {}
+
+  public default void setVoltageHood(double voltage) {}
 }
