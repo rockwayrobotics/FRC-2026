@@ -30,5 +30,14 @@ public class Led extends SubsystemBase {
 
   public Command runPattern(LEDPattern pattern) {
     return run(() -> pattern.applyTo(buffer));
+  } // FIXME remove
+
+  public void setColour(Color c) {
+    LEDPattern solid = LEDPattern.solid(c);
+    solid.applyTo(buffer);
+  }
+
+  public void setColourRGB(double r, double g, double b) {
+    setColour(new Color(r, g, b));
   }
 }

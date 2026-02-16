@@ -16,4 +16,24 @@ public class Shooter extends SubsystemBase {
     shooterIO.updateInputs(shooterInputs);
     Logger.processInputs("Shooter", shooterInputs);
   }
+
+  public void setVoltageShooter(double voltage) {
+    Logger.recordOutput("Shooter/ShooterVoltage", voltage);
+    shooterIO.setVoltageShooter(voltage);
+  }
+
+  public void setVoltageKicker(double voltage) {
+    Logger.recordOutput("Shooter/KickerVoltage", voltage);
+    shooterIO.setVoltageKicker(voltage);
+  }
+
+  public void setVoltageHood(double voltage) {
+    Logger.recordOutput("Shooter/HoodVoltage", voltage);
+    shooterIO.setVoltageHood(voltage);
+  }
+
+  public void stop() {
+    setVoltageKicker(0);
+    setVoltageShooter(0);
+  }
 }
