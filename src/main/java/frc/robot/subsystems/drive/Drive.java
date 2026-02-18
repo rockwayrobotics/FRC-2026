@@ -33,12 +33,12 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
 import frc.robot.Constants.GlobalConstants;
-import frc.robot.Constants.Mode;
 import frc.robot.util.FieldRelativeAccel;
 import frc.robot.util.FieldRelativeSpeed;
 import frc.robot.util.LocalADStarAK;
@@ -55,6 +55,7 @@ public class Drive extends SubsystemBase {
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
+  private final Field2d m_field = new Field2d();
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = Rotation2d.kZero;
@@ -121,6 +122,12 @@ public class Drive extends SubsystemBase {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+    SmartDashboard.putData("ElasticField", m_field);
+    PathPlannerLogging.setLogActivePathCallback(
+        (activePath) -> {
+          m_field.getObject("nav").setPoses(activePath);
+        });
+        
   }
 
   @Override
@@ -182,7 +189,6 @@ public class Drive extends SubsystemBase {
     }
 
     // Update gyro alert
-    gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
   }
 
   /**
@@ -324,6 +330,11 @@ public class Drive extends SubsystemBase {
       Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    Pose2d currentPose = poseEstimator.getEstimatedPosition();
+
+    // 1. Update the local Field2d object (for SmartDashboard)
+    m_field.setRobotPose(currentPose);
+    Logger.recordOutput("Odometry/RobotField", currentPose);
   }
 
   /** Returns the maximum linear speed in meters per sec. */
@@ -344,3 +355,4 @@ public class Drive extends SubsystemBase {
     return fieldRelAccel;
   }
 }
+
