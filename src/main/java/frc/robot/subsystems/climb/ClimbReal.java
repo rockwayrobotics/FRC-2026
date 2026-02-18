@@ -10,7 +10,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.Constants.CAN;
 
 public class ClimbReal implements ClimbIO {
-  private final TalonFX motor = new TalonFX(CAN.CLIMB, "rio");
+  private final TalonFX motor = new TalonFX(CAN.CLIMB);
   private final TalonFXConfiguration motorConfigs = new TalonFXConfiguration();
 
   // FIXME - Add Configs

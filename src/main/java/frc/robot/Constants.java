@@ -29,6 +29,10 @@ public final class Constants {
     REPLAY
   }
 
+  public static final class GlobalConstants {
+    public static final double LOOP_TIME = 0.02; // 50 Hz = 20ms
+  }
+
   public static final class CAN {
     // Dev drivebase CAN IDs
     public static final int FL_DRIVE_DEV = 3;

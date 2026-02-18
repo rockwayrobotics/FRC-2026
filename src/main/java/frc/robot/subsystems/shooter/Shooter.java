@@ -34,6 +34,7 @@ public class Shooter extends SubsystemBase {
 
   public void stop() {
     setVoltageKicker(0);
+    setVoltageHood(0);
     setVoltageShooter(0);
   }
 }

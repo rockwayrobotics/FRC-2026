@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.shooterCommands.ShootOnMove;
 import frc.robot.subsystems.augers.Augers;
 import frc.robot.subsystems.augers.AugersIO;
 import frc.robot.subsystems.augers.AugersSim;
@@ -38,6 +39,9 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeSim;
 import frc.robot.subsystems.led.Led;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
@@ -57,6 +61,7 @@ public class RobotContainer {
   private final Led led;
   private final Augers augers;
   private final Intake intake;
+  private final Shooter shooter;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -85,6 +90,7 @@ public class RobotContainer {
 
         augers = new Augers(new AugersSim()); // FIXME: Simulated augers for now until connected
         intake = new Intake(new IntakeSim()); // same as ^
+        shooter = new Shooter(new ShooterSim());
         break;
 
       case SIM:
@@ -104,6 +110,7 @@ public class RobotContainer {
 
         augers = new Augers(new AugersSim());
         intake = new Intake(new IntakeSim());
+        shooter = new Shooter(new ShooterSim());
         break;
 
       default:
@@ -118,6 +125,7 @@ public class RobotContainer {
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         augers = new Augers(new AugersIO() {});
         intake = new Intake(new IntakeIO() {});
+        shooter = new Shooter(new ShooterIO() {});
         break;
     }
 
@@ -159,7 +167,8 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // FIXME: Default command is to stop the augers. If we want them to run continuously,
+    // FIXME: Default command is to stop the augers. If we want them to run
+    // continuously,
     // then we should have a command for that which is scheduled.
     augers.setDefaultCommand(Commands.run(() -> augers.stop(), augers));
 
@@ -194,13 +203,18 @@ public class RobotContainer {
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
 
     // controller
-    //     .leftBumper()
-    //     .whileTrue(
-    //         Commands.runIntake(intake));
+    // .leftBumper()
+    // .whileTrue(
+    // Commands.runIntake(intake));
     // controller
-    //     .rightBumper()
-    //     .whileTrue(
-    //     Commands.runIntakeBackwards(intake));
+    // .rightBumper()
+    // .whileTrue(
+    // Commands.runIntakeBackwards(intake));
+    controller
+        .leftTrigger()
+        .whileTrue(
+            ShootOnMove.run(
+                shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
 
     controller.povLeft().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kCCW_90deg));
     controller.povRight().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kPi));

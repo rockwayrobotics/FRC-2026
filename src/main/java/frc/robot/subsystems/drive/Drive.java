@@ -37,7 +37,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.Constants.GlobalConstants;
 import frc.robot.Constants.Mode;
+import frc.robot.util.FieldRelativeAccel;
+import frc.robot.util.FieldRelativeSpeed;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -64,6 +67,10 @@ public class Drive extends SubsystemBase {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
+
+  private FieldRelativeSpeed fieldRelVel = new FieldRelativeSpeed();
+  private FieldRelativeSpeed lastFieldRelVel = new FieldRelativeSpeed();
+  private FieldRelativeAccel fieldRelAccel = new FieldRelativeAccel();
 
   public Drive(
       GyroIO gyroIO,
@@ -119,6 +126,9 @@ public class Drive extends SubsystemBase {
   @Override
   public void periodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data
+    fieldRelVel = new FieldRelativeSpeed(getChassisSpeeds(), getRotation());
+    fieldRelAccel = new FieldRelativeAccel(fieldRelVel, lastFieldRelVel, GlobalConstants.LOOP_TIME);
+    lastFieldRelVel = fieldRelVel;
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
     for (var module : modules) {
@@ -324,5 +334,13 @@ public class Drive extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
+  }
+
+  public FieldRelativeSpeed getFieldRelativeSpeed() {
+    return fieldRelVel;
+  }
+
+  public FieldRelativeAccel getFieldRelativeAccel() {
+    return fieldRelAccel;
   }
 }

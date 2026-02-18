@@ -15,7 +15,8 @@ import frc.robot.util.SparkUtil;
 import java.util.function.DoubleSupplier;
 
 public class IntakeReal implements IntakeIO {
-  private final SparkBase extendRetractMotor = new SparkMax(CAN.INTAKE_RETRACTION, MotorType.kBrushless);
+  private final SparkBase extendRetractMotor =
+      new SparkMax(CAN.INTAKE_RETRACTION, MotorType.kBrushless);
   private final SparkBase roller = new SparkMax(CAN.INTAKE_EXTENDING_ROLLERS, MotorType.kBrushless);
   private final RelativeEncoder retractEncoder = extendRetractMotor.getEncoder();
   private final RelativeEncoder extendingEncoder = roller.getEncoder();
@@ -49,10 +50,13 @@ public class IntakeReal implements IntakeIO {
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    SparkUtil.ifOk(extendRetractMotor, retractEncoder::getPosition, (value) -> inputs.retractPosition = value);
+    SparkUtil.ifOk(
+        extendRetractMotor, retractEncoder::getPosition, (value) -> inputs.retractPosition = value);
     SparkUtil.ifOk(
         extendRetractMotor,
-        new DoubleSupplier[] {extendRetractMotor::getAppliedOutput, extendRetractMotor::getBusVoltage},
+        new DoubleSupplier[] {
+          extendRetractMotor::getAppliedOutput, extendRetractMotor::getBusVoltage
+        },
         (values) -> inputs.retractAppliedVolts = values[0] * values[1]);
 
     SparkUtil.ifOk(
@@ -72,7 +76,6 @@ public class IntakeReal implements IntakeIO {
   public void intakeInOut(double limit) {
     extendRetractMotor
         .getClosedLoopController()
-        .setSetpoint(
-            limit, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+        .setSetpoint(limit, ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 }
