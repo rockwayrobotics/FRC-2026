@@ -201,15 +201,6 @@ public class RobotContainer {
         .whileTrue(
             DriveCommands.joystickDrivePointAtHub(
                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
-
-    // controller
-    // .leftBumper()
-    // .whileTrue(
-    // Commands.runIntake(intake));
-    // controller
-    // .rightBumper()
-    // .whileTrue(
-    // Commands.runIntakeBackwards(intake));
     controller
         .leftTrigger()
         .whileTrue(

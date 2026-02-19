@@ -127,7 +127,6 @@ public class Drive extends SubsystemBase {
         (activePath) -> {
           m_field.getObject("nav").setPoses(activePath);
         });
-        
   }
 
   @Override
@@ -355,4 +354,3 @@ public class Drive extends SubsystemBase {
     return fieldRelAccel;
   }
 }
-

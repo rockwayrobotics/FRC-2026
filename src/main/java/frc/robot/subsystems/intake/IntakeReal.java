@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import com.revrobotics.PersistMode;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -13,13 +14,15 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.Constants.CAN;
 import frc.robot.util.SparkUtil;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public class IntakeReal implements IntakeIO {
-  private final SparkBase extendRetractMotor =
+  public final SparkBase extendRetractMotor =
       new SparkMax(CAN.INTAKE_RETRACTION, MotorType.kBrushless);
-  private final SparkBase roller = new SparkMax(CAN.INTAKE_EXTENDING_ROLLERS, MotorType.kBrushless);
+  public final SparkBase rollerMotor =
+      new SparkMax(CAN.INTAKE_EXTENDING_ROLLERS, MotorType.kBrushless);
   private final RelativeEncoder retractEncoder = extendRetractMotor.getEncoder();
-  private final RelativeEncoder extendingEncoder = roller.getEncoder();
+  private final RelativeEncoder extendingEncoder = rollerMotor.getEncoder();
 
   public IntakeReal() {
     var retractConfig = new SparkMaxConfig();
@@ -41,10 +44,10 @@ public class IntakeReal implements IntakeIO {
     var extendingConfig = new SparkMaxConfig();
     extendingConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
     SparkUtil.tryUntilOk(
-        roller,
+        rollerMotor,
         5,
         () ->
-            roller.configure(
+            rollerMotor.configure(
                 extendingConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
   }
 
@@ -60,17 +63,33 @@ public class IntakeReal implements IntakeIO {
         (values) -> inputs.retractAppliedVolts = values[0] * values[1]);
 
     SparkUtil.ifOk(
-        roller,
+        rollerMotor,
         extendingEncoder::getVelocity,
         (value) -> inputs.extendingVelocityRadsPerSec = value);
     SparkUtil.ifOk(
-        roller,
-        new DoubleSupplier[] {roller::getAppliedOutput, roller::getBusVoltage},
+        rollerMotor,
+        new DoubleSupplier[] {rollerMotor::getAppliedOutput, rollerMotor::getBusVoltage},
         (values) -> inputs.extendingAppliedVolts = values[0] * values[1]);
+    inputs.rollerVelocity = rollerMotor.getEncoder().getVelocity();
+    inputs.rollerCurrent = rollerMotor.getOutputCurrent();
+    double rollerMotorTemp = rollerMotor.getMotorTemperature();
+    REVLibError rollerMotorLastError = rollerMotor.getLastError();
+    double extendRetractMotorTemp = extendRetractMotor.getMotorTemperature();
+    REVLibError extendRetractMotorLastError = extendRetractMotor.getLastError();
+    if (rollerMotorLastError != REVLibError.kOk
+        || extendRetractMotorLastError != REVLibError.kOk
+        || rollerMotorTemp == 0
+        || extendRetractMotorTemp == 0) {
+      Boolean intakeStatus = false;
+      Logger.recordOutput("Intake/Status", intakeStatus);
+    } else {
+      Boolean intakeStatus = true;
+      Logger.recordOutput("Intake/Status", intakeStatus);
+    }
   }
 
   public void runIntakeRoller(double volts) {
-    roller.setVoltage(volts);
+    rollerMotor.setVoltage(volts);
   }
 
   public void intakeInOut(double limit) {
