@@ -231,7 +231,12 @@ public class ModuleIOSpark implements ModuleIO {
         turnController::getSetpoint,
         (value) -> inputs.turnSetpoint = MathUtil.inputModulus(value, 0, Math.PI * 2));
     inputs.turnConnected = turnConnectedDebounce.calculate(!sparkStickyFault);
-
+    if (driveConnectedDebounce.calculate(!sparkStickyFault)
+        && turnConnectedDebounce.calculate(!sparkStickyFault)) {
+      inputs.moduleConnected = true;
+    } else {
+      inputs.moduleConnected = false;
+    }
     // Update odometry inputs
     inputs.odometryTimestamps =
         timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
