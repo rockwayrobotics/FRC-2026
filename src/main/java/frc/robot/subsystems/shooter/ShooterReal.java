@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
+import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase;
@@ -111,5 +112,29 @@ public class ShooterReal implements ShooterIO {
     SparkUtil.ifOk(hood, hoodEncoder::getPosition, (value) -> inputs.hoodPosition = value);
 
     SparkUtil.ifOk(kicker, kickerEncoder::getVelocity, (value) -> inputs.kickerVelocity = value);
+    double flywheelLeaderTemp = flywheelLeader.getMotorTemperature();
+    REVLibError flywheelLeaderLastError = flywheelLeader.getLastError();
+    double flywheelFollower1Temp = flywheelFollower1.getMotorTemperature();
+    REVLibError flywheelFollower1LastError = flywheelFollower1.getLastError();
+    double flywheelFollower2Temp = flywheelFollower2.getMotorTemperature();
+    REVLibError flywheelFollower2LastError = flywheelFollower2.getLastError();
+    double hoodTemp = hood.getMotorTemperature();
+    REVLibError hoodLastError = hood.getLastError();
+    double kickerTemp = kicker.getMotorTemperature();
+    REVLibError kickerLastError = kicker.getLastError();
+    if (flywheelLeaderLastError != REVLibError.kOk
+        || flywheelLeaderTemp == 0
+        || flywheelFollower1LastError != REVLibError.kOk
+        || flywheelFollower1Temp == 0
+        || flywheelFollower2LastError != REVLibError.kOk
+        || flywheelFollower2Temp == 0
+        || hoodLastError != REVLibError.kOk
+        || hoodTemp == 0
+        || kickerLastError != REVLibError.kOk
+        || kickerTemp == 0) {
+      inputs.shooterStatus = false;
+    } else {
+      inputs.shooterStatus = true;
+    }
   }
 }

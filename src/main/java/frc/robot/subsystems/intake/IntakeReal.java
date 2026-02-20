@@ -14,7 +14,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.Constants.CAN;
 import frc.robot.util.SparkUtil;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.Logger;
 
 public class IntakeReal implements IntakeIO {
   public final SparkBase extendRetractMotor =
@@ -80,11 +79,9 @@ public class IntakeReal implements IntakeIO {
         || extendRetractMotorLastError != REVLibError.kOk
         || rollerMotorTemp == 0
         || extendRetractMotorTemp == 0) {
-      Boolean intakeStatus = false;
-      Logger.recordOutput("Intake/Status", intakeStatus);
+      inputs.intakeStatus = false;
     } else {
-      Boolean intakeStatus = true;
-      Logger.recordOutput("Intake/Status", intakeStatus);
+      inputs.intakeStatus = true;
     }
   }
 

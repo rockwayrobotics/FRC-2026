@@ -7,6 +7,7 @@ public interface AugersIO {
   public static class AugersIOInputs {
     public double velocityRPM = 0.0;
     public double appliedVolts = 0.0;
+    public boolean augerStatus = false;
   }
 
   public default void updateInputs(AugersIOInputs inputs) {}

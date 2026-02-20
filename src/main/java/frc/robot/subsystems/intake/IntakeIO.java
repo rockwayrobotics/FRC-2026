@@ -13,6 +13,7 @@ public interface IntakeIO {
     public double extendingVelocityRadsPerSec = 0.0;
     public double rollerVelocity = 0.0;
     public double rollerCurrent = 0.0;
+    public boolean intakeStatus = false;
   }
 
   public default void updateInputs(IntakeIOInputs inputs) {}

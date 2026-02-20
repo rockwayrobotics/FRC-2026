@@ -9,6 +9,7 @@ public interface ShooterIO {
     public double flywheelAppliedVolts = 0.0;
     public double hoodPosition = 0.0;
     public double kickerVelocity = 0.0;
+    public boolean shooterStatus = false;
   }
 
   public default void updateInputs(ShooterIOInputs inputs) {}
