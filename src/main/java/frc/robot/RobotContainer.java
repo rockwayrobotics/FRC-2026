@@ -29,6 +29,9 @@ import frc.robot.commands.shooterCommands.ShootOnMove;
 import frc.robot.subsystems.augers.Augers;
 import frc.robot.subsystems.augers.AugersIO;
 import frc.robot.subsystems.augers.AugersSim;
+import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimbIO;
+import frc.robot.subsystems.climb.ClimbSimKraken;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -36,6 +39,7 @@ import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.drive.ModuleIOSparkAbsolute;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeSim;
@@ -63,9 +67,11 @@ public class RobotContainer {
   private final Augers augers;
   private final Intake intake;
   private final Shooter shooter;
+  private final Climb climb;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController operatorController = new CommandXboxController(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -79,7 +85,7 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIONavX(),
-                new ModuleIOSpark(DriveConstants.swerveModuleConfigsDev[0]), // FL
+                new ModuleIOSparkAbsolute(DriveConstants.swerveModuleConfigsDev[0]), // FL
                 new ModuleIOSpark(DriveConstants.swerveModuleConfigsDev[1]), // FR
                 new ModuleIOSpark(DriveConstants.swerveModuleConfigsDev[2]), // BL
                 new ModuleIOSpark(DriveConstants.swerveModuleConfigsDev[3])); // BR
@@ -92,6 +98,7 @@ public class RobotContainer {
         augers = new Augers(new AugersSim()); // FIXME: Simulated augers for now until connected
         intake = new Intake(new IntakeSim()); // same as ^
         shooter = new Shooter(new ShooterSim());
+        climb = new Climb(new ClimbSimKraken());
         break;
 
       case SIM:
@@ -112,6 +119,7 @@ public class RobotContainer {
         augers = new Augers(new AugersSim());
         intake = new Intake(new IntakeSim());
         shooter = new Shooter(new ShooterSim());
+        climb = new Climb(new ClimbSimKraken());
         break;
 
       default:
@@ -127,6 +135,7 @@ public class RobotContainer {
         augers = new Augers(new AugersIO() {});
         intake = new Intake(new IntakeIO() {});
         shooter = new Shooter(new ShooterIO() {});
+        climb = new Climb(new ClimbIO() {});
         break;
     }
 
@@ -154,13 +163,7 @@ public class RobotContainer {
     configureButtonBindings();
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {
+  private void configureDefaultCommands() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
@@ -173,6 +176,29 @@ public class RobotContainer {
     // continuously,
     // then we should have a command for that which is scheduled.
     augers.setDefaultCommand(Commands.run(() -> augers.stop(), augers));
+
+    // There is no default climb command so that it continues to go to its setpoint.
+  }
+
+  private void configureOperatorCommands() {
+    operatorController.b().whileTrue(Commands.run(() -> augers.feed(), augers));
+    operatorController.x().whileTrue(Commands.run(() -> augers.reverse(), augers));
+
+    operatorController.povDown().onTrue(Commands.runOnce(() -> climb.unclimb(), climb));
+    operatorController.povUp().onTrue(Commands.runOnce(() -> climb.climb(), climb));
+    operatorController.povRight().onTrue(Commands.runOnce(() -> climb.extend(), climb));
+    operatorController.povLeft().onTrue(Commands.runOnce(() -> climb.retract(), climb));
+  }
+
+  /**
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   */
+  private void configureButtonBindings() {
+    configureDefaultCommands();
+    configureOperatorCommands();
 
     // Lock to 0° when A button is held
     controller

@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants.CAN;
 
-public class ClimbSim implements ClimbIO {
+public class ClimbSimKraken implements ClimbIO {
   private final DCMotor gearbox = DCMotor.getKrakenX60(1);
   private final DCMotorSim motorSim =
       new DCMotorSim(
@@ -30,21 +30,21 @@ public class ClimbSim implements ClimbIO {
   // private double velocityRPM = 0.0;
   // private double kV = 20;
 
-  public ClimbSim() {
+  public ClimbSimKraken() {
     FeedbackConfigs armFeedbackConfigs = new FeedbackConfigs();
     MotorOutputConfigs armMotorOutputConfigs = new MotorOutputConfigs();
     armFeedbackConfigs.SensorToMechanismRatio = ClimbConstants.CLIMB_GEAR_RATIO; // FIXME: Fix Ratio
     armMotorOutputConfigs.Inverted = InvertedValue.Clockwise_Positive;
     armMotorOutputConfigs.NeutralMode = NeutralModeValue.Brake;
     Slot0Configs PIDConfig = motorConfigs.Slot0;
-    PIDConfig.kS = ClimbConstants.CLIMB_KS; // FIXME: Actually Tune SVAPID
-    PIDConfig.kV = ClimbConstants.CLIMB_KV;
-    PIDConfig.kA = ClimbConstants.CLIMB_KA;
-    PIDConfig.kP = ClimbConstants.CLIMB_KP;
-    PIDConfig.kI = ClimbConstants.CLIMB_KI;
-    PIDConfig.kD = ClimbConstants.CLIMB_KD;
+    PIDConfig.kS = ClimbConstants.KrakenConstants.CLIMB_KS; // FIXME: Actually Tune SVAPID
+    PIDConfig.kV = ClimbConstants.KrakenConstants.CLIMB_KV;
+    PIDConfig.kA = ClimbConstants.KrakenConstants.CLIMB_KA;
+    PIDConfig.kP = ClimbConstants.KrakenConstants.CLIMB_KP;
+    PIDConfig.kI = ClimbConstants.KrakenConstants.CLIMB_KI;
+    PIDConfig.kD = ClimbConstants.KrakenConstants.CLIMB_KD;
     PIDConfig.GravityType = GravityTypeValue.Elevator_Static;
-    PIDConfig.kG = ClimbConstants.CLIMB_KG;
+    PIDConfig.kG = ClimbConstants.KrakenConstants.CLIMB_KG;
     motorConfigs.withFeedback(armFeedbackConfigs);
     motorConfigs.withMotorOutput(armMotorOutputConfigs);
     simMotor.setMotorType(MotorType.KrakenX60);
@@ -69,10 +69,15 @@ public class ClimbSim implements ClimbIO {
   }
 
   @Override
-  public void setPose(double pose) {
+  public void setPose(double pose, boolean fast) {
     pose = (Math.PI * 2 * pose);
     // simMotor.setMotorType(MotorType.KrakenX60);
     var foo = new MotionMagicVoltage(0);
     motor.setControl(foo.withPosition(pose));
+  }
+
+  @Override
+  public void stop() {
+    motor.set(0);
   }
 }

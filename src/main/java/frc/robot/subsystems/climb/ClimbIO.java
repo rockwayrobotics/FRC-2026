@@ -10,5 +10,7 @@ public interface ClimbIO {
 
   public default void updateInputs(ClimbIOInputs inputs) {}
 
-  public default void setPose(double pose) {}
+  public default void stop() {}
+
+  public default void setPose(double pose, boolean fast) {}
 }
