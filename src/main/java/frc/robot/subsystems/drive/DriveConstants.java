@@ -133,7 +133,7 @@ public class DriveConstants {
         .driveMotorId(CAN.FL_DRIVE_DEV)
         .turnMotorId(CAN.FL_TURN_DEV)
         .encoderChannel(0) // 2
-        .absoluteEncoder(true)
+        .absoluteEncoder(false)
         .encoderOffset(Rotation2d.fromRadians(0))
         // .encoderOffset(Rotation2d.fromRadians(1.451 + Math.PI / 4)) // Saturday
         // .encoderOffset(Rotation2d.fromRadians(1.431 + Math.PI / 4)) // Friday night

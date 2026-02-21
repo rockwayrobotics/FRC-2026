@@ -38,7 +38,6 @@ import java.util.function.DoubleSupplier;
  * and duty cycle absolute encoder.
  */
 public class ModuleIOSpark implements ModuleIO {
-  private final boolean useAbsoluteEncoder;
   private final Rotation2d zeroRotation;
 
   // Hardware objects
@@ -64,7 +63,6 @@ public class ModuleIOSpark implements ModuleIO {
   private int resetCounter = 0;
 
   public ModuleIOSpark(SwerveModuleConfig module) {
-    useAbsoluteEncoder = module.absoluteEncoder();
     zeroRotation = module.encoderOffset();
     driveSpark = new SparkFlex(module.driveMotorId(), MotorType.kBrushless);
     turnSpark = new SparkMax(module.turnMotorId(), MotorType.kBrushless);
@@ -120,10 +118,6 @@ public class ModuleIOSpark implements ModuleIO {
         .positionConversionFactor(turnEncoderPositionFactor / turnMotorReduction)
         .velocityConversionFactor(turnEncoderVelocityFactor / turnMotorReduction)
         .uvwAverageDepth(2);
-    if (module.absoluteEncoder()) {
-      turnConfig.analogSensor.positionConversionFactor(
-          1); // FIXME: Possibly 2 * Pi? Or 2 * Pi / 3.3?
-    }
     turnConfig
         .closedLoop
         .feedbackSensor(
@@ -133,27 +127,16 @@ public class ModuleIOSpark implements ModuleIO {
         .positionWrappingEnabled(true)
         .positionWrappingInputRange(turnPIDMinInput, turnPIDMaxInput)
         .pid(turnKp, 0.0, turnKd);
-    if (module.absoluteEncoder()) {
-      turnConfig
-          .signals
-          .analogPositionAlwaysOn(true)
-          .analogPositionPeriodMs((int) (1000.0 / odometryFrequency))
-          .analogVelocityAlwaysOn(true)
-          .analogVelocityPeriodMs(20)
-          .appliedOutputPeriodMs(20)
-          .busVoltagePeriodMs(20)
-          .outputCurrentPeriodMs(20);
-    } else {
-      turnConfig
-          .signals
-          .primaryEncoderPositionAlwaysOn(true)
-          .primaryEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency))
-          .primaryEncoderVelocityAlwaysOn(true)
-          .primaryEncoderVelocityPeriodMs(20)
-          .appliedOutputPeriodMs(20)
-          .busVoltagePeriodMs(20)
-          .outputCurrentPeriodMs(20);
-    }
+
+    turnConfig
+        .signals
+        .primaryEncoderPositionAlwaysOn(true)
+        .primaryEncoderPositionPeriodMs((int) (1000.0 / odometryFrequency))
+        .primaryEncoderVelocityAlwaysOn(true)
+        .primaryEncoderVelocityPeriodMs(20)
+        .appliedOutputPeriodMs(20)
+        .busVoltagePeriodMs(20)
+        .outputCurrentPeriodMs(20);
 
     tryUntilOk(
         turnSpark,
@@ -197,20 +180,12 @@ public class ModuleIOSpark implements ModuleIO {
 
     // Update turn inputs
     sparkStickyFault = false;
-    if (useAbsoluteEncoder) {
-      var analogSensor = turnSpark.getAnalog();
-      ifOk(
-          turnSpark,
-          analogSensor::getPosition,
-          (value) ->
-              inputs.turnPosition = new Rotation2d(MathUtil.inputModulus(value, 0, Math.PI * 2)));
-    } else {
-      ifOk(
-          turnSpark,
-          turnEncoder::getVirtualPosition,
-          (value) ->
-              inputs.turnPosition = new Rotation2d(MathUtil.inputModulus(value, 0, Math.PI * 2)));
-    }
+
+    ifOk(
+        turnSpark,
+        turnEncoder::getVirtualPosition,
+        (value) ->
+            inputs.turnPosition = new Rotation2d(MathUtil.inputModulus(value, 0, Math.PI * 2)));
     ifOk(
         turnSpark,
         () -> turnSpark.getEncoder().getPosition(),
@@ -274,10 +249,6 @@ public class ModuleIOSpark implements ModuleIO {
 
   @Override
   public void setTurnPosition(Rotation2d rotation) {
-    // AdvantageKit template did this: FIXME, figure out why? or remove.
-    // double setpoint =
-    // MathUtil.inputModulus(
-    // rotation.plus(zeroRotation).getRadians(), turnPIDMinInput, turnPIDMaxInput);
     double setpoint =
         MathUtil.inputModulus(rotation.getRadians(), turnPIDMinInput, turnPIDMaxInput);
     turnController.setSetpoint(setpoint, ControlType.kPosition);

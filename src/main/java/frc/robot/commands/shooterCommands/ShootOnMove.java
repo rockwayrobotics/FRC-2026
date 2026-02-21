@@ -123,7 +123,7 @@ public class ShootOnMove {
                */
               // FIXME: This should be a speed
               shooter.setVoltageShooter(m_rpmTable.getOutput(newDist));
-              shooter.setVoltageHood(m_hoodTable.getOutput(newDist));
+              // FIXME: Position here! shooter.setVoltageHood(m_hoodTable.getOutput(newDist));
 
               // }
 
