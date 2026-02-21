@@ -1,10 +1,13 @@
 package frc.robot.commands.shooterCommands;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,7 +48,6 @@ public class ShootOnMove {
               Translation2d robotToGoal = target.minus(drive.getPose().getTranslation());
               double dist = robotToGoal.getDistance(new Translation2d());
 
-              // double fixedShotTime = m_timeTable.getOutput(dist);
               double shotTime = m_timeTable.getOutput(dist);
               Translation2d movingGoalLocation = new Translation2d();
               for (int i = 0; i < 5; i++) {
@@ -121,9 +123,9 @@ public class ShootOnMove {
                * SmartDashboard.getNumber("SetHoodAdjust", 0));
                * } else {
                */
-              // FIXME: This should be a speed
-              shooter.setVoltageShooter(m_rpmTable.getOutput(newDist));
-              // FIXME: Position here! shooter.setVoltageHood(m_hoodTable.getOutput(newDist));
+              shooter.setVelocityFlywheel(m_rpmTable.getOutput(newDist));
+              Angle hoodAngleAsAngle = Degrees.of(m_hoodTable.getOutput(newDist));
+              shooter.setPositionHood(hoodAngleAsAngle);
 
               // }
 

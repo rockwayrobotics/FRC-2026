@@ -34,13 +34,13 @@ public class ClimbNEO2 implements ClimbIO {
         ClimbConstants.CLIMB_SPOOL_DIAMETER.in(Millimeters)
             * Math.PI
             / ClimbConstants.CLIMB_GEAR_RATIO);
-    config.closedLoop.feedForward.kS(NEO2Constants.CLIMB_KS).kG(NEO2Constants.CLIMB_KG);
     config
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(NEO2Constants.CLIMB_KP, 0.0, 0.0)
         .outputRange(-1, 1, fastSlot)
         .outputRange(-0.3, 0.3, slowSlot);
+    config.closedLoop.feedForward.kS(NEO2Constants.CLIMB_KS).kG(NEO2Constants.CLIMB_KG);
     config.signals.primaryEncoderPositionAlwaysOn(true);
     SparkUtil.tryUntilOk(
         motor,

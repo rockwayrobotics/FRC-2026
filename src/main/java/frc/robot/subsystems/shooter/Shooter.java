@@ -1,5 +1,8 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Degrees;
+
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -17,24 +20,25 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs("Shooter", shooterInputs);
   }
 
-  public void setVoltageShooter(double voltage) {
-    Logger.recordOutput("Shooter/ShooterVoltage", voltage);
-    shooterIO.setVoltageShooter(voltage);
+  public void setVelocityFlywheel(double RPM) {
+    Logger.recordOutput("Shooter/ShooterVelocityRPM", RPM);
+    shooterIO.setVelocityFlywheel(RPM);
   }
 
-  public void setVoltageKicker(double voltage) {
-    Logger.recordOutput("Shooter/KickerVoltage", voltage);
-    shooterIO.setVoltageKicker(voltage);
+  public void setVelocityKicker(double RPM) {
+    Logger.recordOutput("Shooter/KickerVelocityRPM", RPM);
+    shooterIO.setVelocityKicker(RPM);
   }
 
-  public void setVoltageHood(double voltage) {
-    Logger.recordOutput("Shooter/HoodVoltage", voltage);
-    shooterIO.setVoltageHood(voltage);
+  public void setPositionHood(Angle angle) {
+    Logger.recordOutput("Shooter/HoodAngle", angle.in(Degrees));
+    Logger.recordOutput("Shooter/HoodAngleDashboard", angle.in(Degrees) + 0);
+    shooterIO.setPositionHood(angle);
   }
 
   public void stop() {
-    setVoltageKicker(0);
-    setVoltageHood(0);
-    setVoltageShooter(0);
+    setVelocityKicker(0);
+    shooterIO.stopHood();
+    setVelocityFlywheel(0);
   }
 }
