@@ -3,6 +3,7 @@ package frc.robot.commands.shooterCommands;
 import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -40,12 +41,15 @@ public class ShootOnMove {
     angleController.enableContinuousInput(-Math.PI, Math.PI);
     return Commands.run(
             () -> {
+              Pose2d robotPose = drive.getPose();
+              Translation2d fieldRelativeShooterOffset = ShooterConstants.kShooterOffset.rotateBy(robotPose.getRotation());
+              Translation2d shooterLocation = robotPose.getTranslation().plus(fieldRelativeShooterOffset);
               FieldRelativeSpeed robotVel = drive.getFieldRelativeSpeed();
               FieldRelativeAccel robotAccel = drive.getFieldRelativeAccel();
 
               Translation2d target = GoalUtils.getHubLocation();
 
-              Translation2d robotToGoal = target.minus(drive.getPose().getTranslation());
+              Translation2d robotToGoal = target.minus(shooterLocation);
               double dist = robotToGoal.getDistance(new Translation2d());
 
               double shotTime = m_timeTable.getOutput(dist);

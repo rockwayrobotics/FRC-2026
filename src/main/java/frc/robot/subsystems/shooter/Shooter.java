@@ -29,7 +29,6 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/KickerVelocityRPM", RPM);
     shooterIO.setVelocityKicker(RPM);
   }
-
   public void setPositionHood(Angle angle) {
     Logger.recordOutput("Shooter/HoodAngle", angle.in(Degrees));
     Logger.recordOutput("Shooter/HoodAngleDashboard", angle.in(Degrees) + 0);

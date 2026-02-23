@@ -3,6 +3,8 @@ package frc.robot.subsystems.shooter;
 import frc.robot.util.LinearInterpolationTable;
 import java.awt.geom.Point2D;
 
+import edu.wpi.first.math.geometry.Translation2d;
+
 public class ShooterConstants {
   // Flywheel PIDV Constants
   public static final double FLYWHEEL_KP = 0.0;
@@ -25,10 +27,11 @@ public class ShooterConstants {
   public static final double HOOD_ENCODER_POSITION_CONVERSION_FACTOR = 360;
 
   public static final double ACCEL_COMP_FACTOR = 0.100; // in units of seconds
+  public static final Translation2d kShooterOffset = new Translation2d(-0.2278, 0.04319);
 
   private static final Point2D[] kHoodPoints =
       new Point2D.Double[] {
-        // (ty-angle,distance)
+        // (distance, hood angle)
         new Point2D.Double(35, 0.0),
         new Point2D.Double(55, 0.0),
         new Point2D.Double(80, 7.5), //
@@ -49,7 +52,7 @@ public class ShooterConstants {
 
   private static final Point2D[] kRPMPoints =
       new Point2D.Double[] {
-        // (ty-angle,distance)
+        // (distance, flywheel RPM)
         new Point2D.Double(35, 1500 + 10),
         new Point2D.Double(55, 1860 + 10),
         new Point2D.Double(80, 2000 + 10), //
@@ -69,7 +72,7 @@ public class ShooterConstants {
 
   private static final Point2D[] kShotTimes =
       new Point2D.Double[] {
-        // (ty-angle,time)
+        // (distance,time)
         new Point2D.Double(80, 0.78),
         new Point2D.Double(130, 0.80),
         new Point2D.Double(190, 0.81),
