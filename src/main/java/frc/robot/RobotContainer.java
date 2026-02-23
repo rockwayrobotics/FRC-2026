@@ -25,10 +25,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.shooterCommands.ShootOnMove;
-import frc.robot.subsystems.augers.Augers;
-import frc.robot.subsystems.augers.AugersIO;
-import frc.robot.subsystems.augers.AugersSim;
+import frc.robot.commands.IndexerCommands;
+import frc.robot.commands.shooterCommands.AimOnMove;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbSimKraken;
@@ -40,6 +38,9 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.drive.ModuleIOSparkAbsolute;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.indexer.IndexerIO;
+import frc.robot.subsystems.indexer.IndexerSim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeSim;
@@ -64,7 +65,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
   private final Led led;
-  private final Augers augers;
+  private final Indexer indexer;
   private final Intake intake;
   private final Shooter shooter;
   private final Climb climb;
@@ -95,7 +96,7 @@ public class RobotContainer {
                 new VisionIOPhotonVision(camera_front, robotToCameraFront),
                 new VisionIOPhotonVision(camera_back, robotToCameraBack));
 
-        augers = new Augers(new AugersSim()); // FIXME: Simulated augers for now until connected
+        indexer = new Indexer(new IndexerSim()); // FIXME: Simulated indexer for now until connected
         intake = new Intake(new IntakeSim()); // same as ^
         shooter = new Shooter(new ShooterSim());
         climb = new Climb(new ClimbSimKraken());
@@ -116,7 +117,7 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(camera_front, robotToCameraFront, drive::getPose),
                 new VisionIOPhotonVisionSim(camera_back, robotToCameraBack, drive::getPose));
 
-        augers = new Augers(new AugersSim());
+        indexer = new Indexer(new IndexerSim());
         intake = new Intake(new IntakeSim());
         shooter = new Shooter(new ShooterSim());
         climb = new Climb(new ClimbSimKraken());
@@ -132,7 +133,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-        augers = new Augers(new AugersIO() {});
+        indexer = new Indexer(new IndexerIO() {});
         intake = new Intake(new IntakeIO() {});
         shooter = new Shooter(new ShooterIO() {});
         climb = new Climb(new ClimbIO() {});
@@ -172,17 +173,17 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // FIXME: Default command is to stop the augers. If we want them to run
+    // FIXME: Default command is to stop the indexer. If we want them to run
     // continuously,
     // then we should have a command for that which is scheduled.
-    augers.setDefaultCommand(Commands.run(() -> augers.stop(), augers));
+    indexer.setDefaultCommand(Commands.run(() -> indexer.stop(), indexer));
 
     // There is no default climb command so that it continues to go to its setpoint.
   }
 
   private void configureOperatorCommands() {
-    operatorController.b().whileTrue(Commands.run(() -> augers.feed(), augers));
-    operatorController.x().whileTrue(Commands.run(() -> augers.reverse(), augers));
+    operatorController.b().whileTrue(Commands.run(() -> indexer.augersFeed(), indexer));
+    operatorController.x().whileTrue(Commands.run(() -> indexer.augersReverse(), indexer));
 
     operatorController.povDown().onTrue(Commands.runOnce(() -> climb.unclimb(), climb));
     operatorController.povUp().onTrue(Commands.runOnce(() -> climb.climb(), climb));
@@ -232,8 +233,10 @@ public class RobotContainer {
     controller
         .leftTrigger()
         .whileTrue(
-            ShootOnMove.run(
-                shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
+            Commands.parallel(
+                AimOnMove.run(
+                    shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()),
+                IndexerCommands.feedShooter(indexer, shooter, drive)));
 
     controller.povLeft().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kCCW_90deg));
     controller.povRight().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kPi));

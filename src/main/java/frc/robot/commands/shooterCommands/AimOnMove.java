@@ -23,7 +23,7 @@ import frc.robot.util.GoalUtils;
 import frc.robot.util.LinearInterpolationTable;
 import java.util.function.DoubleSupplier;
 
-public class ShootOnMove {
+public class AimOnMove {
   private static LinearInterpolationTable m_timeTable = ShooterConstants.kTimeTable;
   private static LinearInterpolationTable m_hoodTable = ShooterConstants.kHoodTable;
   private static LinearInterpolationTable m_rpmTable = ShooterConstants.kRPMTable;
@@ -41,9 +41,14 @@ public class ShootOnMove {
     angleController.enableContinuousInput(-Math.PI, Math.PI);
     return Commands.run(
             () -> {
+<<<<<<< HEAD:src/main/java/frc/robot/commands/shooterCommands/ShootOnMove.java
               Pose2d robotPose = drive.getPose();
               Translation2d fieldRelativeShooterOffset = ShooterConstants.kShooterOffset.rotateBy(robotPose.getRotation());
               Translation2d shooterLocation = robotPose.getTranslation().plus(fieldRelativeShooterOffset);
+=======
+              // FIXME: Offset this so it's where the shooter is.
+              var shooterLocation = drive.getPose().getTranslation();
+>>>>>>> 1dacbc3bf72719967d6774590064b815da04d33d:src/main/java/frc/robot/commands/shooterCommands/AimOnMove.java
               FieldRelativeSpeed robotVel = drive.getFieldRelativeSpeed();
               FieldRelativeAccel robotAccel = drive.getFieldRelativeAccel();
 
@@ -67,7 +72,7 @@ public class ShootOnMove {
 
                 Translation2d testGoalLocation = new Translation2d(virtualGoalX, virtualGoalY);
 
-                Translation2d toTestGoal = testGoalLocation.minus(drive.getPose().getTranslation());
+                Translation2d toTestGoal = testGoalLocation.minus(shooterLocation);
 
                 double newShotTime =
                     m_timeTable.getOutput(toTestGoal.getDistance(new Translation2d()));
@@ -84,18 +89,16 @@ public class ShootOnMove {
               }
 
               double newDist =
-                  movingGoalLocation
-                      .minus(drive.getPose().getTranslation())
-                      .getDistance(new Translation2d());
+                  movingGoalLocation.minus(shooterLocation).getDistance(new Translation2d());
 
               // Get linear velocity
               Translation2d linearVelocity =
                   DriveCommands.getLinearVelocityFromJoysticks(
                       xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-              Rotation2d targetAngle =
-                  movingGoalLocation.minus(drive.getPose().getTranslation()).getAngle();
+              Rotation2d targetAngle = movingGoalLocation.minus(shooterLocation).getAngle();
 
+              drive.setTargetAngle(targetAngle);
               // Calculate angular speed
               double omega =
                   angleController.calculate(

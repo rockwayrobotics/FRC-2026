@@ -11,11 +11,6 @@ public class ShooterConstants {
   public static final double FLYWHEEL_KI = 0.0;
   public static final double FLYWHEEL_KD = 0.0;
   public static final double FLYWHEEL_KV = 0.0;
-  // Kicker PIDV Constants
-  public static final double KICKER_KP = 0.0;
-  public static final double KICKER_KI = 0.0;
-  public static final double KICKER_KD = 0.0;
-  public static final double KICKER_KV = 0.0;
   // Hood PID Constants
   public static final double HOOD_KP = 0.0;
   public static final double HOOD_KI = 0.0;

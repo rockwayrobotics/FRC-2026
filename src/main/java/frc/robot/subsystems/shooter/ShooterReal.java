@@ -31,30 +31,23 @@ public class ShooterReal implements ShooterIO {
       new SparkFlex(CAN.FLYWHEEL_FOLLOWER_2, MotorType.kBrushless);
 
   private final SparkBase hood = new SparkMax(CAN.VARIABLE_HOOD, MotorType.kBrushless);
-  private final SparkBase kicker = new SparkMax(CAN.KICKER, MotorType.kBrushless);
 
   private final RelativeEncoder flywheelEncoder = flywheelLeader.getEncoder();
   private final AbsoluteEncoder hoodEncoder = hood.getAbsoluteEncoder();
-  private final RelativeEncoder kickerEncoder = kicker.getEncoder();
   private final SparkClosedLoopController flywheelLeaderController =
       flywheelLeader.getClosedLoopController();
-  private final SparkClosedLoopController flywheelFollower1Controller =
-      flywheelFollower1.getClosedLoopController();
-  private final SparkClosedLoopController flywheelFollower2Controller =
-      flywheelFollower2.getClosedLoopController();
-  private final SparkClosedLoopController kickerController = kicker.getClosedLoopController();
   private final SparkClosedLoopController hoodController = hood.getClosedLoopController();
-  private static final ClosedLoopSlot flywheelSlot = ClosedLoopSlot.kSlot0;
-  private static final ClosedLoopSlot kickerSlot = ClosedLoopSlot.kSlot1;
-  private static final ClosedLoopSlot hoodSlot = ClosedLoopSlot.kSlot2;
 
   public ShooterReal() {
     var flywheelLeaderConfig = new SparkFlexConfig();
     flywheelLeaderConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(60).voltageCompensation(12.0);
-    flywheelLeaderConfig.closedLoop.pid(
-        (ShooterConstants.FLYWHEEL_KP),
-        (ShooterConstants.FLYWHEEL_KI),
-        (ShooterConstants.FLYWHEEL_KD));
+    flywheelLeaderConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .pid(
+            (ShooterConstants.FLYWHEEL_KP),
+            (ShooterConstants.FLYWHEEL_KI),
+            (ShooterConstants.FLYWHEEL_KD));
     flywheelLeaderConfig.closedLoop.feedForward.kV(ShooterConstants.FLYWHEEL_KV);
 
     SparkUtil.tryUntilOk(
@@ -72,11 +65,6 @@ public class ShooterReal implements ShooterIO {
         .smartCurrentLimit(60)
         .voltageCompensation(12.0)
         .follow(CAN.FLYWHEEL_LEADER, true);
-    flywheelLeaderConfig.closedLoop.feedForward.kV(ShooterConstants.FLYWHEEL_KV);
-    flywheelLeaderConfig.closedLoop.pid(
-        (ShooterConstants.FLYWHEEL_KP),
-        (ShooterConstants.FLYWHEEL_KI),
-        (ShooterConstants.FLYWHEEL_KD));
     SparkUtil.tryUntilOk(
         flywheelFollower1,
         5,
@@ -93,18 +81,6 @@ public class ShooterReal implements ShooterIO {
                 flywheelFollowerConfig,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters));
-
-    var kickerConfig = new SparkMaxConfig();
-    kickerConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
-    kickerConfig.closedLoop.pid(
-        ShooterConstants.KICKER_KP, ShooterConstants.FLYWHEEL_KI, ShooterConstants.FLYWHEEL_KD);
-    kickerConfig.closedLoop.feedForward.kV(ShooterConstants.KICKER_KV);
-    SparkUtil.tryUntilOk(
-        kicker,
-        5,
-        () ->
-            kicker.configure(
-                kickerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
     var hoodConfig = new SparkMaxConfig();
     hoodConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
@@ -147,7 +123,6 @@ public class ShooterReal implements ShooterIO {
 
     SparkUtil.ifOk(hood, hoodEncoder::getPosition, (value) -> inputs.hoodPosition = value);
 
-    SparkUtil.ifOk(kicker, kickerEncoder::getVelocity, (value) -> inputs.kickerVelocity = value);
     double flywheelLeaderTemp = flywheelLeader.getMotorTemperature();
     REVLibError flywheelLeaderLastError = flywheelLeader.getLastError();
     double flywheelFollower1Temp = flywheelFollower1.getMotorTemperature();
@@ -156,8 +131,6 @@ public class ShooterReal implements ShooterIO {
     REVLibError flywheelFollower2LastError = flywheelFollower2.getLastError();
     double hoodTemp = hood.getMotorTemperature();
     REVLibError hoodLastError = hood.getLastError();
-    double kickerTemp = kicker.getMotorTemperature();
-    REVLibError kickerLastError = kicker.getLastError();
     if (flywheelLeaderLastError != REVLibError.kOk
         || flywheelLeaderTemp == 0
         || flywheelFollower1LastError != REVLibError.kOk
@@ -165,9 +138,7 @@ public class ShooterReal implements ShooterIO {
         || flywheelFollower2LastError != REVLibError.kOk
         || flywheelFollower2Temp == 0
         || hoodLastError != REVLibError.kOk
-        || hoodTemp == 0
-        || kickerLastError != REVLibError.kOk
-        || kickerTemp == 0) {
+        || hoodTemp == 0) {
       inputs.shooterStatus = false;
     } else {
       inputs.shooterStatus = true;
@@ -176,26 +147,12 @@ public class ShooterReal implements ShooterIO {
 
   @Override
   public void setVelocityFlywheel(double RPM) {
-    flywheelLeader
-        .getClosedLoopController()
-        .setSetpoint(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
-    flywheelFollower1
-        .getClosedLoopController()
-        .setSetpoint(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
-    flywheelFollower2
-        .getClosedLoopController()
-        .setSetpoint(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
-  }
-
-  @Override
-  public void setVelocityKicker(double RPM) {
-    kicker.getClosedLoopController().setSetpoint(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot2);
+    flywheelLeaderController.setSetpoint(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 
   @Override
   public void setPositionHood(Angle angle) {
-    hood.getClosedLoopController()
-        .setSetpoint(angle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot2);
+    hoodController.setSetpoint(angle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   @Override
