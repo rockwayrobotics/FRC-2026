@@ -19,4 +19,6 @@ public interface ShooterIO {
   public default void setPositionHood(Angle angle) {}
 
   public default void stopHood() {}
+
+  public default void stopFlywheel() {}
 }

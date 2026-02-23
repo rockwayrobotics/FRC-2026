@@ -37,7 +37,7 @@ public class Shooter extends SubsystemBase {
 
   public void stop() {
     shooterIO.stopHood();
-    setVelocityFlywheel(0);
+    shooterIO.stopFlywheel();
   }
 
   public double getFlywheelRPMSetpoint() {

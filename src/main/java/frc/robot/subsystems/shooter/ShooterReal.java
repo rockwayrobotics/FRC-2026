@@ -1,5 +1,6 @@
 package frc.robot.subsystems.shooter;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 
 import com.revrobotics.AbsoluteEncoder;
@@ -153,11 +154,16 @@ public class ShooterReal implements ShooterIO {
 
   @Override
   public void setPositionHood(Angle angle) {
-    hoodController.setSetpoint(ShooterConstants.kHoodAnglesTable.getOutput(angle.in(Rotations)), ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    hoodController.setSetpoint(ShooterConstants.kHoodAnglesTable.getOutput(angle.in(Degrees)), ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   @Override
   public void stopHood() {
-    hood.set(0);
+    hoodController.setSetpoint(ShooterConstants.kHoodAnglesTable.getOutput(0), ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    hood.stopMotor();
+  }
+  @Override
+  public void stopFlywheel() {
+    flywheelLeader.stopMotor();
   }
 }
