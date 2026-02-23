@@ -19,6 +19,7 @@ public class ShooterConstants {
   public static final double HOOD_FORWARD_LIMIT = 0.0;
   public static final double HOOD_REVERSE_LIMIT = 30.0;
   public static final double HOOD_ENCODER_POSITION_CONVERSION_FACTOR = 360;
+  public static final double FLYWHEEL_GEAR_RATIO = 1;
 
   public static final double ACCEL_COMP_FACTOR = 0.100; // in units of seconds
   public static final Translation2d kShooterOffset = new Translation2d(-0.2278, 0.04319);
@@ -74,6 +75,13 @@ public class ShooterConstants {
         new Point2D.Double(280, 0.83)
       };
 
-  public static final LinearInterpolationTable kTimeTable =
-      new LinearInterpolationTable(kShotTimes);
+  public static final LinearInterpolationTable kShotTimesTable = new LinearInterpolationTable(kShotTimes);
+  
+  private static final Point2D[] kHoodAngles =
+      new Point2D.Double[] {
+        // (Hood Angle, Through Bore Encoder Angle)
+        new Point2D.Double(80, 0.78),
+        new Point2D.Double(130, 0.80)
+      };
+  public static final LinearInterpolationTable kHoodAnglesTable = new LinearInterpolationTable(kHoodAngles);
 }

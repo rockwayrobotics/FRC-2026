@@ -147,12 +147,12 @@ public class ShooterReal implements ShooterIO {
 
   @Override
   public void setVelocityFlywheel(double RPM) {
-    flywheelLeaderController.setSetpoint(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    flywheelLeaderController.setSetpoint(RPM * ShooterConstants.FLYWHEEL_GEAR_RATIO, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 
   @Override
   public void setPositionHood(Angle angle) {
-    hoodController.setSetpoint(angle.in(Rotations), ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    hoodController.setSetpoint(ShooterConstants.kHoodAnglesTable.getOutput(angle.in(Rotations)), ControlType.kPosition, ClosedLoopSlot.kSlot0);
   }
 
   @Override

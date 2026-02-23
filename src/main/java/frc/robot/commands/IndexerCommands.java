@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.util.GameHubStatus;
 
 public class IndexerCommands {
   public static final double FLYWHEEL_RPM_TOLERANCE = 100;
@@ -16,9 +17,11 @@ public class IndexerCommands {
             Commands.waitUntil(() -> shooter.atFlywheelSetpoint(FLYWHEEL_RPM_TOLERANCE)),
             Commands.run(
                 () -> {
-                  if (drive.pointedAtTargetAngle(HEADING_TOLERANCE_DEGREES)) && (GameHubStatus.isHubActive()){
-                    indexer.augersFeed();
-                    indexer.setVelocityKicker(KICKER_LOAD_RPM);
+                  if (drive.pointedAtTargetAngle(HEADING_TOLERANCE_DEGREES)){
+                    if (GameHubStatus.isHubActive()) { 
+                      indexer.augersFeed();
+                      indexer.setVelocityKicker(KICKER_LOAD_RPM);
+                    }
                   } else {
                     indexer.stop();
                   }

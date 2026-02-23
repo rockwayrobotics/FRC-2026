@@ -24,7 +24,7 @@ import frc.robot.util.LinearInterpolationTable;
 import java.util.function.DoubleSupplier;
 
 public class AimOnMove {
-  private static LinearInterpolationTable m_timeTable = ShooterConstants.kTimeTable;
+  private static LinearInterpolationTable m_timeTable = ShooterConstants.kShotTimesTable;
   private static LinearInterpolationTable m_hoodTable = ShooterConstants.kHoodTable;
   private static LinearInterpolationTable m_rpmTable = ShooterConstants.kRPMTable;
 
