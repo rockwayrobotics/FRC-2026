@@ -1,9 +1,8 @@
 package frc.robot.subsystems.shooter;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.util.LinearInterpolationTable;
 import java.awt.geom.Point2D;
-
-import edu.wpi.first.math.geometry.Translation2d;
 
 public class ShooterConstants {
   // Flywheel PIDV Constants

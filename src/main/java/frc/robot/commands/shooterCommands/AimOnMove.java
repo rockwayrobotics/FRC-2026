@@ -41,14 +41,11 @@ public class AimOnMove {
     angleController.enableContinuousInput(-Math.PI, Math.PI);
     return Commands.run(
             () -> {
-<<<<<<< HEAD:src/main/java/frc/robot/commands/shooterCommands/ShootOnMove.java
               Pose2d robotPose = drive.getPose();
-              Translation2d fieldRelativeShooterOffset = ShooterConstants.kShooterOffset.rotateBy(robotPose.getRotation());
-              Translation2d shooterLocation = robotPose.getTranslation().plus(fieldRelativeShooterOffset);
-=======
-              // FIXME: Offset this so it's where the shooter is.
-              var shooterLocation = drive.getPose().getTranslation();
->>>>>>> 1dacbc3bf72719967d6774590064b815da04d33d:src/main/java/frc/robot/commands/shooterCommands/AimOnMove.java
+              Translation2d fieldRelativeShooterOffset =
+                  ShooterConstants.kShooterOffset.rotateBy(robotPose.getRotation());
+              Translation2d shooterLocation =
+                  robotPose.getTranslation().plus(fieldRelativeShooterOffset);
               FieldRelativeSpeed robotVel = drive.getFieldRelativeSpeed();
               FieldRelativeAccel robotAccel = drive.getFieldRelativeAccel();
 

@@ -35,14 +35,14 @@ public final class Constants {
 
   public static final class CAN {
     // Drive
-    public static final int FL_DRIVE_DEV = 3;
-    public static final int FL_TURN_DEV = 9;
-    public static final int FR_DRIVE_DEV = 5;
-    public static final int FR_TURN_DEV = 6;
-    public static final int BL_DRIVE_DEV = 4;
-    public static final int BL_TURN_DEV = 7;
-    public static final int BR_DRIVE_DEV = 2;
-    public static final int BR_TURN_DEV = 8;
+    public static final int FL_DRIVE = 3;
+    public static final int FL_TURN = 9;
+    public static final int FR_DRIVE = 5;
+    public static final int FR_TURN = 6;
+    public static final int BL_DRIVE = 4;
+    public static final int BL_TURN = 7;
+    public static final int BR_DRIVE = 2;
+    public static final int BR_TURN = 8;
 
     // Indexer
     public static final int AUGER = 10;

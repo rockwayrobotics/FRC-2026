@@ -28,6 +28,7 @@ public class Shooter extends SubsystemBase {
     shooterIO.setVelocityFlywheel(RPM);
     flywheelRPMSetpoint = RPM;
   }
+
   public void setPositionHood(Angle angle) {
     Logger.recordOutput("Shooter/HoodAngle", angle.in(Degrees));
     Logger.recordOutput("Shooter/HoodAngleDashboard", angle.in(Degrees) + 0);

@@ -91,8 +91,8 @@ public class DriveConstants {
   public static final SwerveModuleConfig[] swerveModuleConfigsComp = {
     // FL
     SwerveModuleConfig.builder()
-        .driveMotorId(CAN.FL_DRIVE_COMP)
-        .turnMotorId(CAN.FL_TURN_COMP)
+        .driveMotorId(CAN.FL_DRIVE)
+        .turnMotorId(CAN.FL_TURN)
         .encoderChannel(0)
         .encoderOffset(Rotation2d.fromRadians(0)) // 1.439 + Math.PI / 4))
         .turnInverted(true)
@@ -100,8 +100,8 @@ public class DriveConstants {
         .build(),
     // FR
     SwerveModuleConfig.builder()
-        .driveMotorId(CAN.FR_DRIVE_COMP)
-        .turnMotorId(CAN.FR_TURN_COMP)
+        .driveMotorId(CAN.FR_DRIVE)
+        .turnMotorId(CAN.FR_TURN)
         .encoderChannel(1)
         .encoderOffset(Rotation2d.fromRadians(0)) // -3.127 - Math.PI / 4))
         .turnInverted(true)
@@ -109,8 +109,8 @@ public class DriveConstants {
         .build(),
     // BL
     SwerveModuleConfig.builder()
-        .driveMotorId(CAN.BL_DRIVE_COMP)
-        .turnMotorId(CAN.BL_TURN_COMP)
+        .driveMotorId(CAN.BL_DRIVE)
+        .turnMotorId(CAN.BL_TURN)
         .encoderChannel(2)
         .encoderOffset(Rotation2d.fromRadians(0)) // 2.651 + 3 * Math.PI / 4))
         .turnInverted(true)
@@ -118,8 +118,8 @@ public class DriveConstants {
         .build(),
     // BR
     SwerveModuleConfig.builder()
-        .driveMotorId(CAN.BR_DRIVE_COMP)
-        .turnMotorId(CAN.BR_TURN_COMP)
+        .driveMotorId(CAN.BR_DRIVE)
+        .turnMotorId(CAN.BR_TURN)
         .encoderChannel(3)
         .encoderOffset(Rotation2d.fromRadians(0)) // -1.94 - 3 * Math.PI / 4))
         .turnInverted(true)
@@ -130,8 +130,8 @@ public class DriveConstants {
   public static final SwerveModuleConfig[] swerveModuleConfigsDev = {
     // FL
     SwerveModuleConfig.builder()
-        .driveMotorId(CAN.FL_DRIVE_DEV)
-        .turnMotorId(CAN.FL_TURN_DEV)
+        .driveMotorId(CAN.FL_DRIVE)
+        .turnMotorId(CAN.FL_TURN)
         .encoderChannel(0) // 2
         .absoluteEncoder(false)
         .encoderOffset(Rotation2d.fromRadians(0))
@@ -142,8 +142,8 @@ public class DriveConstants {
         .build(),
     // FR
     SwerveModuleConfig.builder()
-        .driveMotorId(CAN.FR_DRIVE_DEV)
-        .turnMotorId(CAN.FR_TURN_DEV)
+        .driveMotorId(CAN.FR_DRIVE)
+        .turnMotorId(CAN.FR_TURN)
         .encoderChannel(1)
         .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
@@ -153,8 +153,8 @@ public class DriveConstants {
         .build(),
     // BL
     SwerveModuleConfig.builder()
-        .driveMotorId(CAN.BL_DRIVE_DEV)
-        .turnMotorId(CAN.BL_TURN_DEV)
+        .driveMotorId(CAN.BL_DRIVE)
+        .turnMotorId(CAN.BL_TURN)
         .encoderChannel(3)
         .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
@@ -164,8 +164,8 @@ public class DriveConstants {
         .build(),
     // BR
     SwerveModuleConfig.builder()
-        .driveMotorId(CAN.BR_DRIVE_DEV)
-        .turnMotorId(CAN.BR_TURN_DEV)
+        .driveMotorId(CAN.BR_DRIVE)
+        .turnMotorId(CAN.BR_TURN)
         .encoderChannel(2)
         .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
