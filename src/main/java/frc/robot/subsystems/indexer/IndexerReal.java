@@ -48,6 +48,8 @@ public class IndexerReal implements IndexerIO {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(IndexerConstants.KICKER_KP, IndexerConstants.KICKER_KI, IndexerConstants.KICKER_KD);
     kickerConfig.closedLoop.feedForward.kV(IndexerConstants.KICKER_KV);
+
+    kickerConfig.encoder.velocityConversionFactor(1.0 / IndexerConstants.KICKER_GEAR_RATIO);
     SparkUtil.tryUntilOk(
         kickerMotor,
         5,

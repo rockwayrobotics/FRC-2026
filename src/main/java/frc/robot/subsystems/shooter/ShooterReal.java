@@ -20,6 +20,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.Constants.CAN;
+import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.util.SparkUtil;
 import java.util.function.DoubleSupplier;
 
@@ -49,7 +50,7 @@ public class ShooterReal implements ShooterIO {
             (ShooterConstants.FLYWHEEL_KI),
             (ShooterConstants.FLYWHEEL_KD));
     flywheelLeaderConfig.closedLoop.feedForward.kV(ShooterConstants.FLYWHEEL_KV);
-
+    flywheelLeaderConfig.encoder.velocityConversionFactor(1.0 / ShooterConstants.FLYWHEEL_GEAR_RATIO);
     SparkUtil.tryUntilOk(
         flywheelLeader,
         5,
@@ -147,7 +148,7 @@ public class ShooterReal implements ShooterIO {
 
   @Override
   public void setVelocityFlywheel(double RPM) {
-    flywheelLeaderController.setSetpoint(RPM * ShooterConstants.FLYWHEEL_GEAR_RATIO, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    flywheelLeaderController.setSetpoint(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
 
   @Override
