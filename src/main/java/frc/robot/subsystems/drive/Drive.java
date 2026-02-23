@@ -73,6 +73,8 @@ public class Drive extends SubsystemBase {
   private FieldRelativeSpeed lastFieldRelVel = new FieldRelativeSpeed();
   private FieldRelativeAccel fieldRelAccel = new FieldRelativeAccel();
 
+  private Rotation2d targetAngle = new Rotation2d();
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -352,5 +354,13 @@ public class Drive extends SubsystemBase {
 
   public FieldRelativeAccel getFieldRelativeAccel() {
     return fieldRelAccel;
+  }
+
+  public void setTargetAngle(Rotation2d target) {
+    targetAngle = target;
+  }
+
+  public boolean pointedAtTargetAngle(double toleranceDegrees) {
+    return Math.abs(this.getRotation().minus(targetAngle).getDegrees()) < toleranceDegrees;
   }
 }

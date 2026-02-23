@@ -9,15 +9,12 @@ public interface ShooterIO {
     public double flywheelVelocity = 0.0;
     public double flywheelAppliedVolts = 0.0;
     public double hoodPosition = 0.0;
-    public double kickerVelocity = 0.0;
     public boolean shooterStatus = false;
   }
 
   public default void updateInputs(ShooterIOInputs inputs) {}
 
   public default void setVelocityFlywheel(double RPM) {}
-
-  public default void setVelocityKicker(double RPM) {}
 
   public default void setPositionHood(Angle angle) {}
 
