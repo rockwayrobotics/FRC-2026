@@ -7,14 +7,18 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.subsystems.vision.VisionConstants.camera_back;
 import static frc.robot.subsystems.vision.VisionConstants.camera_front;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraBack;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraFront;
 
+import java.security.PrivateKey;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,9 +28,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IndexerCommands;
-import frc.robot.commands.shooterCommands.AimOnMove;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbSimKraken;
@@ -46,6 +50,7 @@ import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeSim;
 import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.vision.Vision;
@@ -184,11 +189,16 @@ public class RobotContainer {
   private void configureOperatorCommands() {
     operatorController.b().whileTrue(Commands.run(() -> indexer.augersFeed(), indexer));
     operatorController.x().whileTrue(Commands.run(() -> indexer.augersReverse(), indexer));
+    operatorController.x().whileTrue(Commands.run(() -> indexer.setVelocityKicker(100), indexer));
 
     operatorController.povDown().onTrue(Commands.runOnce(() -> climb.unclimb(), climb));
     operatorController.povUp().onTrue(Commands.runOnce(() -> climb.climb(), climb));
     operatorController.povRight().onTrue(Commands.runOnce(() -> climb.extend(), climb));
     operatorController.povLeft().onTrue(Commands.runOnce(() -> climb.retract(), climb));
+
+    operatorController.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200), shooter));
+    operatorController.y().whileTrue(Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(0, Degrees)), shooter));
+    operatorController.povCenter().whileTrue(Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(30, Degrees)), shooter));
   }
 
   /**
@@ -234,7 +244,7 @@ public class RobotContainer {
         .leftTrigger()
         .whileTrue(
             Commands.parallel(
-                AimOnMove.run(
+                ShooterCommands.aimOnMove(
                     shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()),
                 IndexerCommands.feedShooter(indexer, shooter, drive)));
 

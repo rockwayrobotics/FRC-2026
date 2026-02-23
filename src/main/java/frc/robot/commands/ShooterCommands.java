@@ -1,4 +1,4 @@
-package frc.robot.commands.shooterCommands;
+package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
 
@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
@@ -23,12 +22,12 @@ import frc.robot.util.GoalUtils;
 import frc.robot.util.LinearInterpolationTable;
 import java.util.function.DoubleSupplier;
 
-public class AimOnMove {
+public class ShooterCommands {
   private static LinearInterpolationTable m_timeTable = ShooterConstants.kShotTimesTable;
   private static LinearInterpolationTable m_hoodTable = ShooterConstants.kHoodTable;
   private static LinearInterpolationTable m_rpmTable = ShooterConstants.kRPMTable;
 
-  public static Command run(
+  public static Command aimOnMove(
       Shooter shooter, Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
     // Create PID controller
     ProfiledPIDController angleController =
