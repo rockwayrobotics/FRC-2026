@@ -75,13 +75,15 @@ public class ShooterConstants {
         new Point2D.Double(280, 0.83)
       };
 
-  public static final LinearInterpolationTable kShotTimesTable = new LinearInterpolationTable(kShotTimes);
-  
+  public static final LinearInterpolationTable kShotTimesTable =
+      new LinearInterpolationTable(kShotTimes);
+
   private static final Point2D[] kHoodAngles =
       new Point2D.Double[] {
         // (Hood Angle, Through Bore Encoder Angle)
-        new Point2D.Double(80, 0.78),
-        new Point2D.Double(130, 0.80)
+        new Point2D.Double(15, 319.32),
+        new Point2D.Double(145, 268.92)
       };
-  public static final LinearInterpolationTable kHoodAnglesTable = new LinearInterpolationTable(kHoodAngles);
+  public static final LinearInterpolationTable kHoodAnglesTable =
+      new LinearInterpolationTable(kHoodAngles);
 }
