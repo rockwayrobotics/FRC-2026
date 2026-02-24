@@ -11,6 +11,7 @@ public class IndexerCommands {
   public static final double FLYWHEEL_RPM_TOLERANCE = 100;
   public static final double HEADING_TOLERANCE_DEGREES = 5;
   public static final double KICKER_LOAD_RPM = 2000;
+  public static boolean isShooting = false;
 
   public static Command feedShooter(Indexer indexer, Shooter shooter, Drive drive) {
     return Commands.sequence(
@@ -21,9 +22,11 @@ public class IndexerCommands {
                     if (GameHubStatus.isHubActive()) { 
                       indexer.augersFeed();
                       indexer.setVelocityKicker(KICKER_LOAD_RPM);
+                      isShooting = true;
                     }
                   } else {
                     indexer.stop();
+                    isShooting = false;
                   }
                 },
                 indexer))

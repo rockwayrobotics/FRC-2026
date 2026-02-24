@@ -13,8 +13,6 @@ import static frc.robot.subsystems.vision.VisionConstants.camera_front;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraBack;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraFront;
 
-import java.security.PrivateKey;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -50,7 +48,6 @@ import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeSim;
 import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.vision.Vision;
