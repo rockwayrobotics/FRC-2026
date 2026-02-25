@@ -37,6 +37,8 @@ public class ShooterReal implements ShooterIO {
   private final SparkClosedLoopController flywheelLeaderController =
       flywheelLeader.getClosedLoopController();
   private final SparkClosedLoopController hoodController = hood.getClosedLoopController();
+  private static final ClosedLoopSlot normalSlot = ClosedLoopSlot.kSlot0;
+  private static final ClosedLoopSlot agressiveSlot = ClosedLoopSlot.kSlot1;
 
   public ShooterReal() {
     var flywheelLeaderConfig = new SparkFlexConfig();
@@ -45,10 +47,12 @@ public class ShooterReal implements ShooterIO {
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .pid(
-            (ShooterConstants.FLYWHEEL_KP),
-            (ShooterConstants.FLYWHEEL_KI),
-            (ShooterConstants.FLYWHEEL_KD));
-    flywheelLeaderConfig.closedLoop.feedForward.kV(ShooterConstants.FLYWHEEL_KV);
+            (ShooterConstants.FLYWHEEL_NORMAL_KP),
+            (ShooterConstants.FLYWHEEL_NORMAL_KI),
+            (ShooterConstants.FLYWHEEL_AGGRESIVE_KD), normalSlot)
+        .pid(ShooterConstants.FLYWHEEL_AGGRESIVE_KP, ShooterConstants.FLYWHEEL_AGGRESIVE_KI, ShooterConstants.FLYWHEEL_AGGRESIVE_KD, agressiveSlot);
+    flywheelLeaderConfig.closedLoop.feedForward.kV(ShooterConstants.FLYWHEEL_NORMAL_KV, normalSlot);
+    flywheelLeaderConfig.closedLoop.feedForward.kV(ShooterConstants.FLYWHEEL_AGGRESIVE_KV, agressiveSlot);
     flywheelLeaderConfig.encoder.velocityConversionFactor(1.0 / ShooterConstants.FLYWHEEL_GEAR_RATIO);
     SparkUtil.tryUntilOk(
         flywheelLeader,
@@ -148,6 +152,10 @@ public class ShooterReal implements ShooterIO {
   @Override
   public void setVelocityFlywheel(double RPM) {
     flywheelLeaderController.setSetpoint(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+  }
+  @Override
+  public void setVelocityFlywheelAgressivePID(double RPM) {
+    flywheelLeaderController.setSetpoint(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
   }
 
   @Override

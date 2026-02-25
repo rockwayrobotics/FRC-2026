@@ -6,10 +6,15 @@ import java.awt.geom.Point2D;
 
 public class ShooterConstants {
   // Flywheel PIDV Constants
-  public static final double FLYWHEEL_KP = 0.0;
-  public static final double FLYWHEEL_KI = 0.0;
-  public static final double FLYWHEEL_KD = 0.0;
-  public static final double FLYWHEEL_KV = 0.0;
+  public static final double FLYWHEEL_NORMAL_KP = 0.0;
+  public static final double FLYWHEEL_NORMAL_KI = 0.0;
+  public static final double FLYWHEEL_NORMAL_KD = 0.0;
+  public static final double FLYWHEEL_NORMAL_KV = 0.0;
+
+  public static final double FLYWHEEL_AGGRESIVE_KP = 0.0;
+  public static final double FLYWHEEL_AGGRESIVE_KI = 0.0;
+  public static final double FLYWHEEL_AGGRESIVE_KD = 0.0;
+  public static final double FLYWHEEL_AGGRESIVE_KV = 0.0;
   // Hood PID Constants
   public static final double HOOD_KP = 0.0;
   public static final double HOOD_KI = 0.0;

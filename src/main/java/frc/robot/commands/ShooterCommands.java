@@ -126,7 +126,7 @@ public class ShooterCommands {
                * SmartDashboard.getNumber("SetHoodAdjust", 0));
                * } else {
                */
-              shooter.setVelocityFlywheel(m_rpmTable.getOutput(newDist));
+              shooter.setVelocityFlywheelNormalPID(m_rpmTable.getOutput(newDist));
               Angle hoodAngleAsAngle = Degrees.of(m_hoodTable.getOutput(newDist));
               shooter.setPositionHood(hoodAngleAsAngle);
 

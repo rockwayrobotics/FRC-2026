@@ -16,6 +16,8 @@ public interface ShooterIO {
 
   public default void setVelocityFlywheel(double RPM) {}
 
+  public default void setVelocityFlywheelAgressivePID(double RPM) {}
+
   public default void setPositionHood(Angle angle) {}
 
   public default void stopHood() {}

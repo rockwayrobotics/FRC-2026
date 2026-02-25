@@ -23,7 +23,12 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs("Shooter", shooterInputs);
   }
 
-  public void setVelocityFlywheel(double RPM) {
+  public void setVelocityFlywheelNormalPID(double RPM) {
+    Logger.recordOutput("Shooter/ShooterVelocityRPM", RPM);
+    shooterIO.setVelocityFlywheel(RPM);
+    flywheelRPMSetpoint = RPM;
+  }
+  public void setVelocityFlywheelAgressivePID(double RPM) {
     Logger.recordOutput("Shooter/ShooterVelocityRPM", RPM);
     shooterIO.setVelocityFlywheel(RPM);
     flywheelRPMSetpoint = RPM;

@@ -193,7 +193,7 @@ public class RobotContainer {
     operatorController.povRight().onTrue(Commands.runOnce(() -> climb.extend(), climb));
     operatorController.povLeft().onTrue(Commands.runOnce(() -> climb.retract(), climb));
 
-    operatorController.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200), shooter));
+    operatorController.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheelNormalPID(200), shooter));
     operatorController.y().whileTrue(Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(0, Degrees)), shooter));
     operatorController.povCenter().whileTrue(Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(30, Degrees)), shooter));
   }
