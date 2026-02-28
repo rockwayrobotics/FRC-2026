@@ -88,55 +88,15 @@ public class DriveConstants {
               1),
           moduleTranslations);
 
-  public static final SwerveModuleConfig[] swerveModuleConfigsComp = {
+  public static final SwerveModuleConfig[] swerveModuleConfigs = {
     // FL
     SwerveModuleConfig.builder()
         .driveMotorId(CAN.FL_DRIVE)
         .turnMotorId(CAN.FL_TURN)
         .encoderChannel(0)
-        .encoderOffset(Rotation2d.fromRadians(0)) // 1.439 + Math.PI / 4))
-        .turnInverted(true)
-        .encoderInverted(false)
-        .build(),
-    // FR
-    SwerveModuleConfig.builder()
-        .driveMotorId(CAN.FR_DRIVE)
-        .turnMotorId(CAN.FR_TURN)
-        .encoderChannel(1)
-        .encoderOffset(Rotation2d.fromRadians(0)) // -3.127 - Math.PI / 4))
-        .turnInverted(true)
-        .encoderInverted(false)
-        .build(),
-    // BL
-    SwerveModuleConfig.builder()
-        .driveMotorId(CAN.BL_DRIVE)
-        .turnMotorId(CAN.BL_TURN)
-        .encoderChannel(2)
-        .encoderOffset(Rotation2d.fromRadians(0)) // 2.651 + 3 * Math.PI / 4))
-        .turnInverted(true)
-        .encoderInverted(false)
-        .build(),
-    // BR
-    SwerveModuleConfig.builder()
-        .driveMotorId(CAN.BR_DRIVE)
-        .turnMotorId(CAN.BR_TURN)
-        .encoderChannel(3)
-        .encoderOffset(Rotation2d.fromRadians(0)) // -1.94 - 3 * Math.PI / 4))
-        .turnInverted(true)
-        .encoderInverted(false)
-        .build()
-  };
-
-  public static final SwerveModuleConfig[] swerveModuleConfigsDev = {
-    // FL
-    SwerveModuleConfig.builder()
-        .driveMotorId(CAN.FL_DRIVE)
-        .turnMotorId(CAN.FL_TURN)
-        .encoderChannel(0) // 2
         .absoluteEncoder(false)
-        .encoderOffset(Rotation2d.fromRadians(0))
-        // .encoderOffset(Rotation2d.fromRadians(1.451 + Math.PI / 4)) // Saturday
-        // .encoderOffset(Rotation2d.fromRadians(1.431 + Math.PI / 4)) // Friday night
+        // .encoderOffset(Rotation2d.fromRadians(0))
+        .encoderOffset(Rotation2d.fromRadians(-3.8368 + Math.PI / 4))
         .turnInverted(true)
         .encoderInverted(false)
         .build(),
@@ -147,7 +107,7 @@ public class DriveConstants {
         .encoderChannel(1)
         .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
-        .encoderOffset(Rotation2d.fromRadians(0.5425 - Math.PI / 4))
+        .encoderOffset(Rotation2d.fromRadians(-1.924 - Math.PI / 4))
         .turnInverted(true)
         .encoderInverted(false)
         .build(),
@@ -158,7 +118,7 @@ public class DriveConstants {
         .encoderChannel(3)
         .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
-        .encoderOffset(Rotation2d.fromRadians(-3.0377 + 3 * Math.PI / 4))
+        .encoderOffset(Rotation2d.fromRadians(-3.054 + 3 * Math.PI / 4))
         .turnInverted(true)
         .encoderInverted(false)
         .build(),
@@ -169,8 +129,7 @@ public class DriveConstants {
         .encoderChannel(2)
         .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
-        .encoderOffset(Rotation2d.fromRadians(0.815 - 3 * Math.PI / 4)) // Saturday
-        // .encoderOffset(Rotation2d.fromRadians(0.792 - 3 * Math.PI / 4)) // Friday night
+        .encoderOffset(Rotation2d.fromRadians(-4.836 - 3 * Math.PI / 4))
         .turnInverted(true)
         .encoderInverted(false)
         .build()

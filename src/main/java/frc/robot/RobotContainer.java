@@ -26,9 +26,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IndexerCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbSimKraken;
@@ -39,7 +39,6 @@ import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
-import frc.robot.subsystems.drive.ModuleIOSparkAbsolute;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.IndexerIO;
 import frc.robot.subsystems.indexer.IndexerSim;
@@ -88,10 +87,10 @@ public class RobotContainer {
         drive =
             new Drive(
                 new GyroIONavX(),
-                new ModuleIOSparkAbsolute(DriveConstants.swerveModuleConfigsDev[0]), // FL
-                new ModuleIOSpark(DriveConstants.swerveModuleConfigsDev[1]), // FR
-                new ModuleIOSpark(DriveConstants.swerveModuleConfigsDev[2]), // BL
-                new ModuleIOSpark(DriveConstants.swerveModuleConfigsDev[3])); // BR
+                new ModuleIOSpark(DriveConstants.swerveModuleConfigs[0]), // FL
+                new ModuleIOSpark(DriveConstants.swerveModuleConfigs[1]), // FR
+                new ModuleIOSpark(DriveConstants.swerveModuleConfigs[2]), // BL
+                new ModuleIOSpark(DriveConstants.swerveModuleConfigs[3])); // BR
         vision =
             new Vision(
                 drive::addVisionMeasurement,
@@ -194,8 +193,14 @@ public class RobotContainer {
     operatorController.povLeft().onTrue(Commands.runOnce(() -> climb.retract(), climb));
 
     operatorController.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200), shooter));
-    operatorController.y().whileTrue(Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(0, Degrees)), shooter));
-    operatorController.povCenter().whileTrue(Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(30, Degrees)), shooter));
+    operatorController
+        .y()
+        .whileTrue(
+            Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(0, Degrees)), shooter));
+    operatorController
+        .povCenter()
+        .whileTrue(
+            Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(30, Degrees)), shooter));
   }
 
   /**
@@ -208,16 +213,9 @@ public class RobotContainer {
     configureDefaultCommands();
     configureOperatorCommands();
 
-    // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
-
+    controller.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200), shooter));
+    controller.rightBumper().whileTrue(Commands.run(() -> indexer.setVelocityKicker(100), indexer));
+    controller.leftBumper().whileTrue(Commands.run(() -> indexer.augersFeed(), indexer));
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 

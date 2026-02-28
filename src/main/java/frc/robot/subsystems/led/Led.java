@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.IndexerCommands;
-import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.GameHubStatus;
 
 public class Led extends SubsystemBase {
@@ -27,27 +26,26 @@ public class Led extends SubsystemBase {
 
     setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack)).withName("Off"));
   }
+
   @Override
   public void periodic() {
     led.setData(buffer);
     if (DriverStation.isAutonomous()) {
-        double timeLeft = Timer.getMatchTime();
+      double timeLeft = Timer.getMatchTime();
 
-        // 1. Priority: Auto Ending (Last 5 seconds)
-        if (timeLeft < 5.0 && timeLeft > 0) {
-            this.setEndStrobe(Color.kGold); 
-        } 
-        else if (GameHubStatus.isHubActive()) {
-            this.setColor(Color.kCyan); // Hub Active
+      // 1. Priority: Auto Ending (Last 5 seconds)
+      if (timeLeft < 5.0 && timeLeft > 0) {
+        this.setEndStrobe(Color.kGold);
+      } else if (GameHubStatus.isHubActive()) {
+        this.setColor(Color.kCyan); // Hub Active
         if (IndexerCommands.isShooting) {
-            this.setColor(Color.kDarkCyan);  // Shooting
-        } 
-        } else {
-            this.setColor(Color.kMagenta); // Inactive 
+          this.setColor(Color.kDarkCyan); // Shooting
         }
+      } else {
+        this.setColor(Color.kMagenta); // Inactive
       }
-   
-}
+    }
+  }
 
   public Command runPattern(LEDPattern pattern) {
     return run(() -> pattern.applyTo(buffer));
@@ -61,29 +59,28 @@ public class Led extends SubsystemBase {
   public void setColourRGB(double r, double g, double b) {
     setColour(new Color(r, g, b));
   }
+
   public void setColor(Color color) {
     for (var i = 0; i < buffer.getLength(); i++) {
-        buffer.setLED(i, color);
+      buffer.setLED(i, color);
     }
     led.setData(buffer);
-}
+  }
 
-/** 
- * Flashes the LEDs between a color and Black.
- * 0.1s on, 0.1s off (adjust the 0.2 for speed)
- */
-public void setStrobe(Color color) {
+  /** Flashes the LEDs between a color and Black. 0.1s on, 0.1s off (adjust the 0.2 for speed) */
+  public void setStrobe(Color color) {
     if ((Timer.getFPGATimestamp() % 0.2) > 0.1) {
-        setColor(color);
+      setColor(color);
     } else {
-        setColor(Color.kBlack); // "Off" state
+      setColor(Color.kBlack); // "Off" state
     }
-}
-public void setEndStrobe(Color color) {
+  }
+
+  public void setEndStrobe(Color color) {
     if ((Timer.getFPGATimestamp() % 0.2) > 0.1) {
-        setColor(color);
+      setColor(color);
     } else {
-        setColor(Color.kBlack); // "Off" state
+      setColor(Color.kBlack); // "Off" state
     }
-}
+  }
 }

@@ -138,7 +138,6 @@ public class ShooterCommands {
         .finallyDo(
             () -> {
               shooter.stop();
-
             });
   }
 }

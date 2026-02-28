@@ -18,8 +18,8 @@ public class IndexerCommands {
             Commands.waitUntil(() -> shooter.atFlywheelSetpoint(FLYWHEEL_RPM_TOLERANCE)),
             Commands.run(
                 () -> {
-                  if (drive.pointedAtTargetAngle(HEADING_TOLERANCE_DEGREES)){
-                    if (GameHubStatus.isHubActive()) { 
+                  if (drive.pointedAtTargetAngle(HEADING_TOLERANCE_DEGREES)) {
+                    if (GameHubStatus.isHubActive()) {
                       indexer.augersFeed();
                       indexer.setVelocityKicker(KICKER_LOAD_RPM);
                       isShooting = true;

@@ -6,20 +6,19 @@ import java.awt.geom.Point2D;
 
 public class ShooterConstants {
   // Flywheel PIDV Constants
-  public static final double FLYWHEEL_KP = 0.0;
+  public static final double FLYWHEEL_KP = 0.001;
   public static final double FLYWHEEL_KI = 0.0;
-  public static final double FLYWHEEL_KD = 0.0;
-  public static final double FLYWHEEL_KV = 0.0;
+  public static final double FLYWHEEL_KD = 0.05;
+  public static final double FLYWHEEL_KV = 0.00117;
   // Hood PID Constants
   public static final double HOOD_KP = 0.0;
   public static final double HOOD_KI = 0.0;
   public static final double HOOD_KD = 0.0;
 
-  // FIXME: These constants are entirely made up.
   public static final double HOOD_FORWARD_LIMIT = 0.0;
   public static final double HOOD_REVERSE_LIMIT = 30.0;
   public static final double HOOD_ENCODER_POSITION_CONVERSION_FACTOR = 360;
-  public static final double FLYWHEEL_GEAR_RATIO = 1;
+  public static final double FLYWHEEL_GEAR_RATIO = 0.5;
 
   public static final double ACCEL_COMP_FACTOR = 0.100; // in units of seconds
   public static final Translation2d kShooterOffset = new Translation2d(-0.2278, 0.04319);
@@ -81,8 +80,7 @@ public class ShooterConstants {
   private static final Point2D[] kHoodAngles =
       new Point2D.Double[] {
         // (Hood Angle, Through Bore Encoder Angle)
-        new Point2D.Double(15, 319.32),
-        new Point2D.Double(145, 268.92)
+        new Point2D.Double(15, 319.32), new Point2D.Double(145, 268.92)
       };
   public static final LinearInterpolationTable kHoodAnglesTable =
       new LinearInterpolationTable(kHoodAngles);

@@ -49,7 +49,8 @@ public class ShooterReal implements ShooterIO {
             (ShooterConstants.FLYWHEEL_KI),
             (ShooterConstants.FLYWHEEL_KD));
     flywheelLeaderConfig.closedLoop.feedForward.kV(ShooterConstants.FLYWHEEL_KV);
-    flywheelLeaderConfig.encoder.velocityConversionFactor(1.0 / ShooterConstants.FLYWHEEL_GEAR_RATIO);
+    flywheelLeaderConfig.encoder.velocityConversionFactor(
+        1.0 / ShooterConstants.FLYWHEEL_GEAR_RATIO);
     SparkUtil.tryUntilOk(
         flywheelLeader,
         5,
@@ -152,14 +153,21 @@ public class ShooterReal implements ShooterIO {
 
   @Override
   public void setPositionHood(Angle angle) {
-    hoodController.setSetpoint(ShooterConstants.kHoodAnglesTable.getOutput(angle.in(Degrees)), ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    hoodController.setSetpoint(
+        ShooterConstants.kHoodAnglesTable.getOutput(angle.in(Degrees)),
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0);
   }
 
   @Override
   public void stopHood() {
-    hoodController.setSetpoint(ShooterConstants.kHoodAnglesTable.getOutput(0), ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    hoodController.setSetpoint(
+        ShooterConstants.kHoodAnglesTable.getOutput(0),
+        ControlType.kPosition,
+        ClosedLoopSlot.kSlot0);
     hood.stopMotor();
   }
+
   @Override
   public void stopFlywheel() {
     flywheelLeader.stopMotor();
