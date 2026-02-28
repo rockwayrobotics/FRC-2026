@@ -5,8 +5,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface IndexerIO {
   @AutoLog
   public static class IndexerIOInputs {
-    public double velocityRPM = 0.0;
-    public double appliedVolts = 0.0;
+    public double augerVelocityRPM = 0.0;
+    public double augerAppliedVolts = 0.0;
     public double kickerVelocity = 0.0;
     public boolean indexerStatus = false;
   }
@@ -15,7 +15,7 @@ public interface IndexerIO {
 
   public default void stop() {}
 
-  public default void setVelocityAugers(double voltage) {}
+  public default void setVelocityAugers(double RPM) {}
 
   public default void setVelocityKicker(double RPM) {}
 }

@@ -69,7 +69,7 @@ public class ClimbSimKraken implements ClimbIO {
   }
 
   @Override
-  public void setPose(double pose, boolean fast) {
+  public void setPos(double pose, boolean fast) {
     pose = (Math.PI * 2 * pose);
     // simMotor.setMotorType(MotorType.KrakenX60);
     var foo = new MotionMagicVoltage(0);

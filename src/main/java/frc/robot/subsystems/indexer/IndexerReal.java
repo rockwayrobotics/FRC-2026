@@ -60,11 +60,12 @@ public class IndexerReal implements IndexerIO {
 
   @Override
   public void updateInputs(IndexerIOInputs inputs) {
-    SparkUtil.ifOk(augersMotor, augersEncoder::getVelocity, (value) -> inputs.velocityRPM = value);
+    SparkUtil.ifOk(
+        augersMotor, augersEncoder::getVelocity, (value) -> inputs.augerVelocityRPM = value);
     SparkUtil.ifOk(
         augersMotor,
         new DoubleSupplier[] {augersMotor::getAppliedOutput, augersMotor::getBusVoltage},
-        (values) -> inputs.appliedVolts = values[0] * values[1]);
+        (values) -> inputs.augerAppliedVolts = values[0] * values[1]);
     SparkUtil.ifOk(
         kickerMotor, kickerEncoder::getVelocity, (value) -> inputs.kickerVelocity = value);
     double augerMotorTemp = augersMotor.getMotorTemperature();

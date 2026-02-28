@@ -60,7 +60,8 @@ public class ClimbNEO2 implements ClimbIO {
     motor.set(0);
   }
 
-  public void setPose(double pose, boolean fast) {
+  @Override
+  public void setPos(double pose, boolean fast) {
     if (fast) {
       controller.setSetpoint(pose, ControlType.kPosition, fastSlot);
     } else {

@@ -23,24 +23,24 @@ public class Climb extends SubsystemBase {
     climbIO.stop();
   }
 
-  private void setPose(double pose, boolean fast) {
+  private void setPos(double pose, boolean fast) {
     Logger.recordOutput("Climb/Setpoint", pose);
-    climbIO.setPose(pose, fast);
+    climbIO.setPos(pose, fast);
   }
 
   public void extend() {
-    setPose(ClimbConstants.EXTEND_HEIGHT.in(Millimeters), true);
+    setPos(ClimbConstants.EXTEND_HEIGHT.in(Millimeters), true);
   }
 
   public void retract() {
-    setPose(0, true);
+    setPos(0, true);
   }
 
   public void climb() {
-    setPose(ClimbConstants.CLIMB_HEIGHT.in(Millimeters), false);
+    setPos(ClimbConstants.CLIMB_HEIGHT.in(Millimeters), false);
   }
 
   public void unclimb() {
-    setPose(ClimbConstants.EXTEND_HEIGHT.in(Millimeters), false);
+    setPos(ClimbConstants.EXTEND_HEIGHT.in(Millimeters), false);
   }
 }

@@ -40,7 +40,7 @@ public class ClimbKraken implements ClimbIO {
   public void updateInputs(ClimbIOInputs inputs) {}
 
   @Override
-  public void setPose(double pose, boolean fast) {
+  public void setPos(double pose, boolean fast) {
     // motor.setVoltage(volts);
     final var foo = new MotionMagicVoltage(0);
     motor.setControl(foo.withPosition(pose));

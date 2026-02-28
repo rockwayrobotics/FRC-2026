@@ -31,6 +31,7 @@ import frc.robot.commands.IndexerCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbIO;
+import frc.robot.subsystems.climb.ClimbNEO2;
 import frc.robot.subsystems.climb.ClimbSimKraken;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -41,13 +42,16 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.IndexerIO;
+import frc.robot.subsystems.indexer.IndexerReal;
 import frc.robot.subsystems.indexer.IndexerSim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeReal;
 import frc.robot.subsystems.intake.IntakeSim;
 import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.shooter.ShooterReal;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -97,10 +101,10 @@ public class RobotContainer {
                 new VisionIOPhotonVision(camera_front, robotToCameraFront),
                 new VisionIOPhotonVision(camera_back, robotToCameraBack));
 
-        indexer = new Indexer(new IndexerSim()); // FIXME: Simulated indexer for now until connected
-        intake = new Intake(new IntakeSim()); // same as ^
-        shooter = new Shooter(new ShooterSim());
-        climb = new Climb(new ClimbSimKraken());
+        indexer = new Indexer(new IndexerReal());
+        intake = new Intake(new IntakeReal());
+        shooter = new Shooter(new ShooterReal());
+        climb = new Climb(new ClimbNEO2());
         break;
 
       case SIM:

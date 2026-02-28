@@ -1,7 +1,7 @@
 package frc.robot.subsystems.indexer;
 
 public class IndexerSim implements IndexerIO {
-  private double appliedVolts = 0.0;
+  private double augerAppliedVolts = 0.0;
   private double augersVelocity = 0.0;
   private double kickerVelocity = 0.0;
 
@@ -14,10 +14,10 @@ public class IndexerSim implements IndexerIO {
   public void updateInputs(IndexerIOInputs inputs) {
     // FIXME: This sets velocity instantaneously. If we need to simulate
     // ramp-up time, then we need more details here.
-    augersVelocity = appliedVolts * kV;
+    augersVelocity = augerAppliedVolts * kV;
 
-    inputs.appliedVolts = appliedVolts;
-    inputs.velocityRPM = augersVelocity;
+    inputs.augerAppliedVolts = augerAppliedVolts;
+    inputs.augerVelocityRPM = augersVelocity;
     inputs.kickerVelocity = kickerVelocity;
   }
 
@@ -33,6 +33,6 @@ public class IndexerSim implements IndexerIO {
 
   @Override
   public void stop() {
-    appliedVolts = 0;
+    augerAppliedVolts = 0;
   }
 }
