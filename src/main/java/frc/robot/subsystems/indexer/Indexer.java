@@ -20,7 +20,7 @@ public class Indexer extends SubsystemBase { // Defines every Subsystem
     Logger.processInputs("Indexer", indexerInputs); // Logs indexerInputs under "Indexer"
   }
 
-  private void setVelocityAugers(double RPM) { // Sets voltage
+  public void setVelocityAugers(double RPM) { // Sets voltage
     Logger.recordOutput(
         "Indexer/AugersVelocityRPM", RPM); // Logs voltage under a category in "Indexer"
     indexerIO.setVelocityAugers(RPM); // References the setVoltage command in indexerIO

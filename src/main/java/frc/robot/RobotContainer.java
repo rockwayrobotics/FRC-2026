@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IndexerCommands;
 import frc.robot.commands.ShooterCommands;
+import frc.robot.commands.TestCommands;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbNEO2;
@@ -217,7 +218,8 @@ public class RobotContainer {
     configureDefaultCommands();
     configureOperatorCommands();
 
-    controller.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200), shooter));
+    controller.a().whileTrue(TestCommands.testShot(shooter, indexer));
+    // controller.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200), shooter));
     controller.rightBumper().whileTrue(Commands.run(() -> indexer.setVelocityKicker(100), indexer));
     controller.leftBumper().whileTrue(Commands.run(() -> indexer.augersFeed(), indexer));
     // Switch to X pattern when X button is pressed
