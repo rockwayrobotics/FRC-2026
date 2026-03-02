@@ -39,6 +39,32 @@ public class LinearInterpolationTable {
     return interpolate(input, m_points[index], m_points[index + 1]);
   }
 
+  public double inverseGet(double output) {
+    // Swap X and Y roles
+    int index = 0;
+    double minOutput = Double.POSITIVE_INFINITY;
+    double maxOutput = Double.NEGATIVE_INFINITY;
+    for (Point2D p : m_points) {
+      if (p.getY() < minOutput) minOutput = p.getY();
+      if (p.getY() > maxOutput) maxOutput = p.getY();
+    }
+    if (output <= minOutput) {
+      index = 0;
+    } else if (output >= maxOutput) {
+      index = size - 2;
+    } else {
+      for (int i = 1; i < m_points.length; i++) {
+        if (output > m_points[i - 1].getY() && output <= m_points[i].getY()) {
+          index = i - 1;
+        }
+      }
+    }
+    // Swap point1/point2 x and y for interpolation
+    Point2D p1 = new Point2D.Double(m_points[index].getY(), m_points[index].getX());
+    Point2D p2 = new Point2D.Double(m_points[index + 1].getY(), m_points[index + 1].getX());
+    return interpolate(output, p1, p2);
+  }
+
   public static double interpolate(double input, Point2D point1, Point2D point2) {
     final double slope = (point2.getY() - point1.getY()) / (point2.getX() - point1.getX());
     final double delta_x = input - point1.getX();

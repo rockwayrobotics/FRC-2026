@@ -8,7 +8,9 @@ public interface ShooterIO {
   public static class ShooterIOInputs {
     public double flywheelVelocity = 0.0;
     public double flywheelAppliedVolts = 0.0;
-    public double hoodPosition = 0.0;
+    public double hoodPosition = 0.0; // degrees, 15-45 range
+    public double hoodRawPosition =
+        0.0; // encoder units, scaled into the 0-360 range but really more like 268-320
     public boolean shooterStatus = false;
   }
 

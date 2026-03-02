@@ -122,7 +122,13 @@ public class ShooterReal implements ShooterIO {
         (values) -> inputs.flywheelAppliedVolts = values[0] * values[1]);
     // FIXME: Should we log applied for followers?
 
-    SparkUtil.ifOk(hood, hoodEncoder::getPosition, (value) -> inputs.hoodPosition = value);
+    SparkUtil.ifOk(
+        hood,
+        hoodEncoder::getPosition,
+        (value) -> {
+          inputs.hoodRawPosition = value;
+          inputs.hoodPosition = ShooterConstants.kHoodAnglesTable.inverseGet(value);
+        });
 
     double flywheelLeaderTemp = flywheelLeader.getMotorTemperature();
     REVLibError flywheelLeaderLastError = flywheelLeader.getLastError();
@@ -161,10 +167,6 @@ public class ShooterReal implements ShooterIO {
 
   @Override
   public void stopHood() {
-    hoodController.setSetpoint(
-        ShooterConstants.kHoodAnglesTable.getOutput(0),
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0);
     hood.stopMotor();
   }
 

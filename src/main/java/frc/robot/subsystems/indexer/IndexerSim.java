@@ -1,38 +1,47 @@
 package frc.robot.subsystems.indexer;
 
+import frc.robot.util.SimUtils;
+
 public class IndexerSim implements IndexerIO {
-  private double augerAppliedVolts = 0.0;
   private double augersVelocity = 0.0;
   private double kickerVelocity = 0.0;
+  private double augersSetpoint = 0.0;
+  private double kickerSetpoint = 0.0;
+  private boolean stopped = false;
 
-  // FIXME: Totally made up constant
-  private static final double kV = 600.0;
-
-  public IndexerSim() {}
+  private static final double AUGERS_ACCEL_RATE = 300.0; // RPM per second
+  private static final double KICKER_ACCEL_RATE = 1000.0; // RPM per second
 
   @Override
   public void updateInputs(IndexerIOInputs inputs) {
-    // FIXME: This sets velocity instantaneously. If we need to simulate
-    // ramp-up time, then we need more details here.
-    augersVelocity = augerAppliedVolts * kV;
+    if (!stopped) {
+      augersVelocity = SimUtils.slew(augersVelocity, augersSetpoint, AUGERS_ACCEL_RATE);
+      kickerVelocity = SimUtils.slew(kickerVelocity, kickerSetpoint, KICKER_ACCEL_RATE);
+    } else {
+      augersVelocity = SimUtils.slew(augersVelocity, 0.0, AUGERS_ACCEL_RATE);
+      kickerVelocity = SimUtils.slew(kickerVelocity, 0.0, KICKER_ACCEL_RATE);
+    }
 
-    inputs.augerAppliedVolts = augerAppliedVolts;
     inputs.augerVelocityRPM = augersVelocity;
+    inputs.augerAppliedVolts = (augersVelocity / 6000.0) * 12.0;
     inputs.kickerVelocity = kickerVelocity;
+    inputs.indexerStatus = true;
   }
 
   @Override
   public void setVelocityAugers(double RPM) {
-    augersVelocity = RPM;
+    stopped = false;
+    augersSetpoint = RPM;
   }
 
   @Override
   public void setVelocityKicker(double RPM) {
-    kickerVelocity = RPM;
+    stopped = false;
+    kickerSetpoint = RPM;
   }
 
   @Override
   public void stop() {
-    augerAppliedVolts = 0;
+    stopped = true;
   }
 }
