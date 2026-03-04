@@ -11,7 +11,6 @@ public class ShooterSim implements ShooterIO {
   private double hoodRawPosition = ShooterConstants.kHoodAnglesTable.getOutput(15);
   private double flywheelSetpoint = 0.0;
   private double hoodSetpoint = 0.0;
-  private boolean hoodStopped = true;
 
   // Simulation tuning constants
   private static final double FLYWHEEL_ACCEL_RATE = 1000.0; // RPM per second
@@ -28,10 +27,8 @@ public class ShooterSim implements ShooterIO {
     // Simulate applied volts proportional to velocity (rough approximation)
     flywheelAppliedVolts = (flywheelVelocity / 6000.0) * 12.0;
 
-    if (!hoodStopped) {
-      // Simulate hood slewing toward setpoint
-      hoodRawPosition = SimUtils.slew(hoodRawPosition, hoodSetpoint, HOOD_SLEW_RATE);
-    }
+    // Simulate hood slewing toward setpoint
+    hoodRawPosition = SimUtils.slew(hoodRawPosition, hoodSetpoint, HOOD_SLEW_RATE);
 
     inputs.flywheelVelocity = flywheelVelocity;
     inputs.flywheelAppliedVolts = flywheelAppliedVolts;
@@ -47,13 +44,12 @@ public class ShooterSim implements ShooterIO {
 
   @Override
   public void setPositionHood(Angle angle) {
-    hoodStopped = false;
     hoodSetpoint = ShooterConstants.kHoodAnglesTable.getOutput(angle.in(Degrees));
   }
 
   @Override
   public void stopHood() {
-    hoodStopped = true;
+    hoodSetpoint = ShooterConstants.kHoodAnglesTable.getOutput(15);
   }
 
   @Override

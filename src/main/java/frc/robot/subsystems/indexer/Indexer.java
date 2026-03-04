@@ -20,18 +20,26 @@ public class Indexer extends SubsystemBase { // Defines every Subsystem
     Logger.processInputs("Indexer", indexerInputs); // Logs indexerInputs under "Indexer"
   }
 
-  public void setVelocityAugers(double RPM) { // Sets voltage
+  public void setVelocityAugers(double RPM) { // Sets velocity setpoint
     Logger.recordOutput(
-        "Indexer/AugersVelocityRPM", RPM); // Logs voltage under a category in "Indexer"
-    indexerIO.setVelocityAugers(RPM); // References the setVoltage command in indexerIO
+        "Indexer/AugersVelocityRPM", RPM); // Logs velocity under a category in "Indexer"
+    indexerIO.setVelocityAugers(RPM); // References the setVelocityAugers command in indexerIO
+  }
+
+  public void setAugers(double value) {
+    Logger.recordOutput(
+        "Indexer/AugersDutyCycle", value); // Logs voltage under a category in "Indexer"
+    indexerIO.setAugers(value); // References the setAugers command in indexerIO
   }
 
   public void augersFeed() { // Sets voltage to forward value
-    setVelocityAugers(IndexerConstants.FEED_VELOCITY_RPM); // References preset value
+    setAugers(IndexerConstants.FEED_DUTY_CYCLE);
+    // setVelocityAugers(IndexerConstants.FEED_VELOCITY_RPM); // References preset value
   }
 
   public void augersReverse() { // Sets voltage to reverse value
-    setVelocityAugers(IndexerConstants.REVERSE_VELOCITY_RPM); // References preset value
+    setAugers(IndexerConstants.REVERSE_DUTY_CYCLE);
+    // setVelocityAugers(IndexerConstants.REVERSE_VELOCITY_RPM); // References preset value
   }
 
   public void setVelocityKicker(double RPM) {

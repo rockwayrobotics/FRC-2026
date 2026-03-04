@@ -29,6 +29,12 @@ public class IndexerSim implements IndexerIO {
   }
 
   @Override
+  public void setAugers(double value) {
+    augersSetpoint = 2000 * value;
+    augersVelocity = augersSetpoint;
+  }
+
+  @Override
   public void setVelocityAugers(double RPM) {
     stopped = false;
     augersSetpoint = RPM;

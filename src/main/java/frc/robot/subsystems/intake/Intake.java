@@ -16,4 +16,16 @@ public class Intake extends SubsystemBase {
     intakeIO.updateInputs(intakeInputs);
     Logger.processInputs("Intake", intakeInputs);
   }
+
+  public void extend() {
+    intakeIO.extend();
+  }
+
+  public void retract() {
+    intakeIO.retract();
+  }
+
+  public void intake(double dutyCycle) {
+    intakeIO.intake(dutyCycle);
+  }
 }

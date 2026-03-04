@@ -183,8 +183,78 @@ public class RobotContainer {
     // continuously,
     // then we should have a command for that which is scheduled.
     indexer.setDefaultCommand(Commands.run(() -> indexer.stop(), indexer));
-
+    shooter.setDefaultCommand(Commands.run(() -> shooter.stop(), shooter));
     // There is no default climb command so that it continues to go to its setpoint.
+  }
+
+  private void configureDriverCommands() {
+    // Left bumper is 50% speed
+    final double SLOW_SPEED = 0.5;
+    controller
+        .leftBumper()
+        .and(controller.leftTrigger().negate())
+        .whileTrue(
+            DriveCommands.joystickDrive(
+                drive,
+                () -> -controller.getLeftY() * SLOW_SPEED,
+                () -> -controller.getLeftX() * SLOW_SPEED,
+                () -> -controller.getRightX() * SLOW_SPEED));
+
+    controller
+        .leftTrigger()
+        .and(controller.leftBumper().negate())
+        .whileTrue(
+            ShooterCommands.aimOnMove(
+                shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
+
+    controller
+        .leftBumper()
+        .and(controller.leftTrigger())
+        .whileTrue(
+            ShooterCommands.aimOnMove(
+                shooter,
+                drive,
+                () -> -controller.getLeftY() * SLOW_SPEED,
+                () -> -controller.getLeftX() * SLOW_SPEED));
+
+    controller.rightTrigger().whileTrue(IndexerCommands.feedShooter(indexer));
+
+    // Switch to X pattern when X button is pressed
+    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+
+    // Reset gyro to 0° when B button is pressed
+    controller
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                    drive)
+                .ignoringDisable(true));
+
+    controller.rightBumper().whileTrue(getAutonomousCommand());
+
+    controller.a().whileTrue(TestCommands.testShot(shooter, indexer));
+    // controller.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200),
+    // shooter));
+    controller.rightBumper().whileTrue(Commands.run(() -> indexer.setVelocityKicker(100), indexer));
+
+    controller
+        .y()
+        .whileTrue(
+            DriveCommands.joystickDrivePointAtHub(
+                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
+    controller
+        .leftTrigger()
+        .whileTrue(
+            Commands.parallel(
+                ShooterCommands.aimOnMove(
+                    shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()),
+                IndexerCommands.feedShooterFancy(indexer, shooter, drive)));
+
+    controller.povLeft().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kCCW_90deg));
+    controller.povRight().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kPi));
   }
 
   private void configureOperatorCommands() {
@@ -215,42 +285,29 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // Controller notes:
+    // // Full speed all the time
+    // // Left bumper to drive while slower (50%)
+    // Left trigger - hold down to spin up flywheel, point at hub and set hood
+    // angle. Still be able
+    // to drive
+    // Right trigger - hold down to run the auger + kickers
+    // Driver has auto-shoot triggers, driver commands take precedence
+    // Operator has both semi-manual setpoints
+    // and also manual move the setpoint up or down for everything.
+    // Operator needs joysticks for moving rpm setpoints gradually
+    // Hood default position is DOWN
+    // operator may have manual control of that too
+    // toggle situation where the operator takes over manual control and the hood
+    // doesn't auto-fold.
+    // but if the driver ever auto-shoots after that, then the hood will auto-fold.
+    // Driver has controls for extend and start spinning intakes,
+    // Add agitate button for operator (run kicker backwards, auger forwards)
+    // May want to add this agitate sequence to be part of intaking as well.
     configureDefaultCommands();
+    configureDriverCommands();
     configureOperatorCommands();
 
-    controller.a().whileTrue(TestCommands.testShot(shooter, indexer));
-    // controller.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200), shooter));
-    controller.rightBumper().whileTrue(Commands.run(() -> indexer.setVelocityKicker(100), indexer));
-    controller.leftBumper().whileTrue(Commands.run(() -> indexer.augersFeed(), indexer));
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
-    // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
-
-    controller
-        .y()
-        .whileTrue(
-            DriveCommands.joystickDrivePointAtHub(
-                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
-    controller
-        .leftTrigger()
-        .whileTrue(
-            Commands.parallel(
-                ShooterCommands.aimOnMove(
-                    shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()),
-                IndexerCommands.feedShooter(indexer, shooter, drive)));
-
-    controller.povLeft().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kCCW_90deg));
-    controller.povRight().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kPi));
     LEDPattern base =
         LEDPattern.progressMaskLayer(
             () -> {

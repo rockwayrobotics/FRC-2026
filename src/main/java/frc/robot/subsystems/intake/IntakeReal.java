@@ -25,7 +25,7 @@ public class IntakeReal implements IntakeIO {
 
   public IntakeReal() {
     var retractConfig = new SparkMaxConfig();
-    retractConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
+    retractConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(20).voltageCompensation(12.0);
     retractConfig.encoder.positionConversionFactor(IntakeConstants.RETRACT_GEAR_RATIO);
     retractConfig
         .softLimit
@@ -93,5 +93,13 @@ public class IntakeReal implements IntakeIO {
     extendRetractMotor
         .getClosedLoopController()
         .setSetpoint(limit, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+  }
+
+  public void extend() {}
+
+  public void retract() {}
+
+  public void intake(double dutyCycle) {
+    rollerMotor.set(dutyCycle);
   }
 }

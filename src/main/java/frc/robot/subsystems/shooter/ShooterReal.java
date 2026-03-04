@@ -25,8 +25,8 @@ import java.util.function.DoubleSupplier;
 
 public class ShooterReal implements ShooterIO {
   private final SparkBase flywheelLeader = new SparkFlex(CAN.FLYWHEEL_LEADER, MotorType.kBrushless);
-  private final SparkBase flywheelFollower1 =
-      new SparkFlex(CAN.FLYWHEEL_FOLLOWER_1, MotorType.kBrushless);
+  //   private final SparkBase flywheelFollower1 =
+  //       new SparkFlex(CAN.FLYWHEEL_FOLLOWER_1, MotorType.kBrushless);
   private final SparkBase flywheelFollower2 =
       new SparkFlex(CAN.FLYWHEEL_FOLLOWER_2, MotorType.kBrushless);
 
@@ -66,14 +66,14 @@ public class ShooterReal implements ShooterIO {
         .smartCurrentLimit(60)
         .voltageCompensation(12.0)
         .follow(CAN.FLYWHEEL_LEADER, true);
-    SparkUtil.tryUntilOk(
-        flywheelFollower1,
-        5,
-        () ->
-            flywheelFollower1.configure(
-                flywheelFollowerConfig,
-                ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters));
+    // SparkUtil.tryUntilOk(
+    //     flywheelFollower1,
+    //     5,
+    //     () ->
+    //         flywheelFollower1.configure(
+    //             flywheelFollowerConfig,
+    //             ResetMode.kResetSafeParameters,
+    //             PersistMode.kPersistParameters));
     SparkUtil.tryUntilOk(
         flywheelFollower2,
         5,
@@ -132,16 +132,16 @@ public class ShooterReal implements ShooterIO {
 
     double flywheelLeaderTemp = flywheelLeader.getMotorTemperature();
     REVLibError flywheelLeaderLastError = flywheelLeader.getLastError();
-    double flywheelFollower1Temp = flywheelFollower1.getMotorTemperature();
-    REVLibError flywheelFollower1LastError = flywheelFollower1.getLastError();
+    // double flywheelFollower1Temp = flywheelFollower1.getMotorTemperature();
+    // REVLibError flywheelFollower1LastError = flywheelFollower1.getLastError();
     double flywheelFollower2Temp = flywheelFollower2.getMotorTemperature();
     REVLibError flywheelFollower2LastError = flywheelFollower2.getLastError();
     double hoodTemp = hood.getMotorTemperature();
     REVLibError hoodLastError = hood.getLastError();
     if (flywheelLeaderLastError != REVLibError.kOk
         || flywheelLeaderTemp == 0
-        || flywheelFollower1LastError != REVLibError.kOk
-        || flywheelFollower1Temp == 0
+        // || flywheelFollower1LastError != REVLibError.kOk
+        // || flywheelFollower1Temp == 0
         || flywheelFollower2LastError != REVLibError.kOk
         || flywheelFollower2Temp == 0
         || hoodLastError != REVLibError.kOk
@@ -167,7 +167,7 @@ public class ShooterReal implements ShooterIO {
 
   @Override
   public void stopHood() {
-    hood.stopMotor();
+    setPositionHood(Degrees.of(15));
   }
 
   @Override

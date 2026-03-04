@@ -17,4 +17,10 @@ public interface IntakeIO {
   }
 
   public default void updateInputs(IntakeIOInputs inputs) {}
+
+  public default void extend() {}
+
+  public default void retract() {}
+
+  public default void intake(double dutyCycle) {}
 }

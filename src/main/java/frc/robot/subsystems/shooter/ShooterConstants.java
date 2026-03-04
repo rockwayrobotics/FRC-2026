@@ -15,6 +15,11 @@ public class ShooterConstants {
   public static final double HOOD_KI = 0.0;
   public static final double HOOD_KD = 0.0;
 
+  //FIXME: KCOS wants zero degrees at horizontal which we currently don't have.
+  public static final double HOOD_KS = 0.0013;
+  public static final double HOOD_KCOS = 0.0004;
+  public static final double HOOD_KCOSRATIO = 0.76744186046511627906976744186047;
+
   // FIXME: Check these are correct!
   public static final double HOOD_FORWARD_LIMIT =
       268.92; // 15 degree hood angle is about 0.75 scaled by 360
@@ -89,3 +94,16 @@ public class ShooterConstants {
   public static final LinearInterpolationTable kHoodAnglesTable =
       new LinearInterpolationTable(kHoodAngles);
 }
+/*
+
+minimum hood position:
+0.34346
+maximum hood position:
+0.46948
+
+minimum voltage before moving up:
+v1 = 0.1884                 NEW v1 = 0.017
+maximum voltage before moving down:
+v2 = -0.12                 NEW v2 = -0.009
+
+*/

@@ -13,7 +13,7 @@ public class IndexerCommands {
   public static final double KICKER_LOAD_RPM = 2000;
   public static boolean isShooting = false;
 
-  public static Command feedShooter(Indexer indexer, Shooter shooter, Drive drive) {
+  public static Command feedShooterFancy(Indexer indexer, Shooter shooter, Drive drive) {
     return Commands.sequence(
             Commands.waitUntil(() -> shooter.atFlywheelSetpoint(FLYWHEEL_RPM_TOLERANCE)),
             Commands.run(
@@ -28,6 +28,20 @@ public class IndexerCommands {
                     indexer.stop();
                     isShooting = false;
                   }
+                },
+                indexer))
+        .finallyDo(
+            () -> {
+              indexer.stop();
+            });
+  }
+
+  public static Command feedShooter(Indexer indexer) {
+    return Commands.sequence(
+            Commands.run(
+                () -> {
+                  indexer.augersFeed();
+                  indexer.setVelocityKicker(KICKER_LOAD_RPM);
                 },
                 indexer))
         .finallyDo(
