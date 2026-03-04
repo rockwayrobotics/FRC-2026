@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IndexerCommands;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.TestCommands;
 import frc.robot.subsystems.climb.Climb;
@@ -49,6 +50,10 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeReal;
 import frc.robot.subsystems.intake.IntakeSim;
+import frc.robot.subsystems.intakeExtender.IntakeExtender;
+import frc.robot.subsystems.intakeExtender.IntakeExtenderIO;
+import frc.robot.subsystems.intakeExtender.IntakeExtenderReal;
+import frc.robot.subsystems.intakeExtender.IntakeExtenderSim;
 import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
@@ -73,6 +78,7 @@ public class RobotContainer {
   private final Led led;
   private final Indexer indexer;
   private final Intake intake;
+  private final IntakeExtender intakeExtender;
   private final Shooter shooter;
   private final Climb climb;
 
@@ -104,6 +110,7 @@ public class RobotContainer {
 
         indexer = new Indexer(new IndexerReal());
         intake = new Intake(new IntakeReal());
+        intakeExtender = new IntakeExtender(new IntakeExtenderReal());
         shooter = new Shooter(new ShooterReal());
         climb = new Climb(new ClimbNEO2());
         break;
@@ -125,6 +132,7 @@ public class RobotContainer {
 
         indexer = new Indexer(new IndexerSim());
         intake = new Intake(new IntakeSim());
+        intakeExtender = new IntakeExtender(new IntakeExtenderSim());
         shooter = new Shooter(new ShooterSim());
         climb = new Climb(new ClimbSimKraken());
         break;
@@ -141,6 +149,7 @@ public class RobotContainer {
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         indexer = new Indexer(new IndexerIO() {});
         intake = new Intake(new IntakeIO() {});
+        intakeExtender = new IntakeExtender(new IntakeExtenderIO() {});
         shooter = new Shooter(new ShooterIO() {});
         climb = new Climb(new ClimbIO() {});
         break;
@@ -185,13 +194,16 @@ public class RobotContainer {
     indexer.setDefaultCommand(Commands.run(() -> indexer.stop(), indexer));
     shooter.setDefaultCommand(Commands.run(() -> shooter.stop(), shooter));
     // There is no default climb command so that it continues to go to its setpoint.
+
+    intakeExtender.setDefaultCommand(IntakeCommands.retract(intakeExtender));
+    intake.setDefaultCommand(Commands.run(() -> intake.intake(0.0), intake));
   }
 
   private void configureDriverCommands() {
     // Left bumper is 50% speed
     final double SLOW_SPEED = 0.5;
     controller
-        .leftBumper()
+        .rightBumper()
         .and(controller.leftTrigger().negate())
         .whileTrue(
             DriveCommands.joystickDrive(
@@ -202,13 +214,13 @@ public class RobotContainer {
 
     controller
         .leftTrigger()
-        .and(controller.leftBumper().negate())
+        .and(controller.rightBumper().negate())
         .whileTrue(
             ShooterCommands.aimOnMove(
                 shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
 
     controller
-        .leftBumper()
+        .rightBumper()
         .and(controller.leftTrigger())
         .whileTrue(
             ShooterCommands.aimOnMove(
@@ -233,7 +245,7 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    controller.rightBumper().whileTrue(getAutonomousCommand());
+    controller.leftBumper().whileTrue(IntakeCommands.autoIntake(intakeExtender, intake));
 
     controller.a().whileTrue(TestCommands.testShot(shooter, indexer));
     // controller.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200),

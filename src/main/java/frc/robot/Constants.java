@@ -48,7 +48,7 @@ public final class Constants {
     public static final int AUGER = 10;
     // Intake
     public static final int INTAKE_RETRACTION = 11;
-    public static final int INTAKE_EXTENDING_ROLLERS = 13;
+    public static final int INTAKE_ROLLERS = 13;
     // Climb
     public static final int CLIMB = 14;
     // Shooter

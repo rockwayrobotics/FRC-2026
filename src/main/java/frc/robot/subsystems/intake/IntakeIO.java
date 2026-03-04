@@ -5,22 +5,13 @@ import org.littletonrobotics.junction.AutoLog;
 public interface IntakeIO {
   @AutoLog
   public static class IntakeIOInputs {
-    public double retractPosition = 0.0;
-    public double retractAppliedVolts = 0.0;
-    public double fixedAppliedVolts = 0.0;
-    public double fixedVelocityRadsPerSec = 0.0;
-    public double extendingAppliedVolts = 0.0;
-    public double extendingVelocityRadsPerSec = 0.0;
+    public double rollerAppliedVolts = 0.0;
     public double rollerVelocity = 0.0;
     public double rollerCurrent = 0.0;
     public boolean intakeStatus = false;
   }
 
   public default void updateInputs(IntakeIOInputs inputs) {}
-
-  public default void extend() {}
-
-  public default void retract() {}
 
   public default void intake(double dutyCycle) {}
 }

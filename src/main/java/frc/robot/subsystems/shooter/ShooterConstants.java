@@ -15,7 +15,7 @@ public class ShooterConstants {
   public static final double HOOD_KI = 0.0;
   public static final double HOOD_KD = 0.0;
 
-  //FIXME: KCOS wants zero degrees at horizontal which we currently don't have.
+  // FIXME: KCOS wants zero degrees at horizontal which we currently don't have.
   public static final double HOOD_KS = 0.0013;
   public static final double HOOD_KCOS = 0.0004;
   public static final double HOOD_KCOSRATIO = 0.76744186046511627906976744186047;
