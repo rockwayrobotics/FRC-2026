@@ -53,6 +53,10 @@ public class IntakeExtenderReal implements IntakeExtenderIO {
           extendRetractMotor::getAppliedOutput, extendRetractMotor::getBusVoltage
         },
         (values) -> inputs.appliedVolts = values[0] * values[1]);
+    SparkUtil.ifOk(
+        extendRetractMotor,
+        extendRetractMotor::getOutputCurrent,
+        (value) -> inputs.outputCurrent = value);
 
     double extendRetractMotorTemp = extendRetractMotor.getMotorTemperature();
     REVLibError extendRetractMotorLastError = extendRetractMotor.getLastError();

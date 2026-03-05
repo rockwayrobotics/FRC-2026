@@ -140,4 +140,8 @@ public class ShooterCommands {
               shooter.stop();
             });
   }
+
+  public static Command manualFlywheel(Shooter shooter, DoubleSupplier rpmSupplier) {
+    return Commands.run(() -> shooter.setVelocityFlywheel(rpmSupplier.getAsDouble()), shooter);
+  }
 }

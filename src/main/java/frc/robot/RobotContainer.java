@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static frc.robot.subsystems.vision.VisionConstants.camera_back;
 import static frc.robot.subsystems.vision.VisionConstants.camera_front;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraBack;
@@ -16,15 +15,17 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCameraFront;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IndexerCommands;
@@ -43,10 +44,12 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.subsystems.indexer.IndexerIO;
 import frc.robot.subsystems.indexer.IndexerReal;
 import frc.robot.subsystems.indexer.IndexerSim;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
 import frc.robot.subsystems.intake.IntakeReal;
 import frc.robot.subsystems.intake.IntakeSim;
@@ -85,6 +88,7 @@ public class RobotContainer {
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
+  private final GenericHID operatorButtonBoard = new GenericHID(2);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -181,6 +185,8 @@ public class RobotContainer {
 
   private void configureDefaultCommands() {
     // Default command, normal field-relative drive
+    // Strafe
+    // Rotate
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
@@ -188,18 +194,25 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // FIXME: Default command is to stop the indexer. If we want them to run
-    // continuously,
-    // then we should have a command for that which is scheduled.
+    // Stop indexer by default
     indexer.setDefaultCommand(Commands.run(() -> indexer.stop(), indexer));
-    shooter.setDefaultCommand(Commands.run(() -> shooter.stop(), shooter));
-    // There is no default climb command so that it continues to go to its setpoint.
 
-    intakeExtender.setDefaultCommand(IntakeCommands.retract(intakeExtender));
-    intake.setDefaultCommand(Commands.run(() -> intake.intake(0.0), intake));
+    // Stop shooter by default (coast mode flywheel)
+    // This also retracts hood
+    shooter.setDefaultCommand(Commands.run(() -> shooter.stop(), shooter));
+
+    // Retract intake by default
+    intakeExtender.setDefaultCommand(IntakeCommands.autoRetract(intakeExtender));
+
+    // Stop intake rollers by default
+    intake.setDefaultCommand(IntakeCommands.intakeManual(intake, 0.0));
+
+    // There is no default climb command so that it continues to go to its setpoint.
+    // FIXME: Figure out climb
   }
 
   private void configureDriverCommands() {
+    // Slow Down
     // Left bumper is 50% speed
     final double SLOW_SPEED = 0.5;
     controller
@@ -212,6 +225,7 @@ public class RobotContainer {
                 () -> -controller.getLeftX() * SLOW_SPEED,
                 () -> -controller.getRightX() * SLOW_SPEED));
 
+    // Point at Hub
     controller
         .leftTrigger()
         .and(controller.rightBumper().negate())
@@ -219,6 +233,7 @@ public class RobotContainer {
             ShooterCommands.aimOnMove(
                 shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
 
+    // Point at Hub while slow down
     controller
         .rightBumper()
         .and(controller.leftTrigger())
@@ -229,8 +244,11 @@ public class RobotContainer {
                 () -> -controller.getLeftY() * SLOW_SPEED,
                 () -> -controller.getLeftX() * SLOW_SPEED));
 
+    // Shoot Sequence
     controller.rightTrigger().whileTrue(IndexerCommands.feedShooter(indexer));
 
+    // X-Stop
+    // FIXME: Change this to D-M1 and D-M2??
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
@@ -245,31 +263,104 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
+    // Auto-Intake
     controller.leftBumper().whileTrue(IntakeCommands.autoIntake(intakeExtender, intake));
 
+    //////////// Testing commands below here ///////////////////////
+
+    // FIXME: Probably remove this after shot testing
     controller.a().whileTrue(TestCommands.testShot(shooter, indexer));
-    // controller.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200),
-    // shooter));
+    /*
     controller.rightBumper().whileTrue(Commands.run(() -> indexer.setVelocityKicker(100), indexer));
 
     controller
-        .y()
-        .whileTrue(
-            DriveCommands.joystickDrivePointAtHub(
-                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
+            .y()
+            .whileTrue(
+                    DriveCommands.joystickDrivePointAtHub(
+                            drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
     controller
-        .leftTrigger()
-        .whileTrue(
-            Commands.parallel(
-                ShooterCommands.aimOnMove(
-                    shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()),
-                IndexerCommands.feedShooterFancy(indexer, shooter, drive)));
+            .leftTrigger()
+            .whileTrue(
+                    Commands.parallel(
+                            ShooterCommands.aimOnMove(
+                                    shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()),
+                            IndexerCommands.feedShooterFancy(indexer, shooter, drive)));
 
     controller.povLeft().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kCCW_90deg));
     controller.povRight().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kPi));
+    */
   }
 
   private void configureOperatorCommands() {
+    // Extend
+    operatorController.leftBumper().onTrue(IntakeCommands.extend(intakeExtender));
+    // Retract
+    operatorController.rightBumper().onTrue(IntakeCommands.retract(intakeExtender));
+
+    // Complete fold
+    double lastRBPressTime = 0.0;
+    operatorController
+        .rightBumper()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  double now = Timer.getFPGATimestamp();
+                  if (lastRBPressTime > 0.0 && now - lastRBPressTime < 0.3) {
+                    // Double press, spit out balls for 3 seconds while folding
+                    CommandScheduler.getInstance()
+                        .schedule(IntakeCommands.ejectBalls(intakeExtender, intake));
+                  }
+                },
+                intake));
+
+    // Manual extend
+    new JoystickButton(operatorButtonBoard, 0)
+        .whileTrue(IntakeCommands.extendManual(intakeExtender, 0.2));
+    // Manual retract
+    new JoystickButton(operatorButtonBoard, 1)
+        .whileTrue(IntakeCommands.extendManual(intakeExtender, -0.2));
+
+    // Manual forward
+    new JoystickButton(operatorButtonBoard, 2)
+        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
+    // Manual reverse
+    new JoystickButton(operatorButtonBoard, 3)
+        .whileTrue(IntakeCommands.intakeManual(intake, -IntakeConstants.ROLLER_DUTY_CYCLE));
+
+    // Intake balls
+    operatorController
+        .leftTrigger()
+        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
+    operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer));
+
+    // Agitate
+    operatorController.a().whileTrue(IndexerCommands.agitate(indexer));
+    // Unjam
+    operatorController.b().whileTrue(IndexerCommands.unjam(indexer));
+
+    // Forward Augers
+    new JoystickButton(operatorButtonBoard, 4).whileTrue(IndexerCommands.augersFeed(indexer));
+    // Reverse Augers
+    new JoystickButton(operatorButtonBoard, 5).whileTrue(IndexerCommands.augersReverse(indexer));
+
+    // Manual spin up
+    // Do something with
+    // operatorController.getRightY();
+
+    // Manual hood pivot
+    // Do something with
+    // operatorController.getLeftY();
+
+    // Manual kicker forward
+    new JoystickButton(operatorButtonBoard, 6)
+        .onTrue(IndexerCommands.kickerVelocity(indexer, IndexerConstants.KICKER_FEED_RPM));
+    // Reverse kicker
+    new JoystickButton(operatorButtonBoard, 7)
+        .onTrue(IndexerCommands.kickerVelocity(indexer, IndexerConstants.KICKER_AGITATE_RPM));
+
+    ////////////////////// Testing commands below here ///////////////////////
+
+    /*
     operatorController.b().whileTrue(Commands.run(() -> indexer.augersFeed(), indexer));
     operatorController.x().whileTrue(Commands.run(() -> indexer.augersReverse(), indexer));
     operatorController.x().whileTrue(Commands.run(() -> indexer.setVelocityKicker(100), indexer));
@@ -281,13 +372,14 @@ public class RobotContainer {
 
     operatorController.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200), shooter));
     operatorController
-        .y()
-        .whileTrue(
-            Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(0, Degrees)), shooter));
+            .y()
+            .whileTrue(
+                    Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(0, Degrees)), shooter));
     operatorController
-        .povCenter()
-        .whileTrue(
-            Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(30, Degrees)), shooter));
+            .povCenter()
+            .whileTrue(
+                    Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(30, Degrees)), shooter));
+    */
   }
 
   /**
@@ -320,6 +412,8 @@ public class RobotContainer {
     configureDriverCommands();
     configureOperatorCommands();
 
+    /*
+    // Sad, no weight, no LEDs
     LEDPattern base =
         LEDPattern.progressMaskLayer(
             () -> {
@@ -327,6 +421,7 @@ public class RobotContainer {
             });
     LEDPattern rainbow = LEDPattern.solid(Color.kBlue);
     controller.povUp().whileTrue(led.runPattern(rainbow.mask(base)));
+    */
   }
 
   /**

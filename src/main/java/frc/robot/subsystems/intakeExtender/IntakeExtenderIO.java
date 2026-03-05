@@ -7,6 +7,7 @@ public interface IntakeExtenderIO {
   public static class IntakeExtenderIOInputs {
     public double extendPosition = 0.0;
     public double appliedVolts = 0.0;
+    public double outputCurrent = 0.0;
     public boolean intakeExtenderStatus = false;
   }
 

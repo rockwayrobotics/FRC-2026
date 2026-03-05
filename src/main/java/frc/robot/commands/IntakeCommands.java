@@ -9,39 +9,46 @@ import frc.robot.subsystems.intakeExtender.IntakeExtenderConstants;
 
 public class IntakeCommands {
   public static Command autoIntake(IntakeExtender intakeExtender, Intake intake) {
-    return Commands.run(
-            () -> {
-              if (intakeExtender.getExtendAngle() < IntakeExtenderConstants.EXTEND_LIMIT) {
-                intakeExtender.extend(IntakeExtenderConstants.EXTEND_DUTY_CYCLE);
-              } else {
-                intakeExtender.extend(0.0);
-              }
+    return Commands.startRun(
+        () -> {
+          intakeExtender.setHoldingPosition(false);
+          intakeExtender.unlockAutoRetract();
+        },
+        () -> {
+          if (intakeExtender.getExtendAngle() < IntakeExtenderConstants.EXTEND_LIMIT) {
+            intakeExtender.extend(IntakeExtenderConstants.EXTEND_DUTY_CYCLE);
+          } else {
+            intakeExtender.extend(0.0);
+          }
 
-              intake.intake(IntakeConstants.ROLLER_DUTY_CYCLE);
-            },
-            intakeExtender,
-            intake)
-        .withTimeout(2);
+          intake.intake(IntakeConstants.ROLLER_DUTY_CYCLE);
+        },
+        intakeExtender,
+        intake);
   }
 
-  public static Command autoRetract(IntakeExtender intakeExtender, Intake intake) {
-    return Commands.run(
-            () -> {
-              if (intakeExtender.getExtendAngle() > IntakeExtenderConstants.RETRACT_LIMIT) {
-                intakeExtender.extend(IntakeExtenderConstants.RETRACT_DUTY_CYCLE);
-              } else {
-                intakeExtender.extend(0.0);
-              }
-
-              intake.intake(0.0);
-            },
-            intakeExtender,
-            intake)
-        .withTimeout(2);
+  public static Command autoRetract(IntakeExtender intakeExtender) {
+    return Commands.startRun(
+        () -> {
+          intakeExtender.unlockAutoRetract();
+        },
+        () -> {
+          if (!intakeExtender.isHoldingPosition()
+              && !intakeExtender.isAutoRetractBlocked()
+              && intakeExtender.getExtendAngle() > IntakeExtenderConstants.RETRACT_LIMIT) {
+            intakeExtender.extend(IntakeExtenderConstants.RETRACT_DUTY_CYCLE);
+          } else {
+            intakeExtender.extend(0.0);
+          }
+        },
+        intakeExtender);
   }
 
   public static Command extend(IntakeExtender intakeExtender) {
-    return Commands.runEnd(
+    return Commands.startRun(
+        () -> {
+          intakeExtender.setHoldingPosition(true);
+        },
         () -> {
           if (intakeExtender.getExtendAngle() < IntakeExtenderConstants.EXTEND_LIMIT) {
             intakeExtender.extend(IntakeExtenderConstants.EXTEND_DUTY_CYCLE);
@@ -49,25 +56,39 @@ public class IntakeCommands {
             intakeExtender.extend(0.0);
           }
         },
-        () -> intakeExtender.extend(0.0),
         intakeExtender);
   }
 
   public static Command retract(IntakeExtender intakeExtender) {
-    return Commands.runEnd(
+    // After unlocking holdingPosition, this will fall back to the default command
+    // of autoRetract, which will actually retract if it can.
+    return Commands.runOnce(
         () -> {
-          if (intakeExtender.getExtendAngle() > IntakeExtenderConstants.RETRACT_LIMIT && intakeExtender.motorCurrentWithinLimit()) {
-            intakeExtender.extend(IntakeExtenderConstants.RETRACT_DUTY_CYCLE);
-          } else {
-            intakeExtender.extend(0.0);
-          }
+          intakeExtender.setHoldingPosition(false);
         },
-        () -> intakeExtender.extend(0.0),
         intakeExtender);
   }
 
   public static Command extendManual(IntakeExtender intakeExtender, double dutyCycle) {
-    return Commands.run(() -> intakeExtender.extend(dutyCycle), intakeExtender);
+    return Commands.startRun(
+        () -> {
+          intakeExtender.setHoldingPosition(true);
+        },
+        () -> intakeExtender.extend(dutyCycle),
+        intakeExtender);
+  }
+
+  public static Command ejectBalls(IntakeExtender intakeExtender, Intake intake) {
+    return Commands.run(
+            () -> {
+              // This is potentially dangerous because we're just saying
+              // we can retract even if we might not be able to.
+              intakeExtender.setHoldingPosition(false);
+              intakeExtender.unlockAutoRetract();
+              intake.intake(-IntakeConstants.ROLLER_EJECT_DUTY_CYCLE);
+            },
+            intake)
+        .withTimeout(3.0);
   }
 
   public static Command intakeManual(Intake intake, double dutyCycle) {
