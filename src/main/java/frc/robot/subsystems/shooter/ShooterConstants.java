@@ -21,8 +21,8 @@ public class ShooterConstants {
   public static final double HOOD_KCOSRATIO = 0; // 0.76744186046511627906976744186047;
 
   // FIXME: Check these are correct!
-  public static final double HOOD_FORWARD_LIMIT = 50; // 45 degree hood angle
-  public static final double HOOD_REVERSE_LIMIT = 0; // 0 degree hood angle
+  public static final double HOOD_FORWARD_LIMIT = 45; // 45 degree hood angle (50.4 max)
+  public static final double HOOD_REVERSE_LIMIT = 5; // 15 degree hood angle (2.4 min)
   public static final double HOOD_ENCODER_POSITION_CONVERSION_FACTOR = 360;
   public static final double FLYWHEEL_GEAR_RATIO = 0.5;
 
@@ -86,7 +86,7 @@ public class ShooterConstants {
   private static final Point2D[] kHoodAngles =
       new Point2D.Double[] {
         // (Hood Angle, Through Bore Encoder Angle)
-        new Point2D.Double(15, HOOD_FORWARD_LIMIT), new Point2D.Double(45, HOOD_REVERSE_LIMIT)
+        new Point2D.Double(45, HOOD_FORWARD_LIMIT), new Point2D.Double(15, HOOD_REVERSE_LIMIT)
       };
 
   public static final LinearInterpolationTable kHoodAnglesTable =
