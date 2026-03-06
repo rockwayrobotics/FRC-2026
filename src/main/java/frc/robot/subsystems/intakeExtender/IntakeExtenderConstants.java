@@ -3,8 +3,8 @@ package frc.robot.subsystems.intakeExtender;
 public class IntakeExtenderConstants {
   public static final double RETRACT_GEAR_RATIO = 5 * 9 * 60 / 48.0;
 
-  // Limits in degrees
-  public static final double EXTEND_LIMIT = 110.0;
+  // Limits in degrees (was from 12 to -110)
+  public static final double EXTEND_LIMIT = 122.0;
   public static final double RETRACT_LIMIT = 0.0;
 
   // 20% Duty cycle on the retract seems to make it work perfectly (rotates and slides in)

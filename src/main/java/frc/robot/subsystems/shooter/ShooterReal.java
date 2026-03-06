@@ -1,7 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import static edu.wpi.first.units.Units.Degrees;
-
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.PersistMode;
 import com.revrobotics.REVLibError;
@@ -40,7 +38,11 @@ public class ShooterReal implements ShooterIO {
 
   public ShooterReal() {
     var flywheelLeaderConfig = new SparkFlexConfig();
-    flywheelLeaderConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(60).voltageCompensation(12.0);
+    flywheelLeaderConfig
+        .idleMode(IdleMode.kCoast)
+        .inverted(true)
+        .smartCurrentLimit(60)
+        .voltageCompensation(12.0);
     flywheelLeaderConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -84,7 +86,7 @@ public class ShooterReal implements ShooterIO {
                 PersistMode.kPersistParameters));
 
     var hoodConfig = new SparkMaxConfig();
-    hoodConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
+    hoodConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(10).voltageCompensation(12.0);
     hoodConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
@@ -159,15 +161,15 @@ public class ShooterReal implements ShooterIO {
 
   @Override
   public void setPositionHood(Angle angle) {
-    hoodController.setSetpoint(
-        ShooterConstants.kHoodAnglesTable.getOutput(angle.in(Degrees)),
-        ControlType.kPosition,
-        ClosedLoopSlot.kSlot0);
+    /* hoodController.setSetpoint(
+    ShooterConstants.kHoodAnglesTable.getOutput(angle.in(Degrees)),
+    ControlType.kPosition,
+    ClosedLoopSlot.kSlot0);*/
   }
 
   @Override
   public void stopHood() {
-    setPositionHood(Degrees.of(15));
+    // setPositionHood(Degrees.of(15));
   }
 
   @Override

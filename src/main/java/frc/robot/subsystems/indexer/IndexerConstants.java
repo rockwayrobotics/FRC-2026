@@ -11,7 +11,7 @@ public class IndexerConstants {
   public static final double FEED_DUTY_CYCLE = 0.6;
   public static final double REVERSE_DUTY_CYCLE = -0.2;
 
-  public static final double KICKER_FEED_RPM = 3450;
+  public static final double KICKER_FEED_RPM = 3500;
   public static final double KICKER_AGITATE_RPM = -2000;
 
   // Augers PIDV Constants

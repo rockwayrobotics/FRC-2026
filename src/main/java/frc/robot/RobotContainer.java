@@ -16,11 +16,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -217,7 +215,7 @@ public class RobotContainer {
     final double SLOW_SPEED = 0.5;
     controller
         .rightBumper()
-        .and(controller.leftTrigger().negate())
+        // .and(controller.leftTrigger().negate())
         .whileTrue(
             DriveCommands.joystickDrive(
                 drive,
@@ -228,21 +226,21 @@ public class RobotContainer {
     // Point at Hub
     controller
         .leftTrigger()
-        .and(controller.rightBumper().negate())
-        .whileTrue(
-            ShooterCommands.aimOnMove(
-                shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
+        // .and(controller.rightBumper().negate())
+        .whileTrue(ShooterCommands.testShoot(shooter));
+    // ShooterCommands.aimOnMove(
+    //  shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
 
     // Point at Hub while slow down
-    controller
-        .rightBumper()
-        .and(controller.leftTrigger())
-        .whileTrue(
-            ShooterCommands.aimOnMove(
-                shooter,
-                drive,
-                () -> -controller.getLeftY() * SLOW_SPEED,
-                () -> -controller.getLeftX() * SLOW_SPEED));
+    // controller
+    //     .rightBumper()
+    //     .and(controller.leftTrigger())
+    //     .whileTrue(
+    //         ShooterCommands.aimOnMove(
+    //             shooter,
+    //             drive,
+    //             () -> -controller.getLeftY() * SLOW_SPEED,
+    //             () -> -controller.getLeftX() * SLOW_SPEED));
 
     // Shoot Sequence
     controller.rightTrigger().whileTrue(IndexerCommands.feedShooter(indexer));
@@ -314,17 +312,17 @@ public class RobotContainer {
                 intake));
 
     // Manual extend
-    new JoystickButton(operatorButtonBoard, 0)
+    new JoystickButton(operatorButtonBoard, 5)
         .whileTrue(IntakeCommands.extendManual(intakeExtender, 0.2));
     // Manual retract
-    new JoystickButton(operatorButtonBoard, 1)
+    new JoystickButton(operatorButtonBoard, 7)
         .whileTrue(IntakeCommands.extendManual(intakeExtender, -0.2));
 
     // Manual forward
-    new JoystickButton(operatorButtonBoard, 2)
+    new JoystickButton(operatorButtonBoard, 8)
         .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
     // Manual reverse
-    new JoystickButton(operatorButtonBoard, 3)
+    new JoystickButton(operatorButtonBoard, 6)
         .whileTrue(IntakeCommands.intakeManual(intake, -IntakeConstants.ROLLER_DUTY_CYCLE));
 
     // Intake balls
@@ -339,9 +337,9 @@ public class RobotContainer {
     operatorController.b().whileTrue(IndexerCommands.unjam(indexer));
 
     // Forward Augers
-    new JoystickButton(operatorButtonBoard, 4).whileTrue(IndexerCommands.augersFeed(indexer));
+    new JoystickButton(operatorButtonBoard, 3).whileTrue(IndexerCommands.augersFeed(indexer));
     // Reverse Augers
-    new JoystickButton(operatorButtonBoard, 5).whileTrue(IndexerCommands.augersReverse(indexer));
+    new JoystickButton(operatorButtonBoard, 4).whileTrue(IndexerCommands.augersReverse(indexer));
 
     // Manual spin up
     // Do something with
@@ -352,10 +350,10 @@ public class RobotContainer {
     // operatorController.getLeftY();
 
     // Manual kicker forward
-    new JoystickButton(operatorButtonBoard, 6)
+    new JoystickButton(operatorButtonBoard, 2)
         .onTrue(IndexerCommands.kickerVelocity(indexer, IndexerConstants.KICKER_FEED_RPM));
     // Reverse kicker
-    new JoystickButton(operatorButtonBoard, 7)
+    new JoystickButton(operatorButtonBoard, 1)
         .onTrue(IndexerCommands.kickerVelocity(indexer, IndexerConstants.KICKER_AGITATE_RPM));
 
     ////////////////////// Testing commands below here ///////////////////////

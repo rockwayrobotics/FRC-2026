@@ -20,7 +20,11 @@ public class IntakeExtenderReal implements IntakeExtenderIO {
 
   public IntakeExtenderReal() {
     var extendRetractConfig = new SparkMaxConfig();
-    extendRetractConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(20).voltageCompensation(12.0);
+    extendRetractConfig
+        .idleMode(IdleMode.kBrake)
+        .inverted(true)
+        .smartCurrentLimit(20)
+        .voltageCompensation(12.0);
     // Convert from revolutions to degrees, accounting for the gear ratio.
     extendRetractConfig.encoder.positionConversionFactor(
         360.0 / IntakeExtenderConstants.RETRACT_GEAR_RATIO);
@@ -41,7 +45,8 @@ public class IntakeExtenderReal implements IntakeExtenderIO {
 
     // Set the encoder position to 0 on startup so that the soft limits work correctly.
     extendRetractEncoder.setPosition(0);
-    // FIXME: What do we do if we lose power during a match? This will set the position to 0 at startup.
+    // FIXME: What do we do if we lose power during a match? This will set the position to 0 at
+    // startup.
   }
 
   @Override

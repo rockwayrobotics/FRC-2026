@@ -27,7 +27,11 @@ public class IndexerReal implements IndexerIO {
 
   public IndexerReal() {
     var augersConfig = new SparkMaxConfig();
-    augersConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(20).voltageCompensation(12.0);
+    augersConfig
+        .idleMode(IdleMode.kBrake)
+        .inverted(true)
+        .smartCurrentLimit(20)
+        .voltageCompensation(12.0);
     augersConfig
         .closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)

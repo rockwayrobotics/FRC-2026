@@ -11,20 +11,18 @@ public class ShooterConstants {
   public static final double FLYWHEEL_KD = 0.05;
   public static final double FLYWHEEL_KV = 0.00117;
   // Hood PID Constants
-  public static final double HOOD_KP = 0.0;
+  public static final double HOOD_KP = 0.033;
   public static final double HOOD_KI = 0.0;
   public static final double HOOD_KD = 0.0;
 
   // FIXME: KCOS wants zero degrees at horizontal which we currently don't have.
-  public static final double HOOD_KS = 0.0013;
-  public static final double HOOD_KCOS = 0.0004;
-  public static final double HOOD_KCOSRATIO = 0.76744186046511627906976744186047;
+  public static final double HOOD_KS = 0; // 0.0013;
+  public static final double HOOD_KCOS = 0; // .0004;
+  public static final double HOOD_KCOSRATIO = 0; // 0.76744186046511627906976744186047;
 
   // FIXME: Check these are correct!
-  public static final double HOOD_FORWARD_LIMIT =
-      268.92; // 15 degree hood angle is about 0.75 scaled by 360
-  public static final double HOOD_REVERSE_LIMIT =
-      319.32; // 45 degree hood angle is about 0.89 scaled by 360
+  public static final double HOOD_FORWARD_LIMIT = 50; // 45 degree hood angle
+  public static final double HOOD_REVERSE_LIMIT = 0; // 0 degree hood angle
   public static final double HOOD_ENCODER_POSITION_CONVERSION_FACTOR = 360;
   public static final double FLYWHEEL_GEAR_RATIO = 0.5;
 

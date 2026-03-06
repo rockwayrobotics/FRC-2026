@@ -27,6 +27,16 @@ public class ShooterCommands {
   private static LinearInterpolationTable m_hoodTable = ShooterConstants.kHoodTable;
   private static LinearInterpolationTable m_rpmTable = ShooterConstants.kRPMTable;
 
+  // 75" away from hub (front to front) at 4000 rpm
+  public static Command testShoot(Shooter shooter) {
+    return Commands.run(
+        () -> {
+          shooter.setVelocityFlywheel(4500);
+          shooter.setPositionHood(Degrees.of(25));
+        },
+        shooter);
+  }
+
   public static Command aimOnMove(
       Shooter shooter, Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
     // Create PID controller
