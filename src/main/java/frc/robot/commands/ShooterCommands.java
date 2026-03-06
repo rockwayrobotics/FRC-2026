@@ -110,12 +110,17 @@ public class ShooterCommands {
                   angleController.calculate(
                       drive.getRotation().getRadians(), targetAngle.getRadians());
 
+              // Apply slew rate limiting
+              var targetVelocity = linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
+              var targetSpeed = targetVelocity.getNorm();
+              var limitedSpeed = drive.getLinearAccelLimiter().calculate(targetSpeed);
+              var xSpeed =
+                  targetSpeed < 0.001 ? 0.0 : targetVelocity.getX() * limitedSpeed / targetSpeed;
+              var ySpeed =
+                  targetSpeed < 0.001 ? 0.0 : targetVelocity.getY() * limitedSpeed / targetSpeed;
+
               // Convert to field relative speeds & send command
-              ChassisSpeeds speeds =
-                  new ChassisSpeeds(
-                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                      omega);
+              ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, omega);
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;

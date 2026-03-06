@@ -31,7 +31,6 @@ import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -80,12 +79,20 @@ public class DriveCommands {
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
 
+          // Apply slew rate limiting
+          var targetVelocity = linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
+          var targetSpeed = targetVelocity.getNorm();
+          var limitedSpeed = drive.getLinearAccelLimiter().calculate(targetSpeed);
+          var xSpeed =
+              targetSpeed < 0.001 ? 0.0 : targetVelocity.getX() * limitedSpeed / targetSpeed;
+          var ySpeed =
+              targetSpeed < 0.001 ? 0.0 : targetVelocity.getY() * limitedSpeed / targetSpeed;
+
+          double omegaSpeed =
+              drive.getOmegaAccelLimiter().calculate(omega * drive.getMaxAngularSpeedRadPerSec());
+
           // Convert to field relative speeds & send command
-          ChassisSpeeds speeds =
-              new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
+          ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, omegaSpeed);
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;
@@ -97,60 +104,6 @@ public class DriveCommands {
                       : drive.getRotation()));
         },
         drive);
-  }
-
-  /**
-   * Field relative drive command using joystick for linear control and PID for angular control.
-   * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
-   * absolute rotation with a joystick.
-   */
-  public static Command joystickDriveAtAngle(
-      Drive drive,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      Supplier<Rotation2d> rotationSupplier) {
-
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-
-    // Construct command
-    return Commands.run(
-            () -> {
-              // Get linear velocity
-              Translation2d linearVelocity =
-                  getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-
-              // Calculate angular speed
-              double omega =
-                  angleController.calculate(
-                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
-
-              // Convert to field relative speeds & send command
-              ChassisSpeeds speeds =
-                  new ChassisSpeeds(
-                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                      omega);
-              boolean isFlipped =
-                  DriverStation.getAlliance().isPresent()
-                      && DriverStation.getAlliance().get() == Alliance.Red;
-              drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      speeds,
-                      isFlipped
-                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                          : drive.getRotation()));
-            },
-            drive)
-
-        // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
   /**
@@ -201,12 +154,17 @@ public class DriveCommands {
                   angleController.calculate(
                       drive.getRotation().getRadians(), targetAngle.getRadians());
 
+              // Apply slew rate limiting
+              var targetVelocity = linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
+              var targetSpeed = targetVelocity.getNorm();
+              var limitedSpeed = drive.getLinearAccelLimiter().calculate(targetSpeed);
+              var xSpeed =
+                  targetSpeed < 0.001 ? 0.0 : targetVelocity.getX() * limitedSpeed / targetSpeed;
+              var ySpeed =
+                  targetSpeed < 0.001 ? 0.0 : targetVelocity.getY() * limitedSpeed / targetSpeed;
+
               // Convert to field relative speeds & send command
-              ChassisSpeeds speeds =
-                  new ChassisSpeeds(
-                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                      omega);
+              ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, omega);
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;

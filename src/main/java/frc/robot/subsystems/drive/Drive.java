@@ -42,6 +42,7 @@ import frc.robot.Constants.GlobalConstants;
 import frc.robot.util.FieldRelativeAccel;
 import frc.robot.util.FieldRelativeSpeed;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.LoggedSlewRateLimiter;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -56,6 +57,11 @@ public class Drive extends SubsystemBase {
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
   private final Field2d m_field = new Field2d();
+
+  private final LoggedSlewRateLimiter linearAccelLimiter =
+      new LoggedSlewRateLimiter(4.0, "Drive/MaxSlewRate"); // m/s per second
+  private final LoggedSlewRateLimiter omegaAccelLimiter =
+      new LoggedSlewRateLimiter(8.0, "Drive/MaxOmegaSlewRate"); // rad/s per second
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = Rotation2d.kZero;
@@ -190,6 +196,16 @@ public class Drive extends SubsystemBase {
     }
 
     // Update gyro alert
+
+    // Reset slew rate limiters when disabled to prevent jumps when re-enabled
+    if (DriverStation.isDisabled()) {
+      linearAccelLimiter.reset(0.0);
+      omegaAccelLimiter.reset(0.0);
+    }
+
+    // Update slew rate limiters, only useful in tuning?
+    linearAccelLimiter.periodic();
+    omegaAccelLimiter.periodic();
   }
 
   /**
@@ -362,5 +378,13 @@ public class Drive extends SubsystemBase {
 
   public boolean pointedAtTargetAngle(double toleranceDegrees) {
     return Math.abs(this.getRotation().minus(targetAngle).getDegrees()) < toleranceDegrees;
+  }
+
+  public LoggedSlewRateLimiter getLinearAccelLimiter() {
+    return linearAccelLimiter;
+  }
+
+  public LoggedSlewRateLimiter getOmegaAccelLimiter() {
+    return omegaAccelLimiter;
   }
 }
