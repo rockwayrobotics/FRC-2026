@@ -177,7 +177,7 @@ public class ShooterReal implements ShooterIO {
 
   @Override
   public void stopHood() {
-    setPositionHood(Degrees.of(15));
+    setPositionHood(Degrees.of(20));
   }
 
   @Override

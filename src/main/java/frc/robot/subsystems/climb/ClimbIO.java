@@ -13,4 +13,6 @@ public interface ClimbIO {
   public default void stop() {}
 
   public default void setPos(double pose, boolean fast) {}
+
+  public default void dutyCycle(double value) {}
 }

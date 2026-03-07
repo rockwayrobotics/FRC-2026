@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,18 +22,26 @@ import frc.robot.util.FieldRelativeSpeed;
 import frc.robot.util.GoalUtils;
 import frc.robot.util.LinearInterpolationTable;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ShooterCommands {
   private static LinearInterpolationTable m_timeTable = ShooterConstants.kShotTimesTable;
   private static LinearInterpolationTable m_hoodTable = ShooterConstants.kHoodTable;
   private static LinearInterpolationTable m_rpmTable = ShooterConstants.kRPMTable;
 
+  private static LoggedNetworkNumber flywheelSpeed =
+      new LoggedNetworkNumber("Shooter/FlywheelSpeedSetter", 4250);
+  private static LoggedNetworkNumber hoodAngle =
+      new LoggedNetworkNumber("Shooter/HoodAngleSetter", 25);
+
   // 75" away from hub (front to front) at 4000 rpm
   public static Command testShoot(Shooter shooter) {
     return Commands.run(
         () -> {
-          shooter.setVelocityFlywheel(4500);
-          shooter.setPositionHood(Degrees.of(25));
+          double rpm = MathUtil.clamp(flywheelSpeed.get(), 3000, 5000);
+          double hood = MathUtil.clamp(hoodAngle.get(), 5, 45);
+          shooter.setVelocityFlywheel(rpm);
+          shooter.setPositionHood(Degrees.of(hood));
         },
         shooter);
   }

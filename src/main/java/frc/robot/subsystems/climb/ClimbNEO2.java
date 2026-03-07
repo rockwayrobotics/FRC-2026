@@ -28,7 +28,7 @@ public class ClimbNEO2 implements ClimbIO {
 
   public ClimbNEO2() {
     var config = new SparkMaxConfig();
-    config.idleMode(IdleMode.kBrake).smartCurrentLimit(60).voltageCompensation(12.0);
+    config.idleMode(IdleMode.kBrake).inverted(true).smartCurrentLimit(60).voltageCompensation(12.0);
     // Convert wheel revolutions to mm
     config.encoder.positionConversionFactor(
         ClimbConstants.CLIMB_SPOOL_DIAMETER.in(Millimeters)
@@ -48,6 +48,8 @@ public class ClimbNEO2 implements ClimbIO {
         () ->
             motor.configure(
                 config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+
+    encoder.setPosition(0);
   }
 
   @Override
@@ -67,5 +69,10 @@ public class ClimbNEO2 implements ClimbIO {
     } else {
       controller.setSetpoint(pose, ControlType.kPosition, slowSlot);
     }
+  }
+
+  @Override
+  public void dutyCycle(double value) {
+    motor.set(value);
   }
 }

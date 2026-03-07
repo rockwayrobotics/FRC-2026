@@ -7,6 +7,9 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -18,13 +21,20 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String camera_front = "OV9782_Front";
+  public static String camera_front = "OV9281_Front";
   public static String camera_back = "OV9281_Back";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
+  // 31/16" from left of frame perimeter
+  // 20 1/2" above floor
+  // 11 3/4" from center
   public static Transform3d robotToCameraFront =
-      new Transform3d(0.34, 0.083, 0.28, new Rotation3d(0.0, -15 * Math.PI / 180.0, 0));
+      new Transform3d(
+          Inches.of(11.75).in(Meters),
+          Inches.of(27.5 * 0.5 - 0.9375).in(Meters),
+          Inches.of(20.5).in(Meters),
+          new Rotation3d(0.0, -10 * Math.PI / 180.0, 0));
   public static Transform3d robotToCameraBack =
       new Transform3d(-0.376, -0.094, 0.29, new Rotation3d(0, 0, Math.PI));
 

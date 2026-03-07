@@ -43,4 +43,8 @@ public class Climb extends SubsystemBase {
   public void unclimb() {
     setPos(ClimbConstants.EXTEND_HEIGHT.in(Millimeters), false);
   }
+
+  public void dutyCycle(double value) {
+    climbIO.dutyCycle(value);
+  }
 }

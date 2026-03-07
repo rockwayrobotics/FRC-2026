@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
@@ -7,11 +8,17 @@ import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.GameHubStatus;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class IndexerCommands {
   public static final double FLYWHEEL_RPM_TOLERANCE = 100;
   public static final double HEADING_TOLERANCE_DEGREES = 5;
   public static boolean isShooting = false;
+
+  private static LoggedNetworkNumber augerDutyNumber =
+      new LoggedNetworkNumber("Indexer/AugerDuty", 0.6);
+  private static LoggedNetworkNumber kickerVelocityNumber =
+      new LoggedNetworkNumber("Indexer/KickerRPM", 3500);
 
   public static Command feedShooterFancy(Indexer indexer, Shooter shooter, Drive drive) {
     return Commands.sequence(
@@ -40,8 +47,12 @@ public class IndexerCommands {
     return Commands.sequence(
             Commands.run(
                 () -> {
-                  indexer.augersFeed();
-                  indexer.setVelocityKicker(IndexerConstants.KICKER_FEED_RPM);
+                  // indexer.augersFeed();
+                  // indexer.setVelocityKicker(IndexerConstants.KICKER_FEED_RPM);
+                  double augerDuty = MathUtil.clamp(augerDutyNumber.get(), 0.1, 0.6);
+                  double kickerRPM = MathUtil.clamp(kickerVelocityNumber.get(), 3000, 5000);
+                  indexer.setAugers(augerDuty);
+                  indexer.setVelocityKicker(kickerRPM);
                 },
                 indexer))
         .finallyDo(

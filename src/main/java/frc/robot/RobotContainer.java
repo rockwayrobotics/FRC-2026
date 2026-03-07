@@ -29,7 +29,6 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IndexerCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
-import frc.robot.commands.TestCommands;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbNEO2;
@@ -87,7 +86,6 @@ public class RobotContainer {
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final GenericHID operatorButtonBoard = new GenericHID(2);
-
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -107,8 +105,12 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVision(camera_front, robotToCameraFront),
-                new VisionIOPhotonVision(camera_back, robotToCameraBack));
+                new VisionIOPhotonVision(camera_front, robotToCameraFront) /*
+                                                                                    * ,
+                                                                                    * new
+                                                                                    * VisionIOPhotonVision(camera_back,
+                                                                                    * robotToCameraBack)
+                                                                                    */);
 
         indexer = new Indexer(new IndexerReal());
         intake = new Intake(new IntakeReal());
@@ -205,8 +207,8 @@ public class RobotContainer {
     // Stop intake rollers by default
     intake.setDefaultCommand(IntakeCommands.intakeManual(intake, 0.0));
 
-    // There is no default climb command so that it continues to go to its setpoint.
-    // FIXME: Figure out climb
+    // Stop climb by default
+    climb.setDefaultCommand(Commands.run(() -> climb.stop(), climb));
   }
 
   private void configureDriverCommands() {
@@ -226,21 +228,21 @@ public class RobotContainer {
     // Point at Hub
     controller
         .leftTrigger()
-        // .and(controller.rightBumper().negate())
+        .and(controller.rightBumper().negate())
         .whileTrue(ShooterCommands.testShoot(shooter));
     // ShooterCommands.aimOnMove(
-    //  shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
+    // shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
 
     // Point at Hub while slow down
     // controller
-    //     .rightBumper()
-    //     .and(controller.leftTrigger())
-    //     .whileTrue(
-    //         ShooterCommands.aimOnMove(
-    //             shooter,
-    //             drive,
-    //             () -> -controller.getLeftY() * SLOW_SPEED,
-    //             () -> -controller.getLeftX() * SLOW_SPEED));
+    // .rightBumper()
+    // .and(controller.leftTrigger())
+    // .whileTrue(
+    // ShooterCommands.aimOnMove(
+    // shooter,
+    // drive,
+    // () -> -controller.getLeftY() * SLOW_SPEED,
+    // () -> -controller.getLeftX() * SLOW_SPEED));
 
     // Shoot Sequence
     controller.rightTrigger().whileTrue(IndexerCommands.feedShooter(indexer));
@@ -264,29 +266,51 @@ public class RobotContainer {
     // Auto-Intake
     controller.leftBumper().whileTrue(IntakeCommands.autoIntake(intakeExtender, intake));
 
+    controller
+        .povUp()
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  climb.dutyCycle(0.5);
+                },
+                climb));
+
+    controller
+        .povDown()
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  climb.dutyCycle(-0.5);
+                },
+                climb));
+
     //////////// Testing commands below here ///////////////////////
 
     // FIXME: Probably remove this after shot testing
-    controller.a().whileTrue(TestCommands.testShot(shooter, indexer));
     /*
-    controller.rightBumper().whileTrue(Commands.run(() -> indexer.setVelocityKicker(100), indexer));
-
-    controller
-            .y()
-            .whileTrue(
-                    DriveCommands.joystickDrivePointAtHub(
-                            drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
-    controller
-            .leftTrigger()
-            .whileTrue(
-                    Commands.parallel(
-                            ShooterCommands.aimOnMove(
-                                    shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()),
-                            IndexerCommands.feedShooterFancy(indexer, shooter, drive)));
-
-    controller.povLeft().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kCCW_90deg));
-    controller.povRight().whileTrue(DriveCommands.turnSetpoint(drive, Rotation2d.kPi));
-    */
+     * ontroller.a().whileTrue(TestCommands.testShot(shooter, indexer));
+     *
+     * controller.rightBumper().whileTrue(Commands.run(() ->
+     * indexer.setVelocityKicker(100), indexer));
+     *
+     * controller
+     * .y()
+     * .whileTrue(
+     * DriveCommands.joystickDrivePointAtHub(
+     * drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
+     * controller
+     * .leftTrigger()
+     * .whileTrue(
+     * Commands.parallel(
+     * ShooterCommands.aimOnMove(
+     * shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()),
+     * IndexerCommands.feedShooterFancy(indexer, shooter, drive)));
+     *
+     * controller.povLeft().whileTrue(DriveCommands.turnSetpoint(drive,
+     * Rotation2d.kCCW_90deg));
+     * controller.povRight().whileTrue(DriveCommands.turnSetpoint(drive,
+     * Rotation2d.kPi));
+     */
   }
 
   private void configureOperatorCommands() {
@@ -359,25 +383,35 @@ public class RobotContainer {
     ////////////////////// Testing commands below here ///////////////////////
 
     /*
-    operatorController.b().whileTrue(Commands.run(() -> indexer.augersFeed(), indexer));
-    operatorController.x().whileTrue(Commands.run(() -> indexer.augersReverse(), indexer));
-    operatorController.x().whileTrue(Commands.run(() -> indexer.setVelocityKicker(100), indexer));
-
-    operatorController.povDown().onTrue(Commands.runOnce(() -> climb.unclimb(), climb));
-    operatorController.povUp().onTrue(Commands.runOnce(() -> climb.climb(), climb));
-    operatorController.povRight().onTrue(Commands.runOnce(() -> climb.extend(), climb));
-    operatorController.povLeft().onTrue(Commands.runOnce(() -> climb.retract(), climb));
-
-    operatorController.a().whileTrue(Commands.run(() -> shooter.setVelocityFlywheel(200), shooter));
-    operatorController
-            .y()
-            .whileTrue(
-                    Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(0, Degrees)), shooter));
-    operatorController
-            .povCenter()
-            .whileTrue(
-                    Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(30, Degrees)), shooter));
-    */
+     * operatorController.b().whileTrue(Commands.run(() -> indexer.augersFeed(),
+     * indexer));
+     * operatorController.x().whileTrue(Commands.run(() -> indexer.augersReverse(),
+     * indexer));
+     * operatorController.x().whileTrue(Commands.run(() ->
+     * indexer.setVelocityKicker(100), indexer));
+     *
+     * operatorController.povDown().onTrue(Commands.runOnce(() -> climb.unclimb(),
+     * climb));
+     * operatorController.povUp().onTrue(Commands.runOnce(() -> climb.climb(),
+     * climb));
+     * operatorController.povRight().onTrue(Commands.runOnce(() -> climb.extend(),
+     * climb));
+     * operatorController.povLeft().onTrue(Commands.runOnce(() -> climb.retract(),
+     * climb));
+     *
+     * operatorController.a().whileTrue(Commands.run(() ->
+     * shooter.setVelocityFlywheel(200), shooter));
+     * operatorController
+     * .y()
+     * .whileTrue(
+     * Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(0, Degrees)),
+     * shooter));
+     * operatorController
+     * .povCenter()
+     * .whileTrue(
+     * Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(30, Degrees)),
+     * shooter));
+     */
   }
 
   /**
@@ -411,15 +445,15 @@ public class RobotContainer {
     configureOperatorCommands();
 
     /*
-    // Sad, no weight, no LEDs
-    LEDPattern base =
-        LEDPattern.progressMaskLayer(
-            () -> {
-              return 1.0 - (Math.abs(drive.getRotation().getDegrees()) / 180.0);
-            });
-    LEDPattern rainbow = LEDPattern.solid(Color.kBlue);
-    controller.povUp().whileTrue(led.runPattern(rainbow.mask(base)));
-    */
+     * // Sad, no weight, no LEDs
+     * LEDPattern base =
+     * LEDPattern.progressMaskLayer(
+     * () -> {
+     * return 1.0 - (Math.abs(drive.getRotation().getDegrees()) / 180.0);
+     * });
+     * LEDPattern rainbow = LEDPattern.solid(Color.kBlue);
+     * controller.povUp().whileTrue(led.runPattern(rainbow.mask(base)));
+     */
   }
 
   /**
