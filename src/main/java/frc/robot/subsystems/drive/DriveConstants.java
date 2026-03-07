@@ -96,7 +96,7 @@ public class DriveConstants {
         .encoderChannel(0)
         .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
-        .encoderOffset(Rotation2d.fromRadians(-3.8368 + Math.PI / 4))
+        .encoderOffset(Rotation2d.fromRadians(-5.436 + Math.PI / 4))
         .turnInverted(true)
         .encoderInverted(false)
         .build(),
@@ -107,7 +107,7 @@ public class DriveConstants {
         .encoderChannel(1)
         .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
-        .encoderOffset(Rotation2d.fromRadians(-1.924 - Math.PI / 4))
+        .encoderOffset(Rotation2d.fromRadians(-3.029 - Math.PI / 4))
         .turnInverted(true)
         .encoderInverted(false)
         .build(),
@@ -118,7 +118,7 @@ public class DriveConstants {
         .encoderChannel(3)
         .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
-        .encoderOffset(Rotation2d.fromRadians(-3.054 + 3 * Math.PI / 4))
+        .encoderOffset(Rotation2d.fromRadians(-5.774 + 3 * Math.PI / 4))
         .turnInverted(true)
         .encoderInverted(false)
         .build(),
@@ -129,7 +129,7 @@ public class DriveConstants {
         .encoderChannel(2)
         .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
-        .encoderOffset(Rotation2d.fromRadians(-4.836 - 3 * Math.PI / 4))
+        .encoderOffset(Rotation2d.fromRadians(-4.879 - 3 * Math.PI / 4))
         .turnInverted(true)
         .encoderInverted(false)
         .build()

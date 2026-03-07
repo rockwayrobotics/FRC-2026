@@ -32,8 +32,6 @@ import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.TestCommands;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbIO;
-import frc.robot.subsystems.climb.ClimbNEO2;
-import frc.robot.subsystems.climb.ClimbSimKraken;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -44,21 +42,17 @@ import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.subsystems.indexer.IndexerIO;
-import frc.robot.subsystems.indexer.IndexerReal;
 import frc.robot.subsystems.indexer.IndexerSim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
-import frc.robot.subsystems.intake.IntakeReal;
 import frc.robot.subsystems.intake.IntakeSim;
 import frc.robot.subsystems.intakeExtender.IntakeExtender;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderIO;
-import frc.robot.subsystems.intakeExtender.IntakeExtenderReal;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderSim;
 import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
-import frc.robot.subsystems.shooter.ShooterReal;
 import frc.robot.subsystems.shooter.ShooterSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -107,14 +101,14 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVision(camera_front, robotToCameraFront),
-                new VisionIOPhotonVision(camera_back, robotToCameraBack));
+                new VisionIOPhotonVision(camera_front, robotToCameraFront));
+        // new VisionIOPhotonVision(camera_back, robotToCameraBack));
 
-        indexer = new Indexer(new IndexerReal());
-        intake = new Intake(new IntakeReal());
-        intakeExtender = new IntakeExtender(new IntakeExtenderReal());
-        shooter = new Shooter(new ShooterReal());
-        climb = new Climb(new ClimbNEO2());
+        indexer = new Indexer(new IndexerSim());
+        intake = new Intake(new IntakeSim());
+        intakeExtender = new IntakeExtender(new IntakeExtenderSim());
+        shooter = new Shooter(new ShooterSim());
+        climb = new Climb(new ClimbIO() {});
         break;
 
       case SIM:
@@ -136,7 +130,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeSim());
         intakeExtender = new IntakeExtender(new IntakeExtenderSim());
         shooter = new Shooter(new ShooterSim());
-        climb = new Climb(new ClimbSimKraken());
+        climb = new Climb(new ClimbIO() {});
         break;
 
       default:
