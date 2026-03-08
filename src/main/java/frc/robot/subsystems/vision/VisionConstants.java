@@ -29,14 +29,16 @@ public class VisionConstants {
   // 31/16" from left of frame perimeter
   // 20 1/2" above floor
   // 11 3/4" from center
-  public static Transform3d robotToCameraFront =
+  public static Transform3d robotToCameraFront_REAL_BACKUP =
       new Transform3d(
           Inches.of(11.75).in(Meters),
           Inches.of(27.5 * 0.5 - 0.9375).in(Meters),
           Inches.of(20.5).in(Meters),
           new Rotation3d(0.0, -10 * Math.PI / 180.0, 0));
+  public static Transform3d robotToCameraFront =
+      new Transform3d(0.376, 0.094, 0.29, new Rotation3d(0, 0, 0));
   public static Transform3d robotToCameraBack =
-      new Transform3d(-0.376, -0.094, 0.29, new Rotation3d(0, 0, Math.PI));
+      new Transform3d(-0.376, -0.094, 0.29, new Rotation3d(0, 0, 0));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
