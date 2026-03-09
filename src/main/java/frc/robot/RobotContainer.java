@@ -374,12 +374,19 @@ public class RobotContainer {
     operatorController
         .leftTrigger()
         .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
-    operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer, kicker));
+    // operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer, kicker));
 
     // Agitate
     operatorController.a().whileTrue(IndexerCommands.agitate(indexer, kicker));
-    // Unjam
-    operatorController.b().whileTrue(IndexerCommands.unjam(indexer, kicker));
+    // Unjam - DISABLED
+    // operatorController.b().whileTrue(IndexerCommands.unjam(indexer, kicker));
+
+    // operatorController.a().whileTrue(ShooterCommands.cornerSetpointShoot(shooter, hood));
+    operatorController.b().whileTrue(ShooterCommands.trenchSetpointShoot(shooter, hood));
+    operatorController.x().whileTrue(ShooterCommands.sideTowerSetpointShoot(shooter, hood));
+    operatorController.y().whileTrue(ShooterCommands.towerSetpointShoot(shooter, hood));
+
+    operatorController.leftTrigger().whileTrue(ShooterCommands.activateDeferredHood(hood));
 
     // Forward Augers
     new JoystickButton(operatorButtonBoard, 3).whileTrue(IndexerCommands.augersFeed(indexer));

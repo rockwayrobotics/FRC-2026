@@ -10,6 +10,7 @@ public class Hood extends SubsystemBase {
   private final HoodIO hoodIO;
   private final HoodIOInputsAutoLogged hoodInputs = new HoodIOInputsAutoLogged();
   private Angle hoodAngle = Degrees.of(0);
+  private Angle deferredSetpoint = Degrees.of(0);
 
   public Hood(HoodIO hoodIO) {
     this.hoodIO = hoodIO;
@@ -34,5 +35,13 @@ public class Hood extends SubsystemBase {
 
   public Angle getPositionHood() {
     return hoodAngle;
+  }
+
+  public void setDeferredSetpoint(Angle angle) {
+    deferredSetpoint = angle;
+  }
+
+  public Angle getDeferredSetpoint() {
+    return deferredSetpoint;
   }
 }

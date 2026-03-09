@@ -36,6 +36,23 @@ public class ShooterCommands {
   private static LoggedNetworkNumber hoodAngle =
       new LoggedNetworkNumber("Shooter/HoodAngleSetter", 25);
 
+  private static LoggedNetworkNumber trenchSetpointFlywheel =
+      new LoggedNetworkNumber("Setpoints/TrenchFlywheel", 4250);
+  private static LoggedNetworkNumber trenchSetpointHood =
+      new LoggedNetworkNumber("Setpoints/TrenchHood", 25);
+  private static LoggedNetworkNumber towerSetpointFlywheel =
+      new LoggedNetworkNumber("Setpoints/TowerFlywheel", 4250);
+  private static LoggedNetworkNumber towerSetpointHood =
+      new LoggedNetworkNumber("Setpoints/TowerHood", 30);
+  private static LoggedNetworkNumber sideTowerSetpointFlywheel =
+      new LoggedNetworkNumber("Setpoints/SideTowerFlywheel", 4250);
+  private static LoggedNetworkNumber sideTowerSetpointHood =
+      new LoggedNetworkNumber("Setpoints/SideTowerHood", 25);
+  private static LoggedNetworkNumber cornerSetpointFlywheel =
+      new LoggedNetworkNumber("Setpoints/CornerFlywheel", 4250);
+  private static LoggedNetworkNumber cornerSetpointHood =
+      new LoggedNetworkNumber("Setpoints/CornerHood", 20);
+
   // 75" away from hub (front to front) at 4000 rpm
   public static Command testShoot(Shooter shooter, Hood hood) {
     return Commands.run(
@@ -46,6 +63,49 @@ public class ShooterCommands {
           hood.setPositionHood(Degrees.of(hoodDegrees));
         },
         shooter);
+  }
+
+  /**
+   * Spins up flywheel to setpoint, stores desired hood angle but does not command any movement on
+   * it.
+   *
+   * @param shooter IS a requirement
+   * @param hood is NOT a requirement here, it just sets it up for triggering
+   * @return
+   */
+  private static Command setpointShoot(Shooter shooter, Hood hood, Angle hoodAngle, double rpm) {
+    return Commands.startRun(
+        () -> {
+          hood.setDeferredSetpoint(hoodAngle);
+        },
+        () -> {
+          shooter.setVelocityFlywheel(rpm);
+        },
+        shooter);
+  }
+
+  public static Command trenchSetpointShoot(Shooter shooter, Hood hood) {
+    return setpointShoot(
+        shooter, hood, Degrees.of(trenchSetpointHood.get()), trenchSetpointFlywheel.get());
+  }
+
+  public static Command towerSetpointShoot(Shooter shooter, Hood hood) {
+    return setpointShoot(
+        shooter, hood, Degrees.of(towerSetpointHood.get()), towerSetpointFlywheel.get());
+  }
+
+  public static Command sideTowerSetpointShoot(Shooter shooter, Hood hood) {
+    return setpointShoot(
+        shooter, hood, Degrees.of(sideTowerSetpointHood.get()), sideTowerSetpointFlywheel.get());
+  }
+
+  public static Command cornerSetpointShoot(Shooter shooter, Hood hood) {
+    return setpointShoot(
+        shooter, hood, Degrees.of(cornerSetpointHood.get()), cornerSetpointFlywheel.get());
+  }
+
+  public static Command activateDeferredHood(Hood hood) {
+    return Commands.run(() -> hood.setPositionHood(hood.getDeferredSetpoint()), hood);
   }
 
   public static Command aimOnMove(
