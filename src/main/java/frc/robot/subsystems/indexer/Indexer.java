@@ -42,11 +42,6 @@ public class Indexer extends SubsystemBase { // Defines every Subsystem
     // setVelocityAugers(IndexerConstants.REVERSE_VELOCITY_RPM); // References preset value
   }
 
-  public void setVelocityKicker(double RPM) {
-    Logger.recordOutput("Indexer/KickerVelocityRPM", RPM);
-    indexerIO.setVelocityKicker(RPM);
-  }
-
   public void stop() { // Stops all indexer motors.
     indexerIO.stop();
   }

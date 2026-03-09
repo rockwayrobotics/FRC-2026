@@ -18,6 +18,4 @@ public interface IndexerIO {
   public default void setAugers(double value) {}
 
   public default void setVelocityAugers(double RPM) {}
-
-  public default void setVelocityKicker(double RPM) {}
 }

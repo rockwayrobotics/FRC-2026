@@ -12,11 +12,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
 import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.kicker.Kicker;
 import frc.robot.subsystems.shooter.Shooter;
 
 public class TestCommands {
 
-  public static Command testShot(Shooter shooter, Indexer indexer) {
+  public static Command testShot(Shooter shooter, Indexer indexer, Kicker kicker) {
     final NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
     final NetworkTable table = ntInstance.getTable("ShooterTest");
 
@@ -71,14 +72,15 @@ public class TestCommands {
                       double kickerRPM = testKickerSubscriber.get();
                       kickerRPM = MathUtil.clamp(kickerRPM, 0, 2500);
                       kickerRPMPublisher.set(kickerRPM); // In case it was out of range
-                      indexer.setVelocityKicker(kickerRPM);
+                      kicker.setVelocityKicker(kickerRPM);
                     }))
             .finallyDo(
                 () -> {
                   indexer.stop();
+                  kicker.stop();
                   shooter.stop();
                 });
-    sequence.addRequirements(shooter, indexer);
+    sequence.addRequirements(shooter, indexer, kicker);
     return sequence;
   }
   ;

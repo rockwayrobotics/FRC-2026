@@ -41,7 +41,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.indexer.Indexer;
-import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.subsystems.indexer.IndexerIO;
 import frc.robot.subsystems.indexer.IndexerReal;
 import frc.robot.subsystems.indexer.IndexerSim;
@@ -54,6 +53,11 @@ import frc.robot.subsystems.intakeExtender.IntakeExtender;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderIO;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderReal;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderSim;
+import frc.robot.subsystems.kicker.Kicker;
+import frc.robot.subsystems.kicker.KickerConstants;
+import frc.robot.subsystems.kicker.KickerIO;
+import frc.robot.subsystems.kicker.KickerReal;
+import frc.robot.subsystems.kicker.KickerSim;
 import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterIO;
@@ -77,6 +81,7 @@ public class RobotContainer {
   private final Vision vision;
   private final Led led;
   private final Indexer indexer;
+  private final Kicker kicker;
   private final Intake intake;
   private final IntakeExtender intakeExtender;
   private final Shooter shooter;
@@ -113,6 +118,7 @@ public class RobotContainer {
                                                                                     */);
 
         indexer = new Indexer(new IndexerReal());
+        kicker = new Kicker(new KickerReal());
         intake = new Intake(new IntakeReal());
         intakeExtender = new IntakeExtender(new IntakeExtenderReal());
         shooter = new Shooter(new ShooterReal());
@@ -135,6 +141,7 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(camera_back, robotToCameraBack, drive::getPose));
 
         indexer = new Indexer(new IndexerSim());
+        kicker = new Kicker(new KickerSim());
         intake = new Intake(new IntakeSim());
         intakeExtender = new IntakeExtender(new IntakeExtenderSim());
         shooter = new Shooter(new ShooterSim());
@@ -152,6 +159,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         indexer = new Indexer(new IndexerIO() {});
+        kicker = new Kicker(new KickerIO() {});
         intake = new Intake(new IntakeIO() {});
         intakeExtender = new IntakeExtender(new IntakeExtenderIO() {});
         shooter = new Shooter(new ShooterIO() {});
@@ -196,6 +204,9 @@ public class RobotContainer {
 
     // Stop indexer by default
     indexer.setDefaultCommand(Commands.run(() -> indexer.stop(), indexer));
+
+    // Stop kicker by default
+    kicker.setDefaultCommand(Commands.run(() -> kicker.stop(), kicker));
 
     // Stop shooter by default (coast mode flywheel)
     // This also retracts hood
@@ -245,7 +256,7 @@ public class RobotContainer {
     // () -> -controller.getLeftX() * SLOW_SPEED));
 
     // Shoot Sequence
-    controller.rightTrigger().whileTrue(IndexerCommands.feedShooter(indexer));
+    controller.rightTrigger().whileTrue(IndexerCommands.feedShooter(indexer, kicker));
 
     // X-Stop
     // FIXME: Change this to D-M1 and D-M2??
@@ -353,12 +364,12 @@ public class RobotContainer {
     operatorController
         .leftTrigger()
         .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
-    operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer));
+    operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer, kicker));
 
     // Agitate
-    operatorController.a().whileTrue(IndexerCommands.agitate(indexer));
+    operatorController.a().whileTrue(IndexerCommands.agitate(indexer, kicker));
     // Unjam
-    operatorController.b().whileTrue(IndexerCommands.unjam(indexer));
+    operatorController.b().whileTrue(IndexerCommands.unjam(indexer, kicker));
 
     // Forward Augers
     new JoystickButton(operatorButtonBoard, 3).whileTrue(IndexerCommands.augersFeed(indexer));
@@ -375,10 +386,10 @@ public class RobotContainer {
 
     // Manual kicker forward
     new JoystickButton(operatorButtonBoard, 2)
-        .onTrue(IndexerCommands.kickerVelocity(indexer, IndexerConstants.KICKER_FEED_RPM));
+        .onTrue(IndexerCommands.toggleKickerVelocity(kicker, KickerConstants.KICKER_FEED_RPM));
     // Reverse kicker
     new JoystickButton(operatorButtonBoard, 1)
-        .onTrue(IndexerCommands.kickerVelocity(indexer, IndexerConstants.KICKER_AGITATE_RPM));
+        .onTrue(IndexerCommands.toggleKickerVelocity(kicker, KickerConstants.KICKER_AGITATE_RPM));
 
     ////////////////////// Testing commands below here ///////////////////////
 
