@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.util.FieldRelativeAccel;
@@ -26,7 +28,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ShooterCommands {
   private static LinearInterpolationTable m_timeTable = ShooterConstants.kShotTimesTable;
-  private static LinearInterpolationTable m_hoodTable = ShooterConstants.kHoodTable;
+  private static LinearInterpolationTable m_hoodTable = HoodConstants.kHoodTable;
   private static LinearInterpolationTable m_rpmTable = ShooterConstants.kRPMTable;
 
   private static LoggedNetworkNumber flywheelSpeed =
@@ -35,19 +37,19 @@ public class ShooterCommands {
       new LoggedNetworkNumber("Shooter/HoodAngleSetter", 25);
 
   // 75" away from hub (front to front) at 4000 rpm
-  public static Command testShoot(Shooter shooter) {
+  public static Command testShoot(Shooter shooter, Hood hood) {
     return Commands.run(
         () -> {
           double rpm = MathUtil.clamp(flywheelSpeed.get(), 3000, 5000);
-          double hood = MathUtil.clamp(hoodAngle.get(), 5, 45);
+          double hoodDegrees = MathUtil.clamp(hoodAngle.get(), 5, 45);
           shooter.setVelocityFlywheel(rpm);
-          shooter.setPositionHood(Degrees.of(hood));
+          hood.setPositionHood(Degrees.of(hoodDegrees));
         },
         shooter);
   }
 
   public static Command aimOnMove(
-      Shooter shooter, Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
+      Shooter shooter, Hood hood, Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
     // Create PID controller
     ProfiledPIDController angleController =
         new ProfiledPIDController(
@@ -147,20 +149,26 @@ public class ShooterCommands {
                */
               shooter.setVelocityFlywheel(m_rpmTable.getOutput(newDist));
               Angle hoodAngleAsAngle = Degrees.of(m_hoodTable.getOutput(newDist));
-              shooter.setPositionHood(hoodAngleAsAngle);
+              hood.setPositionHood(hoodAngleAsAngle);
 
               // }
 
             },
             drive,
-            shooter)
+            shooter,
+            hood)
         .finallyDo(
             () -> {
               shooter.stop();
+              hood.stop();
             });
   }
 
   public static Command manualFlywheel(Shooter shooter, DoubleSupplier rpmSupplier) {
     return Commands.run(() -> shooter.setVelocityFlywheel(rpmSupplier.getAsDouble()), shooter);
+  }
+
+  public static Command manualHood(Hood hood, DoubleSupplier angleSupplier) {
+    return Commands.run(() -> hood.setPositionHood(Degrees.of(angleSupplier.getAsDouble())), hood);
   }
 }

@@ -11,13 +11,14 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Robot;
+import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.kicker.Kicker;
 import frc.robot.subsystems.shooter.Shooter;
 
 public class TestCommands {
 
-  public static Command testShot(Shooter shooter, Indexer indexer, Kicker kicker) {
+  public static Command testShot(Shooter shooter, Hood hood, Indexer indexer, Kicker kicker) {
     final NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
     final NetworkTable table = ntInstance.getTable("ShooterTest");
 
@@ -58,7 +59,7 @@ public class TestCommands {
                         double hoodPosition = testHoodSubscriber.get();
                         hoodPosition = MathUtil.clamp(hoodPosition, 15, 45);
                         hoodAnglePublisher.set(hoodPosition); // In case it was out of range
-                        shooter.setPositionHood(Degrees.of(hoodPosition));
+                        hood.setPositionHood(Degrees.of(hoodPosition));
                       }
                     }),
                 Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
@@ -79,8 +80,9 @@ public class TestCommands {
                   indexer.stop();
                   kicker.stop();
                   shooter.stop();
+                  hood.stop();
                 });
-    sequence.addRequirements(shooter, indexer, kicker);
+    sequence.addRequirements(shooter, hood, indexer, kicker);
     return sequence;
   }
   ;

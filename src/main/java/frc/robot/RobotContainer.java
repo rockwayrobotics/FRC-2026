@@ -16,11 +16,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -40,6 +38,10 @@ import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.hood.HoodIO;
+import frc.robot.subsystems.hood.HoodReal;
+import frc.robot.subsystems.hood.HoodSim;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.IndexerIO;
 import frc.robot.subsystems.indexer.IndexerReal;
@@ -85,6 +87,7 @@ public class RobotContainer {
   private final Intake intake;
   private final IntakeExtender intakeExtender;
   private final Shooter shooter;
+  private final Hood hood;
   private final Climb climb;
 
   // Controller
@@ -122,6 +125,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeReal());
         intakeExtender = new IntakeExtender(new IntakeExtenderReal());
         shooter = new Shooter(new ShooterReal());
+        hood = new Hood(new HoodReal());
         climb = new Climb(new ClimbNEO2());
         break;
 
@@ -145,6 +149,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeSim());
         intakeExtender = new IntakeExtender(new IntakeExtenderSim());
         shooter = new Shooter(new ShooterSim());
+        hood = new Hood(new HoodSim());
         climb = new Climb(new ClimbSimKraken());
         break;
 
@@ -163,6 +168,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeIO() {});
         intakeExtender = new IntakeExtender(new IntakeExtenderIO() {});
         shooter = new Shooter(new ShooterIO() {});
+        hood = new Hood(new HoodIO() {});
         climb = new Climb(new ClimbIO() {});
         break;
     }
@@ -209,8 +215,10 @@ public class RobotContainer {
     kicker.setDefaultCommand(Commands.run(() -> kicker.stop(), kicker));
 
     // Stop shooter by default (coast mode flywheel)
-    // This also retracts hood
     shooter.setDefaultCommand(Commands.run(() -> shooter.stop(), shooter));
+
+    // Retract hood by default
+    hood.setDefaultCommand(Commands.run(() -> hood.stop(), hood));
 
     // Retract intake by default
     intakeExtender.setDefaultCommand(IntakeCommands.autoRetract(intakeExtender));
@@ -240,7 +248,7 @@ public class RobotContainer {
     controller
         .leftTrigger()
         .and(controller.rightBumper().negate())
-        .whileTrue(ShooterCommands.testShoot(shooter));
+        .whileTrue(ShooterCommands.testShoot(shooter, hood));
     // ShooterCommands.aimOnMove(
     // shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
 
@@ -299,7 +307,7 @@ public class RobotContainer {
 
     // FIXME: Probably remove this after shot testing
     /*
-     * ontroller.a().whileTrue(TestCommands.testShot(shooter, indexer));
+     * controller.a().whileTrue(TestCommands.testShot(shooter, hood, indexer, kicker));
      *
      * controller.rightBumper().whileTrue(Commands.run(() ->
      * indexer.setVelocityKicker(100), indexer));
@@ -330,7 +338,8 @@ public class RobotContainer {
     // Retract
     operatorController.rightBumper().onTrue(IntakeCommands.retract(intakeExtender));
 
-    // Complete fold
+    // Complete fold - DISABLED
+    /*
     double lastRBPressTime = 0.0;
     operatorController
         .rightBumper()
@@ -345,6 +354,7 @@ public class RobotContainer {
                   }
                 },
                 intake));
+    */
 
     // Manual extend
     new JoystickButton(operatorButtonBoard, 5)
@@ -376,13 +386,37 @@ public class RobotContainer {
     // Reverse Augers
     new JoystickButton(operatorButtonBoard, 4).whileTrue(IndexerCommands.augersReverse(indexer));
 
+    // XBox controller axes:
+    // 0: left stick X
+    // 1: left stick Y
+    // 2: left trigger
+    // 3: right trigger
+    // 4: right stick X
+    // 5: right stick Y
+    // Y-axes are inverted, so pushing stick forward gives negative value.
+
     // Manual spin up
     // Do something with
     // operatorController.getRightY();
+    /*operatorController
+    .axisMagnitudeGreaterThan(5, 0.1)
+    .whileTrue(
+        Commands.run(
+            () -> {
+              System.out.println("Right stick on: " + -operatorController.getRightY());
+            }));
+            */
 
     // Manual hood pivot
     // Do something with
     // operatorController.getLeftY();
+    /*operatorController
+    .axisMagnitudeGreaterThan(1, 0.1)
+    .whileTrue(
+        Commands.run(
+            () -> {
+              System.out.println("Left stick on: " + -operatorController.getLeftY());
+            }));*/
 
     // Manual kicker forward
     new JoystickButton(operatorButtonBoard, 2)

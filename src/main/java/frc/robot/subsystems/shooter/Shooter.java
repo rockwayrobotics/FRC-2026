@@ -1,8 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import static edu.wpi.first.units.Units.Degrees;
-
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -29,14 +26,7 @@ public class Shooter extends SubsystemBase {
     flywheelRPMSetpoint = RPM;
   }
 
-  public void setPositionHood(Angle angle) {
-    Logger.recordOutput("Shooter/HoodAngle", angle.in(Degrees));
-    Logger.recordOutput("Shooter/HoodAngleDashboard", angle.in(Degrees) + 0);
-    shooterIO.setPositionHood(angle);
-  }
-
   public void stop() {
-    shooterIO.stopHood();
     shooterIO.stopFlywheel();
   }
 
