@@ -7,7 +7,7 @@ import edu.wpi.first.units.measure.Distance;
 public class ClimbConstants {
   public static final double CLIMB_GEAR_RATIO = 81;
   public static final Distance CLIMB_SPOOL_DIAMETER = Millimeters.of(20.7);
-  public static final Distance EXTEND_HEIGHT = Millimeters.of(192);//Inches.of(11.375);
+  public static final Distance EXTEND_HEIGHT = Millimeters.of(192); // Inches.of(11.375);
   public static final Distance CLIMB_HEIGHT = Millimeters.of(180);
 
   public static class KrakenConstants {

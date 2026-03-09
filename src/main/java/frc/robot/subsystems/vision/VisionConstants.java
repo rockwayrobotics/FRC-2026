@@ -21,7 +21,7 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String camera_front = "OV9281_Front";
+  public static String camera_front = "OV9782_Front";
   public static String camera_back = "OV9281_Back";
 
   // Robot to camera transforms
