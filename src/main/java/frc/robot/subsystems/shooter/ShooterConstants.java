@@ -8,10 +8,10 @@ public class ShooterConstants {
   public static final Translation2d kShooterOffset = new Translation2d(-0.2278, 0.04319);
 
   // Flywheel PIDV Constants
-  public static final double FLYWHEEL_KP = 0.001;
+  public static final double FLYWHEEL_KP = 0.0008; // 0.001;
   public static final double FLYWHEEL_KI = 0.0;
-  public static final double FLYWHEEL_KD = 0.05;
-  public static final double FLYWHEEL_KV = 0.00117;
+  public static final double FLYWHEEL_KD = 0.02;
+  public static final double FLYWHEEL_KV = 0.0009;
   public static final double HOOD_KCOSRATIO = 0; // 0.76744186046511627906976744186047;
 
   public static final double FLYWHEEL_GEAR_RATIO = 0.5;

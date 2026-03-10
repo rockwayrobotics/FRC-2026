@@ -30,6 +30,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -67,7 +68,8 @@ public class DriveCommands {
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier) {
+      DoubleSupplier omegaSupplier,
+      BooleanSupplier ignoreSlewLimitSupplier) {
     return Commands.run(
         () -> {
           // Get linear velocity
@@ -80,12 +82,21 @@ public class DriveCommands {
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
 
+          Translation2d targetVelocity =
+              linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
+          double targetSpeed = targetVelocity.getNorm();
+          double limitedSpeed = targetSpeed;
+          if (!ignoreSlewLimitSupplier.getAsBoolean()) {
+            limitedSpeed = drive.getSlewRateLimiter().calculate(targetSpeed);
+          }
+          double xSpeed =
+              targetSpeed < 0.001 ? 0.0 : targetVelocity.getX() * limitedSpeed / targetSpeed;
+          double ySpeed =
+              targetSpeed < 0.001 ? 0.0 : targetVelocity.getY() * limitedSpeed / targetSpeed;
+
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
-              new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
+              new ChassisSpeeds(xSpeed, ySpeed, omega * drive.getMaxAngularSpeedRadPerSec());
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;

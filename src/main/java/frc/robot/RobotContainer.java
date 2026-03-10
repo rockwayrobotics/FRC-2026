@@ -201,12 +201,14 @@ public class RobotContainer {
     // Default command, normal field-relative drive
     // Strafe
     // Rotate
+
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> -controller.getRightX(),
+            () -> controller.leftBumper().getAsBoolean()));
 
     // Stop indexer by default
     indexer.setDefaultCommand(Commands.run(() -> indexer.stop(), indexer));
@@ -242,13 +244,32 @@ public class RobotContainer {
                 drive,
                 () -> -controller.getLeftY() * SLOW_SPEED,
                 () -> -controller.getLeftX() * SLOW_SPEED,
-                () -> -controller.getRightX() * SLOW_SPEED));
+                () -> -controller.getRightX() * SLOW_SPEED,
+                () -> true));
 
-    // Point at Hub
-    controller
-        .leftTrigger()
-        .and(controller.rightBumper().negate())
+    (operatorController
+            .a()
+            .or(operatorController.b())
+            .or(operatorController.x())
+            .or(operatorController.y()))
+        .and(controller.leftTrigger())
+        .whileTrue(ShooterCommands.activateDeferredHood(hood));
+    (operatorController
+            .a()
+            .or(operatorController.b())
+            .or(operatorController.x())
+            .or(operatorController.y()))
+        .negate()
+        .and(controller.leftTrigger())
         .whileTrue(ShooterCommands.testShoot(shooter, hood));
+
+    controller.povLeft().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    controller.povRight().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // Point at Hub
+    // controller
+    // .leftTrigger()
+    // .and(controller.rightBumper().negate())
+    // .whileTrue(ShooterCommands.testShoot(shooter, hood));
     // ShooterCommands.aimOnMove(
     // shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
 
@@ -269,7 +290,7 @@ public class RobotContainer {
     // X-Stop
     // FIXME: Change this to D-M1 and D-M2??
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when B button is pressed
     controller
@@ -283,7 +304,7 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Auto-Intake
-    controller.leftBumper().whileTrue(IntakeCommands.autoIntake(intakeExtender, intake));
+    // controller.leftBumper().whileTrue(IntakeCommands.autoIntake(intakeExtender, intake));
 
     controller
         .povUp()
@@ -307,7 +328,8 @@ public class RobotContainer {
 
     // FIXME: Probably remove this after shot testing
     /*
-     * controller.a().whileTrue(TestCommands.testShot(shooter, hood, indexer, kicker));
+     * controller.a().whileTrue(TestCommands.testShot(shooter, hood, indexer,
+     * kicker));
      *
      * controller.rightBumper().whileTrue(Commands.run(() ->
      * indexer.setVelocityKicker(100), indexer));
@@ -340,21 +362,21 @@ public class RobotContainer {
 
     // Complete fold - DISABLED
     /*
-    double lastRBPressTime = 0.0;
-    operatorController
-        .rightBumper()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  double now = Timer.getFPGATimestamp();
-                  if (lastRBPressTime > 0.0 && now - lastRBPressTime < 0.3) {
-                    // Double press, spit out balls for 3 seconds while folding
-                    CommandScheduler.getInstance()
-                        .schedule(IntakeCommands.ejectBalls(intakeExtender, intake));
-                  }
-                },
-                intake));
-    */
+     * double lastRBPressTime = 0.0;
+     * operatorController
+     * .rightBumper()
+     * .onTrue(
+     * Commands.runOnce(
+     * () -> {
+     * double now = Timer.getFPGATimestamp();
+     * if (lastRBPressTime > 0.0 && now - lastRBPressTime < 0.3) {
+     * // Double press, spit out balls for 3 seconds while folding
+     * CommandScheduler.getInstance()
+     * .schedule(IntakeCommands.ejectBalls(intakeExtender, intake));
+     * }
+     * },
+     * intake));
+     */
 
     // Manual extend
     new JoystickButton(operatorButtonBoard, 5)
@@ -374,14 +396,15 @@ public class RobotContainer {
     operatorController
         .leftTrigger()
         .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
-    // operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer, kicker));
+    // operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer,
+    // kicker));
 
     // Agitate
-    operatorController.a().whileTrue(IndexerCommands.agitate(indexer, kicker));
+    // operatorController.a().whileTrue(IndexerCommands.agitate(indexer, kicker));
     // Unjam - DISABLED
     // operatorController.b().whileTrue(IndexerCommands.unjam(indexer, kicker));
 
-    // operatorController.a().whileTrue(ShooterCommands.cornerSetpointShoot(shooter, hood));
+    operatorController.a().whileTrue(ShooterCommands.cornerSetpointShoot(shooter, hood));
     operatorController.b().whileTrue(ShooterCommands.trenchSetpointShoot(shooter, hood));
     operatorController.x().whileTrue(ShooterCommands.sideTowerSetpointShoot(shooter, hood));
     operatorController.y().whileTrue(ShooterCommands.towerSetpointShoot(shooter, hood));
@@ -393,6 +416,7 @@ public class RobotContainer {
     // Reverse Augers
     new JoystickButton(operatorButtonBoard, 4).whileTrue(IndexerCommands.augersReverse(indexer));
 
+    operatorController.back().onTrue(ShooterCommands.configureLeader(shooter));
     // XBox controller axes:
     // 0: left stick X
     // 1: left stick Y
@@ -405,25 +429,28 @@ public class RobotContainer {
     // Manual spin up
     // Do something with
     // operatorController.getRightY();
-    /*operatorController
-    .axisMagnitudeGreaterThan(5, 0.1)
-    .whileTrue(
-        Commands.run(
-            () -> {
-              System.out.println("Right stick on: " + -operatorController.getRightY());
-            }));
-            */
+    /*
+     * operatorController
+     * .axisMagnitudeGreaterThan(5, 0.1)
+     * .whileTrue(
+     * Commands.run(
+     * () -> {
+     * System.out.println("Right stick on: " + -operatorController.getRightY());
+     * }));
+     */
 
     // Manual hood pivot
     // Do something with
     // operatorController.getLeftY();
-    /*operatorController
-    .axisMagnitudeGreaterThan(1, 0.1)
-    .whileTrue(
-        Commands.run(
-            () -> {
-              System.out.println("Left stick on: " + -operatorController.getLeftY());
-            }));*/
+    /*
+     * operatorController
+     * .axisMagnitudeGreaterThan(1, 0.1)
+     * .whileTrue(
+     * Commands.run(
+     * () -> {
+     * System.out.println("Left stick on: " + -operatorController.getLeftY());
+     * }));
+     */
 
     // Manual kicker forward
     new JoystickButton(operatorButtonBoard, 2)

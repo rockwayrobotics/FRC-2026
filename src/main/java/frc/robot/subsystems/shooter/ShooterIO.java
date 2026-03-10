@@ -15,4 +15,6 @@ public interface ShooterIO {
   public default void setVelocityFlywheel(double RPM) {}
 
   public default void stopFlywheel() {}
+
+  public default void configureLeader(double kp, double ki, double kd, double kv) {}
 }

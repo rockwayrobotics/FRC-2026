@@ -41,4 +41,8 @@ public class Shooter extends SubsystemBase {
   public boolean atFlywheelSetpoint(double toleranceRPM) {
     return Math.abs(flywheelRPM - flywheelRPMSetpoint) < toleranceRPM;
   }
+
+  public void configureLeader(double kp, double ki, double kd, double kv) {
+    // shooterIO.configureLeader(kp, ki, kd, kv);
+  }
 }

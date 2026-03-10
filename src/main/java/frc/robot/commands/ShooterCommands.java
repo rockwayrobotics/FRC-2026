@@ -39,19 +39,19 @@ public class ShooterCommands {
   private static LoggedNetworkNumber trenchSetpointFlywheel =
       new LoggedNetworkNumber("Setpoints/TrenchFlywheel", 4250);
   private static LoggedNetworkNumber trenchSetpointHood =
-      new LoggedNetworkNumber("Setpoints/TrenchHood", 25);
+      new LoggedNetworkNumber("Setpoints/TrenchHood", 20);
   private static LoggedNetworkNumber towerSetpointFlywheel =
-      new LoggedNetworkNumber("Setpoints/TowerFlywheel", 4250);
+      new LoggedNetworkNumber("Setpoints/TowerFlywheel", 4000);
   private static LoggedNetworkNumber towerSetpointHood =
-      new LoggedNetworkNumber("Setpoints/TowerHood", 30);
+      new LoggedNetworkNumber("Setpoints/TowerHood", 22);
   private static LoggedNetworkNumber sideTowerSetpointFlywheel =
-      new LoggedNetworkNumber("Setpoints/SideTowerFlywheel", 4250);
+      new LoggedNetworkNumber("Setpoints/SideTowerFlywheel", 4175);
   private static LoggedNetworkNumber sideTowerSetpointHood =
-      new LoggedNetworkNumber("Setpoints/SideTowerHood", 25);
+      new LoggedNetworkNumber("Setpoints/SideTowerHood", 20);
   private static LoggedNetworkNumber cornerSetpointFlywheel =
-      new LoggedNetworkNumber("Setpoints/CornerFlywheel", 4250);
+      new LoggedNetworkNumber("Setpoints/CornerFlywheel", 4575);
   private static LoggedNetworkNumber cornerSetpointHood =
-      new LoggedNetworkNumber("Setpoints/CornerHood", 20);
+      new LoggedNetworkNumber("Setpoints/CornerHood", 25);
 
   // 75" away from hub (front to front) at 4000 rpm
   public static Command testShoot(Shooter shooter, Hood hood) {
@@ -73,35 +73,37 @@ public class ShooterCommands {
    * @param hood is NOT a requirement here, it just sets it up for triggering
    * @return
    */
-  private static Command setpointShoot(Shooter shooter, Hood hood, Angle hoodAngle, double rpm) {
+  private static Command setpointShoot(
+      Shooter shooter, Hood hood, DoubleSupplier hoodDegrees, DoubleSupplier rpmSupplier) {
     return Commands.startRun(
         () -> {
+          Angle hoodAngle = Degrees.of(MathUtil.clamp(hoodDegrees.getAsDouble(), 5, 45));
           hood.setDeferredSetpoint(hoodAngle);
         },
         () -> {
-          shooter.setVelocityFlywheel(rpm);
+          shooter.setVelocityFlywheel(MathUtil.clamp(rpmSupplier.getAsDouble(), 3000, 5000));
         },
         shooter);
   }
 
   public static Command trenchSetpointShoot(Shooter shooter, Hood hood) {
     return setpointShoot(
-        shooter, hood, Degrees.of(trenchSetpointHood.get()), trenchSetpointFlywheel.get());
+        shooter, hood, () -> trenchSetpointHood.get(), () -> trenchSetpointFlywheel.get());
   }
 
   public static Command towerSetpointShoot(Shooter shooter, Hood hood) {
     return setpointShoot(
-        shooter, hood, Degrees.of(towerSetpointHood.get()), towerSetpointFlywheel.get());
+        shooter, hood, () -> towerSetpointHood.get(), () -> towerSetpointFlywheel.get());
   }
 
   public static Command sideTowerSetpointShoot(Shooter shooter, Hood hood) {
     return setpointShoot(
-        shooter, hood, Degrees.of(sideTowerSetpointHood.get()), sideTowerSetpointFlywheel.get());
+        shooter, hood, () -> sideTowerSetpointHood.get(), () -> sideTowerSetpointFlywheel.get());
   }
 
   public static Command cornerSetpointShoot(Shooter shooter, Hood hood) {
     return setpointShoot(
-        shooter, hood, Degrees.of(cornerSetpointHood.get()), cornerSetpointFlywheel.get());
+        shooter, hood, () -> cornerSetpointHood.get(), () -> cornerSetpointFlywheel.get());
   }
 
   public static Command activateDeferredHood(Hood hood) {
@@ -230,5 +232,24 @@ public class ShooterCommands {
 
   public static Command manualHood(Hood hood, DoubleSupplier angleSupplier) {
     return Commands.run(() -> hood.setPositionHood(Degrees.of(angleSupplier.getAsDouble())), hood);
+  }
+
+  private static final LoggedNetworkNumber flywheelKp = new LoggedNetworkNumber("Flywheel/kp", 0);
+  private static final LoggedNetworkNumber flywheelKi = new LoggedNetworkNumber("Flywheel/ki", 0);
+  private static final LoggedNetworkNumber flywheelKd = new LoggedNetworkNumber("Flywheel/kd", 0);
+  private static final LoggedNetworkNumber flywheelKv =
+      new LoggedNetworkNumber("Flywheel/kv", 0.00117);
+
+  public static Command configureLeader(Shooter shooter) {
+    return Commands.runOnce(
+        () -> {
+          double kp = flywheelKp.getAsDouble();
+          double ki = flywheelKi.getAsDouble();
+          double kd = flywheelKd.getAsDouble();
+          double kv = flywheelKv.getAsDouble();
+
+          shooter.configureLeader(kp, ki, kd, kv);
+        },
+        shooter);
   }
 }

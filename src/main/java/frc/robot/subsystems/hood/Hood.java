@@ -9,8 +9,8 @@ import org.littletonrobotics.junction.Logger;
 public class Hood extends SubsystemBase {
   private final HoodIO hoodIO;
   private final HoodIOInputsAutoLogged hoodInputs = new HoodIOInputsAutoLogged();
-  private Angle hoodAngle = Degrees.of(0);
-  private Angle deferredSetpoint = Degrees.of(0);
+  private Angle hoodAngle = Degrees.of(15);
+  private Angle deferredSetpoint = Degrees.of(15);
 
   public Hood(HoodIO hoodIO) {
     this.hoodIO = hoodIO;
@@ -24,6 +24,10 @@ public class Hood extends SubsystemBase {
   }
 
   public void setPositionHood(Angle angle) {
+    double degrees = angle.in(Degrees);
+    if (degrees < 5 || degrees > 45) {
+      return;
+    }
     Logger.recordOutput("Hood/HoodAngle", angle.in(Degrees));
     Logger.recordOutput("Hood/HoodAngleDashboard", angle.in(Degrees) + 0);
     hoodIO.setPositionHood(angle);

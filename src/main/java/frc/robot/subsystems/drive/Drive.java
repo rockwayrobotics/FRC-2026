@@ -42,6 +42,7 @@ import frc.robot.Constants.GlobalConstants;
 import frc.robot.util.FieldRelativeAccel;
 import frc.robot.util.FieldRelativeSpeed;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.LoggedSlewRateLimiter;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -56,6 +57,10 @@ public class Drive extends SubsystemBase {
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
   private final Field2d m_field = new Field2d();
+
+  // FIXME: Turn this off with left bumper held
+  private LoggedSlewRateLimiter slewRateLimiter =
+      new LoggedSlewRateLimiter(4.0, "Drive/MaxSlewRate");
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = Rotation2d.kZero;
@@ -149,6 +154,7 @@ public class Drive extends SubsystemBase {
       for (var module : modules) {
         module.stop();
       }
+      slewRateLimiter.reset(0.0);
     }
 
     // Log empty setpoint states when disabled
@@ -189,7 +195,7 @@ public class Drive extends SubsystemBase {
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
 
-    // Update gyro alert
+    slewRateLimiter.periodic();
   }
 
   /**
@@ -329,8 +335,8 @@ public class Drive extends SubsystemBase {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    poseEstimator.addVisionMeasurement(
-        visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    // poseEstimator.addVisionMeasurement(
+    //    visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     Pose2d currentPose = poseEstimator.getEstimatedPosition();
 
     // 1. Update the local Field2d object (for SmartDashboard)
@@ -362,5 +368,9 @@ public class Drive extends SubsystemBase {
 
   public boolean pointedAtTargetAngle(double toleranceDegrees) {
     return Math.abs(this.getRotation().minus(targetAngle).getDegrees()) < toleranceDegrees;
+  }
+
+  public LoggedSlewRateLimiter getSlewRateLimiter() {
+    return slewRateLimiter;
   }
 }

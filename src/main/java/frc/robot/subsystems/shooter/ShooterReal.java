@@ -107,6 +107,31 @@ public class ShooterReal implements ShooterIO {
   }
 
   @Override
+  public void configureLeader(double kp, double ki, double kd, double kv) {
+    var flywheelLeaderConfig = new SparkFlexConfig();
+    flywheelLeaderConfig
+        .idleMode(IdleMode.kCoast)
+        .inverted(true)
+        .smartCurrentLimit(60)
+        .voltageCompensation(12.0);
+    flywheelLeaderConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(kp, ki, kd);
+    //     (ShooterConstants.FLYWHEEL_KP),
+    //     (ShooterConstants.FLYWHEEL_KI),
+    //     (ShooterConstants.FLYWHEEL_KD));
+    flywheelLeaderConfig.closedLoop.feedForward.kV(kv); // ShooterConstants.FLYWHEEL_KV);
+    flywheelLeaderConfig.encoder.velocityConversionFactor(
+        1.0 / ShooterConstants.FLYWHEEL_GEAR_RATIO);
+    SparkUtil.tryUntilOk(
+        flywheelLeader,
+        5,
+        () ->
+            flywheelLeader.configure(
+                flywheelLeaderConfig,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters));
+  }
+
+  @Override
   public void setVelocityFlywheel(double RPM) {
     flywheelLeaderController.setSetpoint(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
