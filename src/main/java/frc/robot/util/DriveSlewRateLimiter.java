@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
  * controlled is a velocity or a voltage; when controlling a position, consider using a {@link
  * edu.wpi.first.math.trajectory.TrapezoidProfile} instead.
  */
-public class LoggedSlewRateLimiter {
+public class DriveSlewRateLimiter {
   private final LoggedNetworkNumber loggedNumber;
 
   private double rateLimit;
@@ -27,7 +27,7 @@ public class LoggedSlewRateLimiter {
    *
    * @param rateLimit The rate-of-change limit, in units per second.
    */
-  public LoggedSlewRateLimiter(double rateLimit, String ntKey) {
+  public DriveSlewRateLimiter(double rateLimit, String ntKey) {
     this.rateLimit = rateLimit;
     prevVal = 0;
     this.loggedNumber = new LoggedNetworkNumber(ntKey, rateLimit);

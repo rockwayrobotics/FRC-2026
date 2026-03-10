@@ -39,10 +39,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.GlobalConstants;
+import frc.robot.util.DriveSlewRateLimiter;
 import frc.robot.util.FieldRelativeAccel;
 import frc.robot.util.FieldRelativeSpeed;
 import frc.robot.util.LocalADStarAK;
-import frc.robot.util.LoggedSlewRateLimiter;
+import frc.robot.util.SlowModeSlewRateLimiter;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -58,9 +59,10 @@ public class Drive extends SubsystemBase {
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
   private final Field2d m_field = new Field2d();
 
-  // FIXME: Turn this off with left bumper held
-  private LoggedSlewRateLimiter slewRateLimiter =
-      new LoggedSlewRateLimiter(4.0, "Drive/MaxSlewRate");
+  private DriveSlewRateLimiter driveSlewRateLimiter =
+      new DriveSlewRateLimiter(4.0, "Drive/MaxSlewRate");
+  private SlowModeSlewRateLimiter slowModeSlewRateLimiter =
+      new SlowModeSlewRateLimiter(2.0, -1.0, 1.0, "Drive/SlowModeRate");
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = Rotation2d.kZero;
@@ -154,7 +156,7 @@ public class Drive extends SubsystemBase {
       for (var module : modules) {
         module.stop();
       }
-      slewRateLimiter.reset(0.0);
+      driveSlewRateLimiter.reset(0.0);
     }
 
     // Log empty setpoint states when disabled
@@ -195,7 +197,8 @@ public class Drive extends SubsystemBase {
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
 
-    slewRateLimiter.periodic();
+    driveSlewRateLimiter.periodic();
+    slowModeSlewRateLimiter.periodic();
   }
 
   /**
@@ -370,7 +373,11 @@ public class Drive extends SubsystemBase {
     return Math.abs(this.getRotation().minus(targetAngle).getDegrees()) < toleranceDegrees;
   }
 
-  public LoggedSlewRateLimiter getSlewRateLimiter() {
-    return slewRateLimiter;
+  public DriveSlewRateLimiter getDriveSlewRateLimiter() {
+    return driveSlewRateLimiter;
+  }
+
+  public SlowModeSlewRateLimiter getSlowModeSlewRateLimiter() {
+    return slowModeSlewRateLimiter;
   }
 }

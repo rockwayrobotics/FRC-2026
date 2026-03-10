@@ -69,25 +69,32 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
+      BooleanSupplier slowModeSupplier,
       BooleanSupplier ignoreSlewLimitSupplier) {
     return Commands.run(
         () -> {
+          double slowModeMultiplier =
+              drive
+                  .getSlowModeSlewRateLimiter()
+                  .calculate(slowModeSupplier.getAsBoolean() ? 0.5 : 1.0);
+
           // Get linear velocity
           Translation2d linearVelocity =
-              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+              getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble())
+                  .times(slowModeMultiplier);
 
           // Apply rotation deadband
           double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
           // Square rotation value for more precise control
-          omega = Math.copySign(omega * omega, omega);
+          omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
 
           Translation2d targetVelocity =
               linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
           double targetSpeed = targetVelocity.getNorm();
           double limitedSpeed = targetSpeed;
           if (!ignoreSlewLimitSupplier.getAsBoolean()) {
-            limitedSpeed = drive.getSlewRateLimiter().calculate(targetSpeed);
+            limitedSpeed = drive.getDriveSlewRateLimiter().calculate(targetSpeed);
           }
           double xSpeed =
               targetSpeed < 0.001 ? 0.0 : targetVelocity.getX() * limitedSpeed / targetSpeed;

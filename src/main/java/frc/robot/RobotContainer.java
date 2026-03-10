@@ -208,6 +208,7 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> -controller.getRightX(),
+            () -> controller.rightBumper().getAsBoolean(),
             () -> controller.leftBumper().getAsBoolean()));
 
     // Stop indexer by default
@@ -233,20 +234,6 @@ public class RobotContainer {
   }
 
   private void configureDriverCommands() {
-    // Slow Down
-    // Left bumper is 50% speed
-    final double SLOW_SPEED = 0.5;
-    controller
-        .rightBumper()
-        // .and(controller.leftTrigger().negate())
-        .whileTrue(
-            DriveCommands.joystickDrive(
-                drive,
-                () -> -controller.getLeftY() * SLOW_SPEED,
-                () -> -controller.getLeftX() * SLOW_SPEED,
-                () -> -controller.getRightX() * SLOW_SPEED,
-                () -> true));
-
     (operatorController
             .a()
             .or(operatorController.b())
