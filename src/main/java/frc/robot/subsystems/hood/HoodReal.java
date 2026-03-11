@@ -49,8 +49,8 @@ public class HoodReal implements HoodIO {
         .outputCurrentPeriodMs(20);
     hoodConfig
         .softLimit
-        .forwardSoftLimit(HoodConstants.HOOD_FORWARD_LIMIT) // Test forward -> 50
-        .reverseSoftLimit(HoodConstants.HOOD_REVERSE_LIMIT)
+        .forwardSoftLimit(HoodConstants.HOOD_INTERNAL_FORWARD_LIMIT) // Test forward -> 50
+        .reverseSoftLimit(HoodConstants.HOOD_INTERNAL_REVERSE_LIMIT)
         .forwardSoftLimitEnabled(true)
         .reverseSoftLimitEnabled(true);
     SparkUtil.tryUntilOk(
@@ -90,6 +90,6 @@ public class HoodReal implements HoodIO {
 
   @Override
   public void stopHood() {
-    setPositionHood(Degrees.of(20));
+    setPositionHood(Degrees.of(HoodConstants.HOOD_REST_POINT));
   }
 }

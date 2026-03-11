@@ -15,8 +15,12 @@ public class HoodConstants {
   public static final double HOOD_KCOSRATIO = 0; // 0.76744186046511627906976744186047;
 
   // FIXME: Check these are correct!
-  public static final double HOOD_FORWARD_LIMIT = 45; // 45 degree hood angle (50.4 max)
-  public static final double HOOD_REVERSE_LIMIT = 5; // 15 degree hood angle (2.4 min)
+  public static final double HOOD_REST_POINT = 20;
+  public static final double HOOD_FORWARD_LIMIT = 45;
+  public static final double HOOD_INTERNAL_FORWARD_LIMIT = 45; // 45 degree hood angle (50.4 max)
+
+  public static final double HOOD_REVERSE_LIMIT = 15;
+  public static final double HOOD_INTERNAL_REVERSE_LIMIT = 5; // 15 degree hood angle (2.4 min)
   public static final double HOOD_ENCODER_POSITION_CONVERSION_FACTOR = 360;
 
   public static final double ACCEL_COMP_FACTOR = 0.100; // in units of seconds
@@ -24,19 +28,24 @@ public class HoodConstants {
   private static final Point2D[] kHoodPoints =
       new Point2D.Double[] {
         // (distance, hood angle)
-        new Point2D.Double(35, 0.0),
-        new Point2D.Double(55, 0.0),
-        new Point2D.Double(80, 7.5), //
-        new Point2D.Double(105, 16.5), //
-        new Point2D.Double(130, 22.0), //
-        new Point2D.Double(155, 25.5), //
-        new Point2D.Double(165, 25.5), //
-        new Point2D.Double(180, 27.5), //
-        new Point2D.Double(205, 29.0), //
-        new Point2D.Double(230, 33.0), //
-        new Point2D.Double(255, 33.0), //
-        new Point2D.Double(270, 33.5), //
-        new Point2D.Double(280, 36.1)
+        new Point2D.Double(2.44, 20), // more data needed
+        new Point2D.Double(3.09, 22), // tower (can this be 20 too?)
+        new Point2D.Double(3.21, 20), // side tower
+        new Point2D.Double(3.41, 20), // trench
+        new Point2D.Double(4.56, 25), // corner
+        // new Point2D.Double(35, 0.0),
+        // new Point2D.Double(55, 0.0),
+        // new Point2D.Double(80, 7.5), //
+        // new Point2D.Double(105, 16.5), //
+        // new Point2D.Double(130, 22.0), //
+        // new Point2D.Double(155, 25.5), //
+        // new Point2D.Double(165, 25.5), //
+        // new Point2D.Double(180, 27.5), //
+        // new Point2D.Double(205, 29.0), //
+        // new Point2D.Double(230, 33.0), //
+        // new Point2D.Double(255, 33.0), //
+        // new Point2D.Double(270, 33.5), //
+        // new Point2D.Double(280, 36.1)
       };
 
   public static final LinearInterpolationTable kHoodTable =
@@ -45,7 +54,8 @@ public class HoodConstants {
   private static final Point2D[] kHoodAngles =
       new Point2D.Double[] {
         // (Hood Angle, Through Bore Encoder Angle)
-        new Point2D.Double(45, HOOD_FORWARD_LIMIT), new Point2D.Double(15, HOOD_REVERSE_LIMIT)
+        new Point2D.Double(HOOD_FORWARD_LIMIT, HOOD_INTERNAL_FORWARD_LIMIT),
+        new Point2D.Double(HOOD_REVERSE_LIMIT, HOOD_INTERNAL_REVERSE_LIMIT)
       };
 
   public static final LinearInterpolationTable kHoodAnglesTable =

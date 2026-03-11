@@ -10,7 +10,9 @@ public class Hood extends SubsystemBase {
   private final HoodIO hoodIO;
   private final HoodIOInputsAutoLogged hoodInputs = new HoodIOInputsAutoLogged();
   private Angle hoodAngle = Degrees.of(15);
+  private Angle hoodAngleSetpoint = hoodAngle;
   private Angle deferredSetpoint = Degrees.of(15);
+  private boolean operatorOverride = false;
 
   public Hood(HoodIO hoodIO) {
     this.hoodIO = hoodIO;
@@ -25,20 +27,27 @@ public class Hood extends SubsystemBase {
 
   public void setPositionHood(Angle angle) {
     double degrees = angle.in(Degrees);
-    if (degrees < 5 || degrees > 45) {
+    Logger.recordOutput("Hood/RequestedAngle", degrees);
+    if (degrees < HoodConstants.HOOD_REVERSE_LIMIT || degrees > HoodConstants.HOOD_FORWARD_LIMIT) {
       return;
     }
+    hoodAngleSetpoint = angle;
     Logger.recordOutput("Hood/HoodAngle", angle.in(Degrees));
     Logger.recordOutput("Hood/HoodAngleDashboard", angle.in(Degrees) + 0);
     hoodIO.setPositionHood(angle);
   }
 
   public void stop() {
+    hoodAngleSetpoint = Degrees.of(HoodConstants.HOOD_REST_POINT);
     hoodIO.stopHood();
   }
 
   public Angle getPositionHood() {
     return hoodAngle;
+  }
+
+  public Angle getHoodSetpoint() {
+    return hoodAngleSetpoint;
   }
 
   public void setDeferredSetpoint(Angle angle) {
@@ -47,5 +56,14 @@ public class Hood extends SubsystemBase {
 
   public Angle getDeferredSetpoint() {
     return deferredSetpoint;
+  }
+
+  public void setOperatorOverride(boolean override) {
+    Logger.recordOutput("Hood/OperatorOverride", override);
+    operatorOverride = override;
+  }
+
+  public boolean isOperatorOverriding() {
+    return this.operatorOverride;
   }
 }

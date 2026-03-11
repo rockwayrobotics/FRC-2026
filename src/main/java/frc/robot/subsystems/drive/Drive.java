@@ -42,6 +42,7 @@ import frc.robot.Constants.GlobalConstants;
 import frc.robot.util.DriveSlewRateLimiter;
 import frc.robot.util.FieldRelativeAccel;
 import frc.robot.util.FieldRelativeSpeed;
+import frc.robot.util.GoalUtils;
 import frc.robot.util.LocalADStarAK;
 import frc.robot.util.SlowModeSlewRateLimiter;
 import java.util.concurrent.locks.Lock;
@@ -196,7 +197,10 @@ public class Drive extends SubsystemBase {
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
     }
-
+    // Log hub position relative to the robot.
+    Logger.recordOutput(
+        "Drive/HubDistance",
+        GoalUtils.getHubLocation().getDistance(this.getPose().getTranslation()));
     driveSlewRateLimiter.periodic();
     slowModeSlewRateLimiter.periodic();
   }
@@ -330,7 +334,8 @@ public class Drive extends SubsystemBase {
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    Pose2d newPose = new Pose2d(pose.getX(), pose.getY(), pose.getRotation());
+    poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), newPose);
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -338,8 +343,8 @@ public class Drive extends SubsystemBase {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
-    // poseEstimator.addVisionMeasurement(
-    //    visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    poseEstimator.addVisionMeasurement(
+        visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     Pose2d currentPose = poseEstimator.getEstimatedPosition();
 
     // 1. Update the local Field2d object (for SmartDashboard)

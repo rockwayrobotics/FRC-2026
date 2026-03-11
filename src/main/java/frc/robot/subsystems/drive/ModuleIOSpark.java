@@ -160,7 +160,7 @@ public class ModuleIOSpark implements ModuleIO {
     // Reset the relative encoder every 1 second to match the absolute encoder.
     resetCounter++;
     if (resetCounter > 49) {
-      turnSpark.getEncoder().setPosition(turnEncoder.getVirtualPosition());
+      // turnSpark.getEncoder().setPosition(turnEncoder.getVirtualPosition());
       resetCounter = 0;
     }
     // Update drive inputs
@@ -219,7 +219,7 @@ public class ModuleIOSpark implements ModuleIO {
         drivePositionQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryTurnPositions =
         turnPositionQueue.stream()
-            .map((Double value) -> new Rotation2d(value).minus(zeroRotation))
+            .map((Double value) -> new Rotation2d(value)) // .minus(zeroRotation))
             .toArray(Rotation2d[]::new);
     timestampQueue.clear();
     drivePositionQueue.clear();

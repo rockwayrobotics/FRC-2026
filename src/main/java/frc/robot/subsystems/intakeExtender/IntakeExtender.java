@@ -54,6 +54,10 @@ public class IntakeExtender extends SubsystemBase {
     retractBlocked = false;
   }
 
+  public void stop() {
+    intakeIO.extend(0.0);
+  }
+
   public boolean motorCurrentWithinLimit() {
     return outputCurrent < IntakeExtenderConstants.CURRENT_LIMIT;
   }

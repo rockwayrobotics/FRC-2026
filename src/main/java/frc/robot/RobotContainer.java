@@ -113,12 +113,8 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVision(camera_front, robotToCameraFront) /*
-                                                                                    * ,
-                                                                                    * new
-                                                                                    * VisionIOPhotonVision(camera_back,
-                                                                                    * robotToCameraBack)
-                                                                                    */);
+                new VisionIOPhotonVision(camera_front, robotToCameraFront),
+                new VisionIOPhotonVision(camera_back, robotToCameraBack));
 
         indexer = new Indexer(new IndexerReal());
         kicker = new Kicker(new KickerReal());
@@ -218,13 +214,28 @@ public class RobotContainer {
     kicker.setDefaultCommand(Commands.run(() -> kicker.stop(), kicker));
 
     // Stop shooter by default (coast mode flywheel)
-    shooter.setDefaultCommand(Commands.run(() -> shooter.stop(), shooter));
+    shooter.setDefaultCommand(
+        Commands.run(
+            () -> {
+              if (!shooter.isOperatorOverriding()) {
+                shooter.stop();
+              }
+            },
+            shooter));
 
     // Retract hood by default
-    hood.setDefaultCommand(Commands.run(() -> hood.stop(), hood));
+    hood.setDefaultCommand(
+        Commands.run(
+            () -> {
+              if (!hood.isOperatorOverriding()) {
+                hood.stop();
+              }
+            },
+            hood));
 
     // Retract intake by default
-    intakeExtender.setDefaultCommand(IntakeCommands.autoRetract(intakeExtender));
+    // intakeExtender.setDefaultCommand(IntakeCommands.autoRetract(intakeExtender));
+    intakeExtender.setDefaultCommand(Commands.run(() -> intakeExtender.stop(), intakeExtender));
 
     // Stop intake rollers by default
     intake.setDefaultCommand(IntakeCommands.intakeManual(intake, 0.0));
@@ -250,8 +261,14 @@ public class RobotContainer {
         .and(controller.leftTrigger())
         .whileTrue(ShooterCommands.testShoot(shooter, hood));
 
-    controller.povLeft().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    controller.povRight().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
+    controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
+
+    controller
+        .y()
+        .whileTrue(
+            DriveCommands.joystickDrivePointAtHub(
+                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
     // Point at Hub
     // controller
     // .leftTrigger()
@@ -291,7 +308,8 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Auto-Intake
-    // controller.leftBumper().whileTrue(IntakeCommands.autoIntake(intakeExtender, intake));
+    // controller.leftBumper().whileTrue(IntakeCommands.autoIntake(intakeExtender,
+    // intake));
 
     controller
         .povUp()
@@ -343,7 +361,7 @@ public class RobotContainer {
 
   private void configureOperatorCommands() {
     // Extend
-    operatorController.leftBumper().onTrue(IntakeCommands.extend(intakeExtender));
+    operatorController.rightTrigger().onTrue(IntakeCommands.extend(intakeExtender));
     // Retract
     operatorController.rightBumper().onTrue(IntakeCommands.retract(intakeExtender));
 
@@ -383,8 +401,10 @@ public class RobotContainer {
     operatorController
         .leftTrigger()
         .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
-    // operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer,
-    // kicker));
+    operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer, kicker));
+    operatorController
+        .leftBumper()
+        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE));
 
     // Agitate
     // operatorController.a().whileTrue(IndexerCommands.agitate(indexer, kicker));
@@ -396,14 +416,16 @@ public class RobotContainer {
     operatorController.x().whileTrue(ShooterCommands.sideTowerSetpointShoot(shooter, hood));
     operatorController.y().whileTrue(ShooterCommands.towerSetpointShoot(shooter, hood));
 
-    operatorController.leftTrigger().whileTrue(ShooterCommands.activateDeferredHood(hood));
+    // operatorController.leftTrigger().whileTrue(ShooterCommands.activateDeferredHood(hood));
 
     // Forward Augers
     new JoystickButton(operatorButtonBoard, 3).whileTrue(IndexerCommands.augersFeed(indexer));
     // Reverse Augers
     new JoystickButton(operatorButtonBoard, 4).whileTrue(IndexerCommands.augersReverse(indexer));
 
-    operatorController.back().onTrue(ShooterCommands.configureLeader(shooter));
+    // Disabled configure PID for shooter:
+    // operatorController.back().onTrue(ShooterCommands.configureLeader(shooter));
+
     // XBox controller axes:
     // 0: left stick X
     // 1: left stick Y
@@ -416,19 +438,34 @@ public class RobotContainer {
     // Manual spin up
     // Do something with
     // operatorController.getRightY();
-    /*
-     * operatorController
-     * .axisMagnitudeGreaterThan(5, 0.1)
-     * .whileTrue(
-     * Commands.run(
-     * () -> {
-     * System.out.println("Right stick on: " + -operatorController.getRightY());
-     * }));
-     */
+    operatorController
+        .axisLessThan(5, -0.1) // Axis is negated, so this is up.
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  // Set state so that flywheel maintains speed and doesn't stop.
+                  shooter.setOperatorOverride(true);
+                }));
+
+    operatorController
+        .axisMagnitudeGreaterThan(5, 0.01) // -0.01 - 0.01 deadzone
+        .whileTrue(ShooterCommands.manualFlywheel(shooter, () -> -operatorController.getRightY()));
 
     // Manual hood pivot
     // Do something with
     // operatorController.getLeftY();
+    operatorController
+        .axisMagnitudeGreaterThan(1, 0.1)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  // Set state so that hood maintains position and doesn't fold.
+                  hood.setOperatorOverride(true);
+                }));
+    operatorController
+        .axisMagnitudeGreaterThan(1, 0.01) // -0.01 - 0.01 deadzone
+        .whileTrue(ShooterCommands.manualHood(hood, () -> -operatorController.getLeftY()));
+
     /*
      * operatorController
      * .axisMagnitudeGreaterThan(1, 0.1)
@@ -441,10 +478,20 @@ public class RobotContainer {
 
     // Manual kicker forward
     new JoystickButton(operatorButtonBoard, 2)
-        .onTrue(IndexerCommands.toggleKickerVelocity(kicker, KickerConstants.KICKER_FEED_RPM));
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  kicker.setVelocityKicker(KickerConstants.KICKER_FEED_RPM);
+                },
+                kicker));
     // Reverse kicker
     new JoystickButton(operatorButtonBoard, 1)
-        .onTrue(IndexerCommands.toggleKickerVelocity(kicker, KickerConstants.KICKER_AGITATE_RPM));
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  kicker.setVelocityKicker(KickerConstants.KICKER_AGITATE_RPM);
+                },
+                kicker));
 
     ////////////////////// Testing commands below here ///////////////////////
 

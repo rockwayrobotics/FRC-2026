@@ -7,8 +7,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -26,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.GoalUtils;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -179,18 +178,6 @@ public class DriveCommands {
   public static Command joystickDrivePointAtHub(
       Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
 
-    var field = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
-    // Red alliance hub is at the y position of ID 10 and the x position of ID 8.
-    Translation2d redHub =
-        new Translation2d(
-            field.getTagPose(8).get().toPose2d().getX(),
-            field.getTagPose(10).get().toPose2d().getY());
-    // Blue alliance hub is at the y position of ID 25 and the x position of ID 18.
-    Translation2d blueHub =
-        new Translation2d(
-            field.getTagPose(18).get().toPose2d().getX(),
-            field.getTagPose(25).get().toPose2d().getY());
-
     // Create PID controller
     ProfiledPIDController angleController =
         new ProfiledPIDController(
@@ -207,12 +194,8 @@ public class DriveCommands {
               Translation2d linearVelocity =
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-              Rotation2d targetAngle;
-              if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-                targetAngle = redHub.minus(drive.getPose().getTranslation()).getAngle();
-              } else {
-                targetAngle = blueHub.minus(drive.getPose().getTranslation()).getAngle();
-              }
+              Rotation2d targetAngle =
+                  GoalUtils.getHubLocation().minus(drive.getPose().getTranslation()).getAngle();
 
               // Calculate angular speed
               double omega =

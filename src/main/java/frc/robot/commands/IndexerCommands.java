@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.subsystems.kicker.Kicker;
 import frc.robot.subsystems.kicker.KickerConstants;
 import frc.robot.subsystems.shooter.Shooter;
@@ -17,9 +18,9 @@ public class IndexerCommands {
   public static boolean isShooting = false;
 
   private static LoggedNetworkNumber augerDutyNumber =
-      new LoggedNetworkNumber("Indexer/AugerDuty", 0.6);
+      new LoggedNetworkNumber("Indexer/AugerDuty", IndexerConstants.FEED_DUTY_CYCLE);
   private static LoggedNetworkNumber kickerVelocityNumber =
-      new LoggedNetworkNumber("Indexer/KickerRPM", 3500);
+      new LoggedNetworkNumber("Indexer/KickerRPM", KickerConstants.KICKER_FEED_RPM);
 
   public static Command feedShooterFancy(
       Indexer indexer, Kicker kicker, Shooter shooter, Drive drive) {

@@ -9,6 +9,8 @@ public class Shooter extends SubsystemBase {
   private double flywheelRPMSetpoint = 0.0;
   private double flywheelRPM = 0.0;
 
+  private boolean operatorOverride = false;
+
   public Shooter(ShooterIO shooterIO) {
     this.shooterIO = shooterIO;
   }
@@ -44,5 +46,14 @@ public class Shooter extends SubsystemBase {
 
   public void configureLeader(double kp, double ki, double kd, double kv) {
     // shooterIO.configureLeader(kp, ki, kd, kv);
+  }
+
+  public void setOperatorOverride(boolean override) {
+    Logger.recordOutput("Shooter/OperatorOverride", override);
+    operatorOverride = override;
+  }
+
+  public boolean isOperatorOverriding() {
+    return this.operatorOverride;
   }
 }

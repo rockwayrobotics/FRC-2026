@@ -4,7 +4,7 @@ public class KickerConstants {
   public static final double KICKER_GEAR_RATIO = 1;
 
   public static final double KICKER_FEED_RPM = 3500;
-  public static final double KICKER_AGITATE_RPM = -2000;
+  public static final double KICKER_AGITATE_RPM = -1000;
 
   // Kicker PIDV Constants
   public static final double KICKER_KP = 0.00003;
