@@ -7,22 +7,29 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.subsystems.vision.VisionConstants.camera_back;
 import static frc.robot.subsystems.vision.VisionConstants.camera_front;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraBack;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraFront;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IndexerCommands;
 import frc.robot.commands.IntakeCommands;
@@ -169,28 +176,100 @@ public class RobotContainer {
         break;
     }
 
+    // Pathplanner Named Commands
+    // NamedCommands.registerCommand("SetupShotFor2",(ShooterCommands.definitiveShoot(shooter,
+    // hood,
+    // 3556.33588,20)));
+    NamedCommands.registerCommand(
+        "StopShooter",
+        Commands.runOnce(
+            () -> {
+              shooter.stop();
+              hood.stop();
+            },
+            shooter,
+            hood));
+    NamedCommands.registerCommand(
+        "StopIndexer",
+        Commands.runOnce(
+            () -> {
+              indexer.stop();
+              kicker.stop();
+            },
+            indexer,
+            kicker));
+    NamedCommands.registerCommand(
+        "SetupShootHub", ShooterCommands.definitiveShoot(shooter, hood, 3200, 15));
+    NamedCommands.registerCommand(
+        "Shoot2", IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(3)));
+    NamedCommands.registerCommand(
+        "SetupShotFor2", ShooterCommands.definitiveShoot(shooter, hood, 3556.33588, 20));
+    NamedCommands.registerCommand(
+        "ExtendIntake", IntakeCommands.extend(intakeExtender).withTimeout(Seconds.of(1)));
+    NamedCommands.registerCommand(
+        "RetractIntake", IntakeCommands.retract(intakeExtender).withTimeout(Seconds.of(1)));
+    NamedCommands.registerCommand(
+        "IntakeShortTime",
+        Commands.sequence(
+            IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE)
+                .withTimeout(Seconds.of(2)),
+            IntakeCommands.intakeManual(intake, 0.0).withTimeout(Seconds.of(0.1))));
+    NamedCommands.registerCommand(
+        "SetupHubShot",
+        ShooterCommands.setupHubShot(
+            shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false));
+
+    new EventTrigger("IntakeZone")
+        .onTrue(NamedCommands.getCommand("ExtendIntake"))
+        .whileTrue(
+            Commands.sequence(
+                Commands.waitUntil(() -> intakeExtender.getExtendAngle() > 30),
+                IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE)))
+        .onFalse(
+            Commands.parallel(
+                IntakeCommands.intakeManual(intake, 0), NamedCommands.getCommand("RetractIntake")));
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Autos", AutoBuilder.buildAutoChooser());
 
+    autoChooser.addOption(
+        "Center Shoot Hub",
+        Commands.sequence(
+            Commands.runOnce(
+                () -> {
+                  if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+                    drive.setPose(new Pose2d(new Translation2d(3.5, 4), Rotation2d.k180deg));
+                  } else {
+                    drive.setPose(new Pose2d(new Translation2d(13, 4), Rotation2d.kZero));
+                  }
+                }),
+            ShooterCommands.definitiveShoot(shooter, hood, 3400, 15),
+            Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
+            NamedCommands.getCommand("Shoot2"),
+            NamedCommands.getCommand("Stop")));
+
     // Set up SysId routines
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    // autoChooser.addOption(
+    //     "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    // autoChooser.addOption(
+    //     "Drive SysId (Quasistatic Forward)",
+    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Drive SysId (Quasistatic Reverse)",
+    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // autoChooser.addOption(
+    //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // autoChooser.addOption(
+    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     SmartDashboard.putData("Auto Choices", autoChooser.getSendableChooser());
 
     // Configure the button bindings
     configureButtonBindings();
+
+    // Get PathPlanner ready to avoid Java startup time.
+    CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
   }
 
   private void configureDefaultCommands() {
@@ -208,16 +287,30 @@ public class RobotContainer {
             () -> controller.leftBumper().getAsBoolean()));
 
     // Stop indexer by default
-    indexer.setDefaultCommand(Commands.run(() -> indexer.stop(), indexer));
+    indexer.setDefaultCommand(
+        Commands.run(
+            () -> {
+              if (!DriverStation.isAutonomous()) {
+                indexer.stop();
+              }
+            },
+            indexer));
 
     // Stop kicker by default
-    kicker.setDefaultCommand(Commands.run(() -> kicker.stop(), kicker));
+    kicker.setDefaultCommand(
+        Commands.run(
+            () -> {
+              if (!DriverStation.isAutonomous()) {
+                kicker.stop();
+              }
+            },
+            kicker));
 
     // Stop shooter by default (coast mode flywheel)
     shooter.setDefaultCommand(
         Commands.run(
             () -> {
-              if (!shooter.isOperatorOverriding()) {
+              if (!DriverStation.isAutonomous() && !shooter.isOperatorOverriding()) {
                 shooter.stop();
               }
             },
@@ -227,7 +320,7 @@ public class RobotContainer {
     hood.setDefaultCommand(
         Commands.run(
             () -> {
-              if (!hood.isOperatorOverriding()) {
+              if (!DriverStation.isAutonomous() && !hood.isOperatorOverriding()) {
                 hood.stop();
               }
             },
@@ -238,7 +331,14 @@ public class RobotContainer {
     intakeExtender.setDefaultCommand(Commands.run(() -> intakeExtender.stop(), intakeExtender));
 
     // Stop intake rollers by default
-    intake.setDefaultCommand(IntakeCommands.intakeManual(intake, 0.0));
+    intake.setDefaultCommand(
+        Commands.run(
+            () -> {
+              if (!DriverStation.isAutonomous()) {
+                intake.intake(0.0);
+              }
+            },
+            intake));
 
     // Stop climb by default
     climb.setDefaultCommand(Commands.run(() -> climb.stop(), climb));
@@ -252,6 +352,7 @@ public class RobotContainer {
             .or(operatorController.y()))
         .and(controller.leftTrigger())
         .whileTrue(ShooterCommands.activateDeferredHood(hood));
+
     (operatorController
             .a()
             .or(operatorController.b())
@@ -259,11 +360,22 @@ public class RobotContainer {
             .or(operatorController.y()))
         .negate()
         .and(controller.leftTrigger())
-        .whileTrue(ShooterCommands.testShoot(shooter, hood));
+        .whileTrue(
+            ShooterCommands.setupHubShot(
+                shooter,
+                hood,
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> controller.rightBumper().getAsBoolean(),
+                () -> controller.leftBumper().getAsBoolean()));
+    // .whileTrue(ShooterCommands.testShoot(shooter, hood));
 
     controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
     controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
 
+    controller.x().onTrue(NamedCommands.getCommand("ExtendIntake"));
+    controller.a().onTrue(NamedCommands.getCommand("RetractIntake"));
     controller
         .y()
         .whileTrue(
@@ -576,5 +688,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public Pose2d getPose() {
+    return drive.getPose();
   }
 }

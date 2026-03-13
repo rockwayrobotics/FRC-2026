@@ -7,7 +7,11 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.util.FlippingUtil;
 import com.revrobotics.util.StatusLogger;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.GameHubStatus;
@@ -103,7 +107,25 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    var pose = robotContainer.getPose();
+    var command = robotContainer.getAutonomousCommand();
+    if (command instanceof PathPlannerAuto) {
+      var pathPose = ((PathPlannerAuto) command).getStartingPose();
+      if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+        pathPose = FlippingUtil.flipFieldPose(pathPose);
+      }
+      Logger.recordOutput("Drive/DeltaX", pathPose.getX() - pose.getX());
+      Logger.recordOutput("Drive/DeltaY", pathPose.getY() - pose.getY());
+      Logger.recordOutput(
+          "Drive/DeltaOmega",
+          pathPose.getRotation().getDegrees() - pose.getRotation().getDegrees());
+    } else {
+      Logger.recordOutput("Drive/DeltaX", -8089.0);
+      Logger.recordOutput("Drive/DeltaY", -8089.0);
+      Logger.recordOutput("Drive/DeltaOmega", -8089.0);
+    }
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override

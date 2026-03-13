@@ -49,6 +49,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Drive extends SubsystemBase {
   static final Lock odometryLock = new ReentrantLock();
@@ -83,6 +84,16 @@ public class Drive extends SubsystemBase {
 
   private Rotation2d targetAngle = new Rotation2d();
 
+  private LoggedNetworkNumber autoTranslatekP =
+      new LoggedNetworkNumber("AutoDrive/TranslateKp", 5.0);
+  private LoggedNetworkNumber autoTranslatekI =
+      new LoggedNetworkNumber("AutoDrive/TranslateKi", 0.0);
+  private LoggedNetworkNumber autoTranslatekD =
+      new LoggedNetworkNumber("AutoDrive/TranslateKd", 1.0);
+  private LoggedNetworkNumber autoRotatekP = new LoggedNetworkNumber("AutoDrive/RotateKp", 5.0);
+  private LoggedNetworkNumber autoRotatekI = new LoggedNetworkNumber("AutoDrive/RotateKi", 0.0);
+  private LoggedNetworkNumber autoRotatekD = new LoggedNetworkNumber("AutoDrive/RotateKd", 1.0);
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -108,7 +119,7 @@ public class Drive extends SubsystemBase {
         this::getChassisSpeeds,
         this::runVelocity,
         new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+            new PIDConstants(4.0, 0.0, 0.0), new PIDConstants(3.0, 0.0, 0.5)),
         ppConfig,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);

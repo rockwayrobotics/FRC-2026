@@ -28,11 +28,21 @@ public class HoodConstants {
   private static final Point2D[] kHoodPoints =
       new Point2D.Double[] {
         // (distance, hood angle)
-        new Point2D.Double(2.44, 20), // more data needed
-        new Point2D.Double(3.09, 22), // tower (can this be 20 too?)
-        new Point2D.Double(3.21, 20), // side tower
-        new Point2D.Double(3.41, 20), // trench
-        new Point2D.Double(4.56, 25), // corner
+        new Point2D.Double(1.0, 15),
+        new Point2D.Double(1.5, 20),
+        new Point2D.Double(2.25, 20),
+        new Point2D.Double(3.0, 20),
+        new Point2D.Double(3.46, 25),
+        new Point2D.Double(4.0, 25),
+        new Point2D.Double(4.94, 25),
+        new Point2D.Double(6.0, 45),
+
+        // new Point2D.Double(2.44, 20), // more data needed
+        // new Point2D.Double(3.09, 22), // tower (can this be 20 too?)
+        // new Point2D.Double(3.21, 20), // side tower
+        // new Point2D.Double(3.41, 20), // trench
+        // new Point2D.Double(4.56, 25), // corner
+
         // new Point2D.Double(35, 0.0),
         // new Point2D.Double(55, 0.0),
         // new Point2D.Double(80, 7.5), //

@@ -23,7 +23,7 @@ public class IntakeExtenderReal implements IntakeExtenderIO {
     extendRetractConfig
         .idleMode(IdleMode.kBrake)
         .inverted(true)
-        .smartCurrentLimit(20)
+        .smartCurrentLimit(30)
         .voltageCompensation(12.0);
     // Convert from revolutions to degrees, accounting for the gear ratio.
     extendRetractConfig.encoder.positionConversionFactor(

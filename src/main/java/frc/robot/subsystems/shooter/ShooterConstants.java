@@ -22,11 +22,21 @@ public class ShooterConstants {
   private static final Point2D[] kRPMPoints =
       new Point2D.Double[] {
         // (distance, flywheel RPM)
-        new Point2D.Double(2.44, 3900), // more data needed
-        new Point2D.Double(3.09, 4100), // tower
-        new Point2D.Double(3.21, 4175), // side tower
-        new Point2D.Double(3.41, 4250), // trench
-        new Point2D.Double(4.56, 4675), // corner
+        new Point2D.Double(1.0, 3200),
+        new Point2D.Double(1.5, 3200),
+        new Point2D.Double(2.25, 3650),
+        new Point2D.Double(3.0, 4000),
+        new Point2D.Double(3.46, 4000),
+        new Point2D.Double(4.0, 4300),
+        new Point2D.Double(4.94, 4700),
+        new Point2D.Double(6.0, 4200),
+
+        // new Point2D.Double(2.44, 3900), // more data needed
+        // new Point2D.Double(3.09, 4100), // tower
+        // new Point2D.Double(3.21, 4175), // side tower
+        // new Point2D.Double(3.41, 4250), // trench
+        // new Point2D.Double(4.56, 4675), // corner
+
         // new Point2D.Double(35, 1500 + 10),
         // new Point2D.Double(55, 1860 + 10),
         // new Point2D.Double(80, 2000 + 10), //
@@ -45,6 +55,8 @@ public class ShooterConstants {
   public static final LinearInterpolationTable kRPMTable = new LinearInterpolationTable(kRPMPoints);
 
   // FIXME: Record these in meters and seconds
+  // We couldn't figure out how to record these accurately
+  // enough. Our videos vary wildly between 0.5 and 1 sec.
   private static final Point2D[] kShotTimes =
       new Point2D.Double[] {
         // (distance,time)

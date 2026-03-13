@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.528863636363636,
-        "y": 4.045306818181818
+        "x": 3.5,
+        "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.318781998763677,
-        "y": 4.238418488144972
+        "x": 3.216677476354259,
+        "y": 4.193438044321505
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.8831663685152056,
-        "y": 4.921
+        "x": 1.391,
+        "y": 5.839
       },
       "prevControl": {
-        "x": 3.0332504883282696,
-        "y": 4.721063117509706
-      },
-      "nextControl": {
-        "x": 2.7330822487021416,
-        "y": 5.1209368824902946
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.153,
-        "y": 4.921
-      },
-      "prevControl": {
-        "x": 2.153,
-        "y": 4.599443945695771
+        "x": 1.598566137463967,
+        "y": 5.667840320588887
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "DepotSetup"
     }
   ],
   "rotationTargets": [],
@@ -58,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -0.6820603931726544
+    "rotation": 180.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
