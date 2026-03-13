@@ -101,7 +101,11 @@ public class ShooterCommands {
     Command result =
         Commands.parallel(
             // Turn until facing hub
-            Commands.run(
+            Commands.startRun(
+                    () -> {
+                      angleController.reset(
+                          MathUtil.angleModulus(drive.getPose().getRotation().getRadians()));
+                    },
                     () -> {
                       Rotation2d targetAngle =
                           GoalUtils.getHubLocation()
@@ -128,8 +132,8 @@ public class ShooterCommands {
                                     xSupplier.getAsDouble(), ySupplier.getAsDouble())
                                 .times(slowModeMultiplier);
 
-                        // Square rotation value for more precise control
-                        omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
+                        // Do NOT Square rotation value for more precise control
+                        // omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
                         Translation2d targetVelocity =
                             linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
                         double targetSpeed = targetVelocity.getNorm();
@@ -197,7 +201,11 @@ public class ShooterCommands {
     Command result =
         Commands.parallel(
             // Turn until facing goal
-            Commands.run(
+            Commands.startRun(
+                    () -> {
+                      angleController.reset(
+                          MathUtil.angleModulus(drive.getPose().getRotation().getRadians()));
+                    },
                     () -> {
                       Rotation2d targetAngle =
                           goalSupplier.get().minus(drive.getPose().getTranslation()).getAngle();
@@ -224,8 +232,8 @@ public class ShooterCommands {
                                     xSupplier.getAsDouble(), ySupplier.getAsDouble())
                                 .times(slowModeMultiplier);
 
-                        // Square rotation value for more precise control
-                        omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
+                        // Do NOT Square rotation value for more precise control
+                        // omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
                         Translation2d targetVelocity =
                             linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
                         double targetSpeed = targetVelocity.getNorm();
