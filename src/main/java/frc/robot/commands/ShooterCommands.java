@@ -25,6 +25,8 @@ import frc.robot.util.GoalUtils;
 import frc.robot.util.LinearInterpolationTable;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ShooterCommands {
@@ -33,9 +35,9 @@ public class ShooterCommands {
   private static LinearInterpolationTable m_rpmTable = ShooterConstants.kRPMTable;
 
   private static LoggedNetworkNumber flywheelSpeed =
-      new LoggedNetworkNumber("Shooter/FlywheelSpeedSetter", 4350);
+      new LoggedNetworkNumber("Shooter/FlywheelSpeedSetter", 5000);
   private static LoggedNetworkNumber hoodAngle =
-      new LoggedNetworkNumber("Shooter/HoodAngleSetter", 25);
+      new LoggedNetworkNumber("Shooter/HoodAngleSetter", 45);
 
   private static LoggedNetworkNumber trenchSetpointFlywheel =
       new LoggedNetworkNumber("Setpoints/TrenchFlywheel", 4350);
@@ -172,8 +174,114 @@ public class ShooterCommands {
                           GoalUtils.getHubLocation().getDistance(drive.getPose().getTranslation());
                       double rpm = ShooterConstants.kRPMTable.getOutput(distance);
                       double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
+                      shooter.setOperatorOverride(false);
                       shooter.setVelocityFlywheel(rpm);
+                      hood.setOperatorOverride(false);
                       hood.setPositionHood(Degrees.of(hoodAngle));
+                    })
+                .until(() -> DriverStation.isAutonomous() && shooter.atFlywheelSetpoint(100)));
+    result.addRequirements(shooter, hood, drive);
+    return result;
+  }
+
+  public static Command setupGoalShot(
+      Shooter shooter,
+      Hood hood,
+      Drive drive,
+      Supplier<Translation2d> goalSupplier,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      BooleanSupplier slowModeSupplier,
+      BooleanSupplier ignoreSlewLimitSupplier) {
+    ProfiledPIDController angleController = DriveCommands.getRotatePIDController();
+    Command result =
+        Commands.parallel(
+            // Turn until facing goal
+            Commands.run(
+                    () -> {
+                      Rotation2d targetAngle =
+                          goalSupplier.get().minus(drive.getPose().getTranslation()).getAngle();
+                      Logger.recordOutput("SetupGoal/Goal", goalSupplier.get());
+                      Logger.recordOutput("SetupGoal/TargetAngle", targetAngle);
+
+                      // Calculate angular speed
+                      double omega =
+                          angleController.calculate(
+                              drive.getRotation().getRadians(), targetAngle.getRadians());
+
+                      ChassisSpeeds speeds = null;
+                      if (DriverStation.isAutonomous()) {
+                        speeds = new ChassisSpeeds(0, 0, omega);
+                      } else {
+                        double slowModeMultiplier =
+                            drive
+                                .getSlowModeSlewRateLimiter()
+                                .calculate(slowModeSupplier.getAsBoolean() ? 0.5 : 1.0);
+
+                        // Get linear velocity
+                        Translation2d linearVelocity =
+                            DriveCommands.getLinearVelocityFromJoysticks(
+                                    xSupplier.getAsDouble(), ySupplier.getAsDouble())
+                                .times(slowModeMultiplier);
+
+                        // Square rotation value for more precise control
+                        omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
+                        Translation2d targetVelocity =
+                            linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
+                        double targetSpeed = targetVelocity.getNorm();
+                        double limitedSpeed = targetSpeed;
+                        if (!ignoreSlewLimitSupplier.getAsBoolean()) {
+                          limitedSpeed = drive.getDriveSlewRateLimiter().calculate(targetSpeed);
+                        }
+                        double xSpeed =
+                            targetSpeed < 0.001
+                                ? 0.0
+                                : targetVelocity.getX() * limitedSpeed / targetSpeed;
+                        double ySpeed =
+                            targetSpeed < 0.001
+                                ? 0.0
+                                : targetVelocity.getY() * limitedSpeed / targetSpeed;
+
+                        // Convert to field relative speeds & send command
+                        speeds =
+                            new ChassisSpeeds(
+                                xSpeed, ySpeed, omega * drive.getMaxAngularSpeedRadPerSec());
+                      }
+
+                      boolean isFlipped =
+                          DriverStation.getAlliance().isPresent()
+                              && DriverStation.getAlliance().get() == Alliance.Red;
+
+                      drive.runVelocity(
+                          ChassisSpeeds.fromFieldRelativeSpeeds(
+                              speeds,
+                              isFlipped
+                                  ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                                  : drive.getRotation()));
+                    })
+                .until(() -> DriverStation.isAutonomous() && angleController.atGoal())
+                .andThen(Commands.runOnce(() -> drive.stop(), drive)),
+
+            // Spin up flywheel based on table
+            // Raise hood based on table
+            Commands.run(
+                    () -> {
+                      // WARNING: Disabled table for goal shot because we don't have data
+
+                      // double distance =
+                      //
+                      // GoalUtils.getHubLocation().getDistance(drive.getPose().getTranslation());
+                      // double rpm = ShooterConstants.kRPMTable.getOutput(distance);
+                      // double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
+                      // shooter.setVelocityFlywheel(rpm);
+                      // hood.setPositionHood(Degrees.of(hoodAngle));
+
+                      double rpm = MathUtil.clamp(flywheelSpeed.get(), 3000, 7000);
+                      double hoodDegrees = MathUtil.clamp(hoodAngle.get(), 5, 45);
+                      shooter.setOperatorOverride(false);
+                      shooter.setVelocityFlywheel(rpm);
+                      hood.setOperatorOverride(false);
+                      hood.setPositionHood(Degrees.of(hoodDegrees));
                     })
                 .until(() -> DriverStation.isAutonomous() && shooter.atFlywheelSetpoint(100)));
     result.addRequirements(shooter, hood, drive);

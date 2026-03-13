@@ -76,6 +76,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.GoalUtils;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -347,16 +348,16 @@ public class RobotContainer {
   private void configureDriverCommands() {
     (operatorController
             .a()
-            .or(operatorController.b())
-            .or(operatorController.x())
+            // .or(operatorController.b())
+            // .or(operatorController.x())
             .or(operatorController.y()))
         .and(controller.leftTrigger())
         .whileTrue(ShooterCommands.activateDeferredHood(hood));
 
     (operatorController
             .a()
-            .or(operatorController.b())
-            .or(operatorController.x())
+            // .or(operatorController.b())
+            // .or(operatorController.x())
             .or(operatorController.y()))
         .negate()
         .and(controller.leftTrigger())
@@ -374,8 +375,6 @@ public class RobotContainer {
     controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
     controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
 
-    controller.x().onTrue(NamedCommands.getCommand("ExtendIntake"));
-    controller.a().onTrue(NamedCommands.getCommand("RetractIntake"));
     controller
         .y()
         .whileTrue(
@@ -524,8 +523,33 @@ public class RobotContainer {
     // operatorController.b().whileTrue(IndexerCommands.unjam(indexer, kicker));
 
     operatorController.a().whileTrue(ShooterCommands.cornerSetpointShoot(shooter, hood));
-    operatorController.b().whileTrue(ShooterCommands.trenchSetpointShoot(shooter, hood));
-    operatorController.x().whileTrue(ShooterCommands.sideTowerSetpointShoot(shooter, hood));
+    operatorController
+        .b()
+        .whileTrue(
+            ShooterCommands.setupGoalShot(
+                shooter,
+                hood,
+                drive,
+                () -> GoalUtils.getRightTarget(),
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> controller.rightBumper().getAsBoolean(),
+                () -> controller.leftBumper().getAsBoolean()));
+    operatorController
+        .x()
+        .whileTrue(
+            ShooterCommands.setupGoalShot(
+                shooter,
+                hood,
+                drive,
+                () -> GoalUtils.getLeftTarget(),
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> controller.rightBumper().getAsBoolean(),
+                () -> controller.leftBumper().getAsBoolean()));
+
+    // operatorController.b().whileTrue(ShooterCommands.trenchSetpointShoot(shooter, hood));
+    // operatorController.x().whileTrue(ShooterCommands.sideTowerSetpointShoot(shooter, hood));
     operatorController.y().whileTrue(ShooterCommands.towerSetpointShoot(shooter, hood));
 
     // operatorController.leftTrigger().whileTrue(ShooterCommands.activateDeferredHood(hood));
