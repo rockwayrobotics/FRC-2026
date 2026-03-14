@@ -12,8 +12,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.hood.Hood;
 import frc.robot.subsystems.hood.HoodConstants;
@@ -35,7 +37,7 @@ public class ShooterCommands {
   private static LinearInterpolationTable m_rpmTable = ShooterConstants.kRPMTable;
 
   private static LoggedNetworkNumber flywheelSpeed =
-      new LoggedNetworkNumber("Shooter/FlywheelSpeedSetter", 5000);
+      new LoggedNetworkNumber("Shooter/FlywheelSpeedSetter", 4800);
   private static LoggedNetworkNumber hoodAngle =
       new LoggedNetworkNumber("Shooter/HoodAngleSetter", 45);
 
@@ -132,8 +134,12 @@ public class ShooterCommands {
                                     xSupplier.getAsDouble(), ySupplier.getAsDouble())
                                 .times(slowModeMultiplier);
 
-                        // Do NOT Square rotation value for more precise control
-                        // omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
+                        // Do NOT Square rotation value for more precise control in auto
+                        // but dampen rotation during teleop because the controller is held down.
+                        if (!DriverStation.isAutonomous()) {
+                          omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
+                        }
+
                         Translation2d targetVelocity =
                             linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
                         double targetSpeed = targetVelocity.getNorm();
@@ -186,6 +192,30 @@ public class ShooterCommands {
                 .until(() -> DriverStation.isAutonomous() && shooter.atFlywheelSetpoint(100)));
     result.addRequirements(shooter, hood, drive);
     return result;
+  }
+
+  public static Command hubShotWithoutAlign(
+      Shooter shooter, Hood hood, Drive drive, CommandXboxController controller) {
+    return Commands.run(
+            () -> {
+              double distance =
+                  GoalUtils.getHubLocation().getDistance(drive.getPose().getTranslation());
+              double rpm = ShooterConstants.kRPMTable.getOutput(distance);
+              double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
+              shooter.setOperatorOverride(false);
+              shooter.setVelocityFlywheel(rpm);
+              hood.setOperatorOverride(false);
+              hood.setPositionHood(Degrees.of(hoodAngle));
+              if (shooter.atFlywheelSetpoint(100)) {
+                controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+              }
+            },
+            shooter,
+            hood)
+        .finallyDo(
+            () -> {
+              controller.setRumble(GenericHID.RumbleType.kBothRumble, 0);
+            });
   }
 
   public static Command setupGoalShot(

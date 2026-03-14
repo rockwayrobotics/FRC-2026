@@ -1,0 +1,97 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "SetupHubShot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIndexer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooter"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right Trench to Neutral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SetupHubShot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIndexer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooter"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right Trench to Neutral Repeat"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SetupHubShot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIndexer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooter"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

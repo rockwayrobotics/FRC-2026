@@ -220,6 +220,16 @@ public class RobotContainer {
         ShooterCommands.setupHubShot(
             shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false));
 
+    new EventTrigger("ExpelBalls")
+        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE));
+
+    // new EventTrigger("ExpelThenIntakeZone")
+    //     .onTrue(NamedCommands.getCommand("ExtendIntake"))
+    //     .whileTrue(Commands.sequence(
+    //         Commands.waitUntil(() -> intakeExtender.getExtendAngle() > 30),
+    //         IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE),
+    //     ))
+
     new EventTrigger("IntakeZone")
         .onTrue(NamedCommands.getCommand("ExtendIntake"))
         .whileTrue(
@@ -244,7 +254,7 @@ public class RobotContainer {
                     drive.setPose(new Pose2d(new Translation2d(13, 4), Rotation2d.kZero));
                   }
                 }),
-            ShooterCommands.definitiveShoot(shooter, hood, 3400, 15),
+            ShooterCommands.definitiveShoot(shooter, hood, 3100, 15),
             Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
             NamedCommands.getCommand("Shoot2"),
             NamedCommands.getCommand("Stop")));
@@ -361,19 +371,21 @@ public class RobotContainer {
             .or(operatorController.y()))
         .negate()
         .and(controller.leftTrigger())
-        .whileTrue(
-            ShooterCommands.setupHubShot(
-                shooter,
-                hood,
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> controller.rightBumper().getAsBoolean(),
-                () -> controller.leftBumper().getAsBoolean()));
+        .whileTrue(ShooterCommands.hubShotWithoutAlign(shooter, hood, drive, controller));
+    // ShooterCommands.setupHubShot(
+    //     shooter,
+    //     hood,
+    //     drive,
+    //     () -> -controller.getLeftY(),
+    //     () -> -controller.getLeftX(),
+    //     () -> controller.rightBumper().getAsBoolean(),
+    //     () -> controller.leftBumper().getAsBoolean()));
     // .whileTrue(ShooterCommands.testShoot(shooter, hood));
 
     controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
     controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
+
+    controller.a().whileTrue(ShooterCommands.testShoot(shooter, hood));
 
     controller
         .y()
