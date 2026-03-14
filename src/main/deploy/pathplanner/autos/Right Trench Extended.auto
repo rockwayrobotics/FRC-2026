@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left Trench to Neutral"
+            "pathName": "Right Trench to Neutral"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left Trench After Shot"
+            "pathName": "Right Trench After Shot"
           }
         },
         {

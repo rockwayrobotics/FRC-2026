@@ -10,7 +10,7 @@ public class IntakeExtenderConstants {
   // 20% Duty cycle on the retract seems to make it work perfectly (rotates and slides in)
   // 10% duty cycle on the extend works as well.
   // FIXME: Does this work if there are balls?
-  public static final double EXTEND_DUTY_CYCLE = 0.2;
+  public static final double EXTEND_DUTY_CYCLE = 0.6;
   public static final double RETRACT_DUTY_CYCLE = -0.8;
 
   // FIXME: Unclear if this is reasonable
