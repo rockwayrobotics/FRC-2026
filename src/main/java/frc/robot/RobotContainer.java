@@ -219,23 +219,17 @@ public class RobotContainer {
         "SetupHubShot",
         ShooterCommands.setupHubShot(
             shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false));
+    NamedCommands.registerCommand("Agitate", IndexerCommands.agitate(indexer, kicker));
 
     new EventTrigger("ExpelBalls")
         .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE));
-
-    // new EventTrigger("ExpelThenIntakeZone")
-    //     .onTrue(NamedCommands.getCommand("ExtendIntake"))
-    //     .whileTrue(Commands.sequence(
-    //         Commands.waitUntil(() -> intakeExtender.getExtendAngle() > 30),
-    //         IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE),
-    //     ))
 
     new EventTrigger("IntakeZone")
         .onTrue(NamedCommands.getCommand("ExtendIntake"))
         .whileTrue(
             Commands.sequence(
                 Commands.waitUntil(() -> intakeExtender.getExtendAngle() > 30),
-                IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE)))
+                IntakeCommands.intakeFancy(intake, IntakeConstants.ROLLER_DUTY_CYCLE)))
         .onFalse(
             Commands.parallel(
                 IntakeCommands.intakeManual(intake, 0), NamedCommands.getCommand("RetractIntake")));
@@ -515,19 +509,27 @@ public class RobotContainer {
 
     // Manual forward
     new JoystickButton(operatorButtonBoard, 8)
-        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
+        .whileTrue(
+            IntakeCommands.intakeManualWithRumble(
+                intake, IntakeConstants.ROLLER_DUTY_CYCLE, operatorController));
     // Manual reverse
     new JoystickButton(operatorButtonBoard, 6)
-        .whileTrue(IntakeCommands.intakeManual(intake, -IntakeConstants.ROLLER_DUTY_CYCLE));
+        .whileTrue(
+            IntakeCommands.intakeManualWithRumble(
+                intake, -IntakeConstants.ROLLER_DUTY_CYCLE, operatorController));
 
     // Intake balls
     operatorController
         .leftTrigger()
-        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
+        .whileTrue(
+            IntakeCommands.intakeManualWithRumble(
+                intake, IntakeConstants.ROLLER_DUTY_CYCLE, operatorController));
     operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer, kicker));
     operatorController
         .leftBumper()
-        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE));
+        .whileTrue(
+            IntakeCommands.intakeManualWithRumble(
+                intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE, operatorController));
 
     // Agitate
     // operatorController.a().whileTrue(IndexerCommands.agitate(indexer, kicker));
