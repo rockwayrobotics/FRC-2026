@@ -41,6 +41,11 @@ public class ShooterCommands {
   private static LoggedNetworkNumber hoodAngle =
       new LoggedNetworkNumber("Shooter/HoodAngleSetter", 45);
 
+  private static LoggedNetworkNumber flywheelDumpSpeed =
+      new LoggedNetworkNumber("Shooter/DumpFlywheelSpeed", 2500);
+  private static LoggedNetworkNumber hoodDumpAngle =
+      new LoggedNetworkNumber("Shooter/DumpHoodAngle", 45);
+
   private static LoggedNetworkNumber trenchSetpointFlywheel =
       new LoggedNetworkNumber("Setpoints/TrenchFlywheel", 4350);
   private static LoggedNetworkNumber trenchSetpointHood =
@@ -68,7 +73,7 @@ public class ShooterCommands {
     return Commands.run(
         () -> {
           double rpm = MathUtil.clamp(flywheelSpeed.get(), 3000, 7000);
-          double hoodDegrees = MathUtil.clamp(hoodAngle.get(), 5, 45);
+          double hoodDegrees = MathUtil.clamp(hoodAngle.get(), 15, 45);
           shooter.setOperatorOverride(false);
           shooter.setVelocityFlywheel(rpm);
           hood.setOperatorOverride(false);
@@ -81,8 +86,21 @@ public class ShooterCommands {
       Shooter shooter, Hood hood, double flywheel, double hoodangle) {
     return Commands.runOnce(
         () -> {
-          double rpm = MathUtil.clamp(flywheel, 3000, 7000);
-          double hoodDegrees = MathUtil.clamp(hoodangle, 5, 45);
+          double rpm = MathUtil.clamp(flywheel, 2000, 7000);
+          double hoodDegrees = MathUtil.clamp(hoodangle, 15, 45);
+          shooter.setOperatorOverride(false);
+          shooter.setVelocityFlywheel(rpm);
+          hood.setOperatorOverride(false);
+          hood.setPositionHood(Degrees.of(hoodDegrees));
+        },
+        shooter);
+  }
+
+  public static Command dumpShort(Shooter shooter, Hood hood) {
+    return Commands.runOnce(
+        () -> {
+          double rpm = MathUtil.clamp(flywheelDumpSpeed.get(), 3000, 7000);
+          double hoodDegrees = MathUtil.clamp(hoodDumpAngle.get(), 15, 45);
           shooter.setOperatorOverride(false);
           shooter.setVelocityFlywheel(rpm);
           hood.setOperatorOverride(false);
@@ -200,6 +218,33 @@ public class ShooterCommands {
             () -> {
               double distance =
                   GoalUtils.getHubLocation().getDistance(drive.getPose().getTranslation());
+              double rpm = ShooterConstants.kRPMTable.getOutput(distance);
+              double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
+              shooter.setOperatorOverride(false);
+              shooter.setVelocityFlywheel(rpm);
+              hood.setOperatorOverride(false);
+              hood.setPositionHood(Degrees.of(hoodAngle));
+              if (shooter.atFlywheelSetpoint(100)) {
+                controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+              }
+            },
+            shooter,
+            hood)
+        .finallyDo(
+            () -> {
+              controller.setRumble(GenericHID.RumbleType.kBothRumble, 0);
+            });
+  }
+
+  public static Command targetShotWithoutAlign(
+      Shooter shooter,
+      Hood hood,
+      Drive drive,
+      CommandXboxController controller,
+      Supplier<Translation2d> targetSupplier) {
+    return Commands.run(
+            () -> {
+              double distance = targetSupplier.get().getDistance(drive.getPose().getTranslation());
               double rpm = ShooterConstants.kRPMTable.getOutput(distance);
               double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
               shooter.setOperatorOverride(false);
@@ -502,7 +547,7 @@ public class ShooterCommands {
           if (shooter.isOperatorOverriding()) {
             double currentSpeed = Math.max(shooter.getFlywheelRPMSetpoint(), 2000);
             double newSpeed =
-                Math.min(5000, currentSpeed + flywheelScale.getAsDouble() * rpmChange);
+                Math.min(7000, currentSpeed + flywheelScale.getAsDouble() * rpmChange);
             if (newSpeed < 2000 && rpmChange < 0) {
               shooter.stop();
               shooter.setOperatorOverride(false);
@@ -533,6 +578,43 @@ public class ShooterCommands {
           // Also if hood setpoints are ever set, then disable hold state
         },
         hood);
+  }
+
+  public static Command spinUp(Shooter shooter, Drive drive) {
+    return Commands.run(
+        () -> {
+          var field = GoalUtils.getField();
+          var pose = drive.getPose();
+          double distance = 0;
+          if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+            // Red alliance
+            // First check if we are close to our alliance zone, if so we want the shoot at hub
+            // speed
+            if (pose.getX() >= field.getTagPose(3).get().toPose2d().getX()) {
+              distance = GoalUtils.getHubLocation().getDistance(pose.getTranslation());
+            } else if (pose.getY() > field.getFieldWidth() / 2) {
+              // Then assume we are aiming for the left or right target based on our y-position
+              distance = GoalUtils.getRightTarget().getDistance(pose.getTranslation());
+            } else {
+              distance = GoalUtils.getLeftTarget().getDistance(pose.getTranslation());
+            }
+          } else {
+            // Blue alliance
+            // First check if we are close to our alliance zone, if so we want the shoot at hub
+            // speed
+            if (pose.getX() <= field.getTagPose(25).get().toPose2d().getX()) {
+              distance = GoalUtils.getHubLocation().getDistance(pose.getTranslation());
+            } else if (pose.getY() > field.getFieldWidth() / 2) {
+              // Then assume we are aiming for the left or right target based on our y-position
+              distance = GoalUtils.getLeftTarget().getDistance(pose.getTranslation());
+            } else {
+              distance = GoalUtils.getRightTarget().getDistance(pose.getTranslation());
+            }
+          }
+          shooter.setOperatorOverride(false);
+          shooter.setVelocityFlywheel(ShooterConstants.kRPMTable.getOutput(distance));
+        },
+        shooter);
   }
 
   private static final LoggedNetworkNumber flywheelKp = new LoggedNetworkNumber("Flywheel/kp", 0);

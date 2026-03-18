@@ -350,22 +350,28 @@ public class RobotContainer {
   }
 
   private void configureDriverCommands() {
-    (operatorController
-            .a()
-            // .or(operatorController.b())
-            // .or(operatorController.x())
-            .or(operatorController.y()))
-        .and(controller.leftTrigger())
-        .whileTrue(ShooterCommands.activateDeferredHood(hood));
-
-    (operatorController
-            .a()
-            // .or(operatorController.b())
-            // .or(operatorController.x())
-            .or(operatorController.y()))
+    (controller.y().or(controller.x()).or(controller.b()))
         .negate()
         .and(controller.leftTrigger())
+        .whileTrue(ShooterCommands.dumpShort(shooter, hood));
+
+    controller
+        .y()
+        .and(controller.leftTrigger())
         .whileTrue(ShooterCommands.hubShotWithoutAlign(shooter, hood, drive, controller));
+
+    controller
+        .x()
+        .and(controller.leftTrigger())
+        .whileTrue(
+            ShooterCommands.targetShotWithoutAlign(
+                shooter, hood, drive, controller, () -> GoalUtils.getLeftTarget()));
+    controller
+        .b()
+        .and(controller.leftTrigger())
+        .whileTrue(
+            ShooterCommands.targetShotWithoutAlign(
+                shooter, hood, drive, controller, () -> GoalUtils.getRightTarget()));
     // ShooterCommands.setupHubShot(
     //     shooter,
     //     hood,
@@ -382,10 +388,31 @@ public class RobotContainer {
     controller.a().whileTrue(ShooterCommands.testShoot(shooter, hood));
 
     controller
+        .x()
+        .whileTrue(
+            DriveCommands.joystickDrivePointAtTarget(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> GoalUtils.getLeftTarget()));
+
+    controller
+        .b()
+        .whileTrue(
+            DriveCommands.joystickDrivePointAtTarget(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> GoalUtils.getRightTarget()));
+
+    controller
         .y()
         .whileTrue(
-            DriveCommands.joystickDrivePointAtHub(
-                drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
+            DriveCommands.joystickDrivePointAtTarget(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> GoalUtils.getHubLocation()));
     // Point at Hub
     // controller
     // .leftTrigger()
@@ -413,17 +440,6 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
-
     // Auto-Intake
     // controller.leftBumper().whileTrue(IntakeCommands.autoIntake(intakeExtender,
     // intake));
@@ -445,60 +461,29 @@ public class RobotContainer {
                   climb.dutyCycle(-0.5);
                 },
                 climb));
-
-    //////////// Testing commands below here ///////////////////////
-
-    // FIXME: Probably remove this after shot testing
-    /*
-     * controller.a().whileTrue(TestCommands.testShot(shooter, hood, indexer,
-     * kicker));
-     *
-     * controller.rightBumper().whileTrue(Commands.run(() ->
-     * indexer.setVelocityKicker(100), indexer));
-     *
-     * controller
-     * .y()
-     * .whileTrue(
-     * DriveCommands.joystickDrivePointAtHub(
-     * drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
-     * controller
-     * .leftTrigger()
-     * .whileTrue(
-     * Commands.parallel(
-     * ShooterCommands.aimOnMove(
-     * shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()),
-     * IndexerCommands.feedShooterFancy(indexer, shooter, drive)));
-     *
-     * controller.povLeft().whileTrue(DriveCommands.turnSetpoint(drive,
-     * Rotation2d.kCCW_90deg));
-     * controller.povRight().whileTrue(DriveCommands.turnSetpoint(drive,
-     * Rotation2d.kPi));
-     */
   }
 
   private void configureOperatorCommands() {
+    controller
+        .leftTrigger()
+        .negate()
+        .and(operatorController.y())
+        .whileTrue(ShooterCommands.spinUp(shooter, drive));
+    // Reset gyro to 0° when B button is pressed
+    operatorController
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                    drive)
+                .ignoringDisable(true));
+
     // Extend
     operatorController.rightTrigger().onTrue(IntakeCommands.extend(intakeExtender));
     // Retract
     operatorController.rightBumper().onTrue(IntakeCommands.retract(intakeExtender));
-
-    // Complete fold - DISABLED
-    /*
-     * double lastRBPressTime = 0.0;
-     * operatorController
-     * .rightBumper()
-     * .onTrue(
-     * Commands.runOnce(
-     * () -> {
-     * double now = Timer.getFPGATimestamp();
-     * if (lastRBPressTime > 0.0 && now - lastRBPressTime < 0.3) {
-     * // Double press, spit out balls for 3 seconds while folding
-     * CommandScheduler.getInstance()
-     * .schedule(IntakeCommands.ejectBalls(intakeExtender, intake));
-     * }
-     * },
-     * intake));
-     */
 
     // Manual extend
     new JoystickButton(operatorButtonBoard, 5)
@@ -524,7 +509,11 @@ public class RobotContainer {
         .whileTrue(
             IntakeCommands.intakeManualWithRumble(
                 intake, IntakeConstants.ROLLER_DUTY_CYCLE, operatorController));
-    operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer, kicker));
+    controller
+        .rightTrigger()
+        .negate()
+        .and(operatorController.leftTrigger())
+        .whileTrue(IndexerCommands.agitate(indexer, kicker));
     operatorController
         .leftBumper()
         .whileTrue(
@@ -536,35 +525,35 @@ public class RobotContainer {
     // Unjam - DISABLED
     // operatorController.b().whileTrue(IndexerCommands.unjam(indexer, kicker));
 
-    operatorController.a().whileTrue(ShooterCommands.cornerSetpointShoot(shooter, hood));
-    operatorController
-        .b()
-        .whileTrue(
-            ShooterCommands.setupGoalShot(
-                shooter,
-                hood,
-                drive,
-                () -> GoalUtils.getRightTarget(),
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> controller.rightBumper().getAsBoolean(),
-                () -> controller.leftBumper().getAsBoolean()));
-    operatorController
-        .x()
-        .whileTrue(
-            ShooterCommands.setupGoalShot(
-                shooter,
-                hood,
-                drive,
-                () -> GoalUtils.getLeftTarget(),
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> controller.rightBumper().getAsBoolean(),
-                () -> controller.leftBumper().getAsBoolean()));
+    // operatorController.a().whileTrue(ShooterCommands.cornerSetpointShoot(shooter, hood));
+    // operatorController
+    //     .b()
+    //     .whileTrue(
+    //         ShooterCommands.setupGoalShot(
+    //             shooter,
+    //             hood,
+    //             drive,
+    //             () -> GoalUtils.getRightTarget(),
+    //             () -> -controller.getLeftY(),
+    //             () -> -controller.getLeftX(),
+    //             () -> controller.rightBumper().getAsBoolean(),
+    //             () -> controller.leftBumper().getAsBoolean()));
+    // operatorController
+    //     .x()
+    //     .whileTrue(
+    //         ShooterCommands.setupGoalShot(
+    //             shooter,
+    //             hood,
+    //             drive,
+    //             () -> GoalUtils.getLeftTarget(),
+    //             () -> -controller.getLeftY(),
+    //             () -> -controller.getLeftX(),
+    //             () -> controller.rightBumper().getAsBoolean(),
+    //             () -> controller.leftBumper().getAsBoolean()));
 
     // operatorController.b().whileTrue(ShooterCommands.trenchSetpointShoot(shooter, hood));
     // operatorController.x().whileTrue(ShooterCommands.sideTowerSetpointShoot(shooter, hood));
-    operatorController.y().whileTrue(ShooterCommands.towerSetpointShoot(shooter, hood));
+    // operatorController.y().whileTrue(ShooterCommands.towerSetpointShoot(shooter, hood));
 
     // operatorController.leftTrigger().whileTrue(ShooterCommands.activateDeferredHood(hood));
 

@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.util.GoalUtils;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -183,8 +182,11 @@ public class DriveCommands {
    * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
    * absolute rotation with a joystick.
    */
-  public static Command joystickDrivePointAtHub(
-      Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
+  public static Command joystickDrivePointAtTarget(
+      Drive drive,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Supplier<Translation2d> targetSupplier) {
 
     ProfiledPIDController angleController = getRotatePIDController();
 
@@ -196,7 +198,7 @@ public class DriveCommands {
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
               Rotation2d targetAngle =
-                  GoalUtils.getHubLocation().minus(drive.getPose().getTranslation()).getAngle();
+                  targetSupplier.get().minus(drive.getPose().getTranslation()).getAngle();
 
               // Calculate angular speed
               double omega =
