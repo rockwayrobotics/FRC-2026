@@ -34,7 +34,7 @@ public class DriveConstants {
       };
 
   // Drive motor configuration
-  public static final int driveMotorCurrentLimit = 80;
+  public static final int driveMotorCurrentLimit = 60;
   public static final double wheelRadiusMeters = Units.inchesToMeters(2);
   public static final double driveMotorReduction =
       50 * 17 * 45 / 14 / 27 / 15; // L2 gearing for SDS Mk4i
@@ -77,7 +77,7 @@ public class DriveConstants {
   // PathPlanner configuration
   public static final double robotMassKg = Pounds.of(130).in(Kilograms);
   public static final double robotMOI = 6.672;
-  public static final double wheelCOF = 1.1;
+  public static final double wheelCOF = 0.6;
   public static final RobotConfig ppConfig =
       new RobotConfig(
           robotMassKg,

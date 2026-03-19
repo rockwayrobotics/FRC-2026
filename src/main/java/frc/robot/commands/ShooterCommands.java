@@ -72,8 +72,12 @@ public class ShooterCommands {
   public static Command testShoot(Shooter shooter, Hood hood) {
     return Commands.run(
         () -> {
-          double rpm = MathUtil.clamp(flywheelSpeed.get(), 3000, 7000);
-          double hoodDegrees = MathUtil.clamp(hoodAngle.get(), 15, 45);
+          double rpm = MathUtil.clamp(flywheelSpeed.get(), 3000, ShooterConstants.FLYWHEEL_MAX_RPM);
+          double hoodDegrees =
+              MathUtil.clamp(
+                  hoodAngle.get(),
+                  HoodConstants.HOOD_REVERSE_LIMIT,
+                  HoodConstants.HOOD_FORWARD_LIMIT);
           shooter.setOperatorOverride(false);
           shooter.setVelocityFlywheel(rpm);
           hood.setOperatorOverride(false);
@@ -86,8 +90,10 @@ public class ShooterCommands {
       Shooter shooter, Hood hood, double flywheel, double hoodangle) {
     return Commands.runOnce(
         () -> {
-          double rpm = MathUtil.clamp(flywheel, 2000, 7000);
-          double hoodDegrees = MathUtil.clamp(hoodangle, 15, 45);
+          double rpm = MathUtil.clamp(flywheel, 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
+          double hoodDegrees =
+              MathUtil.clamp(
+                  hoodangle, HoodConstants.HOOD_REVERSE_LIMIT, HoodConstants.HOOD_FORWARD_LIMIT);
           shooter.setOperatorOverride(false);
           shooter.setVelocityFlywheel(rpm);
           hood.setOperatorOverride(false);
@@ -99,8 +105,13 @@ public class ShooterCommands {
   public static Command dumpShort(Shooter shooter, Hood hood) {
     return Commands.runOnce(
         () -> {
-          double rpm = MathUtil.clamp(flywheelDumpSpeed.get(), 3000, 7000);
-          double hoodDegrees = MathUtil.clamp(hoodDumpAngle.get(), 15, 45);
+          double rpm =
+              MathUtil.clamp(flywheelDumpSpeed.get(), 3000, ShooterConstants.FLYWHEEL_MAX_RPM);
+          double hoodDegrees =
+              MathUtil.clamp(
+                  hoodDumpAngle.get(),
+                  HoodConstants.HOOD_REVERSE_LIMIT,
+                  HoodConstants.HOOD_FORWARD_LIMIT);
           shooter.setOperatorOverride(false);
           shooter.setVelocityFlywheel(rpm);
           hood.setOperatorOverride(false);
@@ -218,6 +229,7 @@ public class ShooterCommands {
             () -> {
               double distance =
                   GoalUtils.getHubLocation().getDistance(drive.getPose().getTranslation());
+              Logger.recordOutput("Shooter/TargetShotDistance", distance);
               double rpm = ShooterConstants.kRPMTable.getOutput(distance);
               double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
               shooter.setOperatorOverride(false);
@@ -245,8 +257,9 @@ public class ShooterCommands {
     return Commands.run(
             () -> {
               double distance = targetSupplier.get().getDistance(drive.getPose().getTranslation());
-              double rpm = ShooterConstants.kRPMTable.getOutput(distance);
-              double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
+              Logger.recordOutput("Shooter/TargetShotDistance", distance);
+              double rpm = ShooterConstants.kRPMGoalTable.getOutput(distance);
+              double hoodAngle = HoodConstants.kHoodGoalTable.getOutput(distance);
               shooter.setOperatorOverride(false);
               shooter.setVelocityFlywheel(rpm);
               hood.setOperatorOverride(false);
@@ -359,8 +372,14 @@ public class ShooterCommands {
                       // shooter.setVelocityFlywheel(rpm);
                       // hood.setPositionHood(Degrees.of(hoodAngle));
 
-                      double rpm = MathUtil.clamp(flywheelSpeed.get(), 3000, 7000);
-                      double hoodDegrees = MathUtil.clamp(hoodAngle.get(), 5, 45);
+                      double rpm =
+                          MathUtil.clamp(
+                              flywheelSpeed.get(), 3000, ShooterConstants.FLYWHEEL_MAX_RPM);
+                      double hoodDegrees =
+                          MathUtil.clamp(
+                              hoodAngle.get(),
+                              HoodConstants.HOOD_REVERSE_LIMIT,
+                              HoodConstants.HOOD_FORWARD_LIMIT);
                       shooter.setOperatorOverride(false);
                       shooter.setVelocityFlywheel(rpm);
                       hood.setOperatorOverride(false);
@@ -547,7 +566,9 @@ public class ShooterCommands {
           if (shooter.isOperatorOverriding()) {
             double currentSpeed = Math.max(shooter.getFlywheelRPMSetpoint(), 2000);
             double newSpeed =
-                Math.min(7000, currentSpeed + flywheelScale.getAsDouble() * rpmChange);
+                Math.min(
+                    ShooterConstants.FLYWHEEL_MAX_RPM,
+                    currentSpeed + flywheelScale.getAsDouble() * rpmChange);
             if (newSpeed < 2000 && rpmChange < 0) {
               shooter.stop();
               shooter.setOperatorOverride(false);
@@ -586,12 +607,14 @@ public class ShooterCommands {
           var field = GoalUtils.getField();
           var pose = drive.getPose();
           double distance = 0;
+          LinearInterpolationTable table = ShooterConstants.kRPMGoalTable;
           if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
             // Red alliance
             // First check if we are close to our alliance zone, if so we want the shoot at hub
             // speed
             if (pose.getX() >= field.getTagPose(3).get().toPose2d().getX()) {
               distance = GoalUtils.getHubLocation().getDistance(pose.getTranslation());
+              table = ShooterConstants.kRPMTable;
             } else if (pose.getY() > field.getFieldWidth() / 2) {
               // Then assume we are aiming for the left or right target based on our y-position
               distance = GoalUtils.getRightTarget().getDistance(pose.getTranslation());
@@ -604,6 +627,7 @@ public class ShooterCommands {
             // speed
             if (pose.getX() <= field.getTagPose(25).get().toPose2d().getX()) {
               distance = GoalUtils.getHubLocation().getDistance(pose.getTranslation());
+              table = ShooterConstants.kRPMTable;
             } else if (pose.getY() > field.getFieldWidth() / 2) {
               // Then assume we are aiming for the left or right target based on our y-position
               distance = GoalUtils.getLeftTarget().getDistance(pose.getTranslation());
@@ -612,7 +636,7 @@ public class ShooterCommands {
             }
           }
           shooter.setOperatorOverride(false);
-          shooter.setVelocityFlywheel(ShooterConstants.kRPMTable.getOutput(distance));
+          shooter.setVelocityFlywheel(table.getOutput(distance));
         },
         shooter);
   }

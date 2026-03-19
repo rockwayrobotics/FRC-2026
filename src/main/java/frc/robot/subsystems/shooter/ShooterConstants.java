@@ -18,6 +18,8 @@ public class ShooterConstants {
 
   public static final double ACCEL_COMP_FACTOR = 0.100; // in units of seconds
 
+  public static final double FLYWHEEL_MAX_RPM = 8000;
+
   // meters, RPM
   private static final Point2D[] kRPMPoints =
       new Point2D.Double[] {
@@ -29,30 +31,22 @@ public class ShooterConstants {
         new Point2D.Double(3.46, 4000),
         new Point2D.Double(4.0, 4300),
         new Point2D.Double(4.94, 4700),
-        new Point2D.Double(6.0, 4200),
-
-        // new Point2D.Double(2.44, 3900), // more data needed
-        // new Point2D.Double(3.09, 4100), // tower
-        // new Point2D.Double(3.21, 4175), // side tower
-        // new Point2D.Double(3.41, 4250), // trench
-        // new Point2D.Double(4.56, 4675), // corner
-
-        // new Point2D.Double(35, 1500 + 10),
-        // new Point2D.Double(55, 1860 + 10),
-        // new Point2D.Double(80, 2000 + 10), //
-        // new Point2D.Double(105, 2100 + 10), //
-        // new Point2D.Double(130, 2170 + 20), //
-        // new Point2D.Double(155, 2245 + 30), //
-        // new Point2D.Double(165, 2380), //
-        // new Point2D.Double(180, 2465 + 30), //
-        // new Point2D.Double(205, 2670 + 30), //
-        // new Point2D.Double(230, 2840 + 35), //
-        // new Point2D.Double(255, 2980 + 40), //
-        // new Point2D.Double(270, 3300), //
-        // new Point2D.Double(280, 3350 + 60)
       };
 
   public static final LinearInterpolationTable kRPMTable = new LinearInterpolationTable(kRPMPoints);
+
+  private static final Point2D[] kRPMGoalPoints = {
+    // 45 degrees goal shots, measured distance from hub
+    new Point2D.Double(4.5, 4000),
+    new Point2D.Double(6.0, 4400),
+    new Point2D.Double(8, 4650),
+    new Point2D.Double(10.8, 6100),
+    new Point2D.Double(12.13, 6600),
+    new Point2D.Double(14, 7300),
+  };
+
+  public static final LinearInterpolationTable kRPMGoalTable =
+      new LinearInterpolationTable(kRPMGoalPoints);
 
   // FIXME: Record these in meters and seconds
   // We couldn't figure out how to record these accurately
