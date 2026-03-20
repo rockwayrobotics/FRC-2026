@@ -22,7 +22,7 @@ public class HoodConstants {
       45; // 45 degree hood angle (50.4 max)
   public static final double HOOD_INTERNAL_FORWARD_LIMIT = 46; // 46 degree hood angle (50.4 max)
 
-  public static final double HOOD_REVERSE_LIMIT = 15;
+  public static final double HOOD_REVERSE_LIMIT = 5; // was 15...need this for close-to-hub shooting
   public static final double HOOD_INTERNAL_REVERSE_LIMIT = 5; // 15 degree hood angle (2.4 min)
   public static final double HOOD_ENCODER_POSITION_CONVERSION_FACTOR = 360;
 
@@ -31,13 +31,23 @@ public class HoodConstants {
   private static final Point2D[] kHoodPoints =
       new Point2D.Double[] {
         // (distance, hood angle)
-        new Point2D.Double(1.0, 15),
-        new Point2D.Double(1.5, 20),
-        new Point2D.Double(2.25, 20),
-        new Point2D.Double(3.0, 20),
-        new Point2D.Double(3.46, 25),
-        new Point2D.Double(4.0, 25),
-        new Point2D.Double(4.94, 25),
+        // Old data - what we ran at Durham
+        // new Point2D.Double(1.0, 15),
+        // new Point2D.Double(1.5, 20),
+        // new Point2D.Double(2.25, 20),
+        // new Point2D.Double(3.0, 20),
+        // new Point2D.Double(3.46, 25),
+        // new Point2D.Double(4.0, 25),
+        // new Point2D.Double(4.25, 25),
+        // new Point2D.Double(4.94, 25),
+        // new Point2D.Double(5.36, 25),
+
+        new Point2D.Double(1.15, 5),
+        new Point2D.Double(2.5, 20),
+        new Point2D.Double(3.15, 25),
+        new Point2D.Double(3.5, 27.5),
+        new Point2D.Double(4.01, 30),
+        new Point2D.Double(5.36, 35),
       };
 
   public static final LinearInterpolationTable kHoodTable =

@@ -24,13 +24,54 @@ public class ShooterConstants {
   private static final Point2D[] kRPMPoints =
       new Point2D.Double[] {
         // (distance, flywheel RPM)
-        new Point2D.Double(1.0, 3200),
-        new Point2D.Double(1.5, 3200),
-        new Point2D.Double(2.25, 3650),
-        new Point2D.Double(3.0, 4000),
-        new Point2D.Double(3.46, 4000),
-        new Point2D.Double(4.0, 4300),
-        new Point2D.Double(4.94, 4700),
+        // Old data - what we ran at Durham
+        // new Point2D.Double(1.0, 3200), // cant get this close to hub
+        // new Point2D.Double(1.5, 3200),
+        // new Point2D.Double(2.25, 3650),
+        // new Point2D.Double(3.0, 4000),
+        // new Point2D.Double(3.46, 4000),
+        // new Point2D.Double(4.0, 4300),
+        // new Point2D.Double(4.25, 4300),
+        // new Point2D.Double(4.94, 4700),
+
+        new Point2D.Double(1.15, 2900), // 5 degrees
+
+        //        new Point2D.Double(2.5, 3500), // 15 degrees
+        new Point2D.Double(2.5, 3400), // 20 degrees
+        //        new Point2D.Double(2.5, 3300), // 25 degrees
+        //        new Point2D.Double(2.5, 3350), // 30 degrees - sketchy angle
+
+        //        new Point2D.Double(3.15, 3900), // 15 degrees
+        //        new Point2D.Double(3.15, 3700), // 20 degrees
+        new Point2D.Double(3.15, 3600), // 25 degrees
+        //        new Point2D.Double(3.15, 3500), // 30 degrees
+        //        new Point2D.Double(3.15, 3400), // 35 degrees
+
+        // close to trench
+        //        new Point2D.Double(3.5, 4200), // 10 degrees High Spread
+        //        new Point2D.Double(3.5, 3950), // 15 degrees
+        //        new Point2D.Double(3.5,3850), // 20 Degrees
+        // new Point2D.Double(3.5, 3825), // 22.5 Degrees
+        // new Point2D.Double(3.5, 3750), // 25 Degrees
+        new Point2D.Double(3.5, 3700), // 27.5 Degrees
+        //        new Point2D.Double(3.5,3650), // 30 Degrees
+        //        new Point2D.Double(3.5,3500), // 35 Degrees
+
+        //        new Point2D.Double(4.00, 4000), // 20 degrees
+        //        new Point2D.Double(4.01, 3975), // 25 degrees
+        new Point2D.Double(4.01, 3900), // 30 degrees
+        //        new Point2D.Double(4.01, 3850), // 35 degrees
+        //        new Point2D.Double(4.01, 3850), // 40 degrees
+
+        //        new Point2D.Double(5.36, 4950), //10 degrees
+        //        new Point2D.Double(5.36, 4950), //15 degrees
+        //        new Point2D.Double(5.36, 4750), //20 degrees
+        // new Point2D.Double(5.36, 4650), // 25 degrees
+        //        new Point2D.Double(5.36, 4600), //30 degrees
+        new Point2D.Double(5.36, 4500), // 35 degrees
+        //        new Point2D.Double(5.36, 4400), //40 degrees
+        //        new Point2D.Double(5.36, 4150), //45 degrees
+
       };
 
   public static final LinearInterpolationTable kRPMTable = new LinearInterpolationTable(kRPMPoints);

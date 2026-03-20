@@ -56,11 +56,9 @@ import frc.robot.subsystems.indexer.IndexerSim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
-import frc.robot.subsystems.intake.IntakeReal;
 import frc.robot.subsystems.intake.IntakeSim;
 import frc.robot.subsystems.intakeExtender.IntakeExtender;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderIO;
-import frc.robot.subsystems.intakeExtender.IntakeExtenderReal;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderSim;
 import frc.robot.subsystems.kicker.Kicker;
 import frc.robot.subsystems.kicker.KickerConstants;
@@ -126,8 +124,8 @@ public class RobotContainer {
 
         indexer = new Indexer(new IndexerReal());
         kicker = new Kicker(new KickerReal());
-        intake = new Intake(new IntakeReal());
-        intakeExtender = new IntakeExtender(new IntakeExtenderReal());
+        intake = new Intake(new IntakeSim()); // IntakeReal());
+        intakeExtender = new IntakeExtender(new IntakeExtenderSim()); // IntakeExtenderReal());
         shooter = new Shooter(new ShooterReal());
         hood = new Hood(new HoodReal());
         climb = new Climb(new ClimbNEO2());

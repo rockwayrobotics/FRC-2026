@@ -31,11 +31,12 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
-  public static final double ANGLE_KP = 4.0;
-  public static final double ANGLE_KD = 0.4;
+  public static final double ANGLE_KP = 8.0;
+  public static final double ANGLE_KD = 0.0;
   public static final double ANGLE_MAX_VELOCITY = 8.0;
   public static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double FF_START_DELAY = 2.0; // Secs
@@ -55,6 +56,7 @@ public class DriveCommands {
               0.0,
               ANGLE_KD,
               new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+      // rotatePidController.setTolerance(0.1);
       rotatePidController.enableContinuousInput(-Math.PI, Math.PI);
     }
     return rotatePidController;
@@ -174,7 +176,8 @@ public class DriveCommands {
             drive)
 
         // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        .beforeStarting(
+            () -> angleController.reset(MathUtil.angleModulus(drive.getRotation().getRadians())));
   }
 
   /**
@@ -204,6 +207,12 @@ public class DriveCommands {
               double omega =
                   angleController.calculate(
                       drive.getRotation().getRadians(), targetAngle.getRadians());
+              if (angleController.atGoal()) {
+                omega = 0;
+              }
+              Logger.recordOutput("Drive/Heading", drive.getRotation().getRadians());
+              Logger.recordOutput("Drive/Target", targetAngle.getRadians());
+              Logger.recordOutput("Drive/Omega", omega);
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
@@ -224,7 +233,8 @@ public class DriveCommands {
             drive)
 
         // Reset PID controller when command starts
-        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+        .beforeStarting(
+            () -> angleController.reset(MathUtil.angleModulus(drive.getRotation().getRadians())));
   }
 
   public static Command turnSetpoint(Drive drive, Rotation2d rotationinRadians) {
