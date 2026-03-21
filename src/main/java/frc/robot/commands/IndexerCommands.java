@@ -55,7 +55,7 @@ public class IndexerCommands {
                 () -> {
                   // indexer.augersFeed();
                   // indexer.setVelocityKicker(IndexerConstants.KICKER_FEED_RPM);
-                  double augerDuty = MathUtil.clamp(augerDutyNumber.get(), 0.1, 0.6);
+                  double augerDuty = MathUtil.clamp(augerDutyNumber.get(), 0.1, 1.0);
                   double kickerRPM = MathUtil.clamp(kickerVelocityNumber.get(), 3000, 5000);
                   indexer.setAugers(augerDuty);
                   kicker.setVelocityKicker(kickerRPM);
