@@ -137,7 +137,7 @@ public class ShooterCommands {
                         double slowModeMultiplier =
                             drive
                                 .getSlowModeSlewRateLimiter()
-                                .calculate(slowModeSupplier.getAsBoolean() ? 0.5 : 1.0);
+                                .calculate(slowModeSupplier.getAsBoolean() ? DriveCommands.SLOW_MODE_MULTIPLIER : 1.0);
 
                         // Get linear velocity
                         Translation2d linearVelocity =
@@ -294,7 +294,7 @@ public class ShooterCommands {
                         double slowModeMultiplier =
                             drive
                                 .getSlowModeSlewRateLimiter()
-                                .calculate(slowModeSupplier.getAsBoolean() ? 0.5 : 1.0);
+                                .calculate(slowModeSupplier.getAsBoolean() ? DriveCommands.SLOW_MODE_MULTIPLIER : 1.0);
 
                         // Get linear velocity
                         Translation2d linearVelocity =

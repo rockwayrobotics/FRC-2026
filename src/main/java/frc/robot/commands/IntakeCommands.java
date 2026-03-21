@@ -11,43 +11,6 @@ import frc.robot.subsystems.intakeExtender.IntakeExtenderConstants;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class IntakeCommands {
-  // public static Command autoIntake(IntakeExtender intakeExtender, Intake
-  // intake) {
-  // return Commands.startRun(
-  // () -> {
-  // intakeExtender.setHoldingPosition(false);
-  // intakeExtender.unlockAutoRetract();
-  // },
-  // () -> {
-  // if (intakeExtender.getExtendAngle() < IntakeExtenderConstants.EXTEND_LIMIT) {
-  // intakeExtender.extend(IntakeExtenderConstants.EXTEND_DUTY_CYCLE);
-  // } else {
-  // intakeExtender.extend(0.0);
-  // }
-
-  // intake.intake(IntakeConstants.ROLLER_DUTY_CYCLE);
-  // },
-  // intakeExtender,
-  // intake);
-  // }
-
-  // public static Command autoRetract(IntakeExtender intakeExtender) {
-  // return Commands.startRun(
-  // () -> {
-  // intakeExtender.unlockAutoRetract();
-  // },
-  // () -> {
-  // if (!intakeExtender.isHoldingPosition()
-  // && !intakeExtender.isAutoRetractBlocked()
-  // && intakeExtender.getExtendAngle() > IntakeExtenderConstants.RETRACT_LIMIT) {
-  // intakeExtender.extend(IntakeExtenderConstants.RETRACT_DUTY_CYCLE);
-  // } else {
-  // intakeExtender.extend(0.0);
-  // }
-  // },
-  // intakeExtender);
-  // }
-
   public static Command extend(IntakeExtender intakeExtender) {
     return Commands.run(
         () -> {
@@ -80,20 +43,6 @@ public class IntakeCommands {
         () -> intakeExtender.extend(dutyCycle),
         intakeExtender);
   }
-
-  // public static Command ejectBalls(IntakeExtender intakeExtender, Intake
-  // intake) {
-  // return Commands.run(
-  // () -> {
-  // // This is potentially dangerous because we're just saying
-  // // we can retract even if we might not be able to.
-  // intakeExtender.setHoldingPosition(false);
-  // intakeExtender.unlockAutoRetract();
-  // intake.intake(-IntakeConstants.ROLLER_EJECT_DUTY_CYCLE);
-  // },
-  // intake)
-  // .withTimeout(3.0);
-  // }
 
   public static Command intakeManual(Intake intake, double dutyCycle) {
     return Commands.run(() -> intake.intake(dutyCycle), intake);
