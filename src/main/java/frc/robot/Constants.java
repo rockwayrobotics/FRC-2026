@@ -57,5 +57,7 @@ public final class Constants {
     public static final int FLYWHEEL_FOLLOWER_2 = 17;
     public static final int VARIABLE_HOOD = 18;
     public static final int KICKER = 19;
+
+    public static final int KRAKEN_INTAKE = 20;
   }
 }

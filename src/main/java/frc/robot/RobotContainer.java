@@ -46,6 +46,7 @@ import frc.robot.subsystems.indexer.IndexerSim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeKraken;
 import frc.robot.subsystems.intake.IntakeSim;
 import frc.robot.subsystems.intakeExtender.IntakeExtender;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderIO;
@@ -59,6 +60,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -84,6 +86,8 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
+  private final LoggedNetworkNumber rollerTuner = new LoggedNetworkNumber("Intake/RollerDutyCycle", IntakeConstants.ROLLER_DUTY_CYCLE);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     led = new Led();
@@ -108,7 +112,7 @@ public class RobotContainer {
                                                                                     */);
 
         indexer = new Indexer(new IndexerSim());
-        intake = new Intake(new IntakeSim());
+        intake = new Intake(new IntakeKraken());
         intakeExtender = new IntakeExtender(new IntakeExtenderSim());
         shooter = new Shooter(new ShooterSim());
         climb = new Climb(new ClimbIO() {});
@@ -200,7 +204,7 @@ public class RobotContainer {
     intakeExtender.setDefaultCommand(IntakeCommands.autoRetract(intakeExtender));
 
     // Stop intake rollers by default
-    intake.setDefaultCommand(IntakeCommands.intakeManual(intake, 0.0));
+    intake.setDefaultCommand(IntakeCommands.intakeManual(intake, () -> 0.0));
 
     // Stop climb by default
     climb.setDefaultCommand(Commands.run(() -> climb.stop(), climb));
@@ -315,20 +319,20 @@ public class RobotContainer {
     operatorController.rightBumper().onTrue(IntakeCommands.retract(intakeExtender));
 
     // Complete fold
-    double lastRBPressTime = 0.0;
-    operatorController
-        .rightBumper()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  double now = Timer.getFPGATimestamp();
-                  if (lastRBPressTime > 0.0 && now - lastRBPressTime < 0.3) {
-                    // Double press, spit out balls for 3 seconds while folding
-                    CommandScheduler.getInstance()
-                        .schedule(IntakeCommands.ejectBalls(intakeExtender, intake));
-                  }
-                },
-                intake));
+    // double lastRBPressTime = 0.0;
+    // operatorController
+    //     .rightBumper()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> {
+    //               double now = Timer.getFPGATimestamp();
+    //               if (lastRBPressTime > 0.0 && now - lastRBPressTime < 0.3) {
+    //                 // Double press, spit out balls for 3 seconds while folding
+    //                 CommandScheduler.getInstance()
+    //                     .schedule(IntakeCommands.ejectBalls(intakeExtender, intake));
+    //               }
+    //             },
+    //             intake));
 
     // Manual extend
     new JoystickButton(operatorButtonBoard, 5)
@@ -339,15 +343,15 @@ public class RobotContainer {
 
     // Manual forward
     new JoystickButton(operatorButtonBoard, 8)
-        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
+        .whileTrue(IntakeCommands.intakeManual(intake, () -> rollerTuner.get()));
     // Manual reverse
     new JoystickButton(operatorButtonBoard, 6)
-        .whileTrue(IntakeCommands.intakeManual(intake, -IntakeConstants.ROLLER_DUTY_CYCLE));
+        .whileTrue(IntakeCommands.intakeManual(intake, () -> -rollerTuner.get()));
 
     // Intake balls
     operatorController
         .leftTrigger()
-        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
+        .whileTrue(IntakeCommands.intakeManual(intake, () -> rollerTuner.get()));
     operatorController.leftTrigger().whileTrue(IndexerCommands.agitate(indexer));
 
     // Agitate
