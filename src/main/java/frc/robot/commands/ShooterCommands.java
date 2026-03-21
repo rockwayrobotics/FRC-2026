@@ -37,42 +37,24 @@ public class ShooterCommands {
   private static LinearInterpolationTable m_rpmTable = ShooterConstants.kRPMTable;
 
   private static LoggedNetworkNumber flywheelSpeed =
-      new LoggedNetworkNumber("Shooter/FlywheelSpeedSetter", 4800);
+      new LoggedNetworkNumber("Shooter/FlywheelSpeedSetter", 4000);
   private static LoggedNetworkNumber hoodAngle =
       new LoggedNetworkNumber("Shooter/HoodAngleSetter", 45);
 
   private static LoggedNetworkNumber flywheelDumpSpeed =
-      new LoggedNetworkNumber("Shooter/DumpFlywheelSpeed", 2500);
+      new LoggedNetworkNumber("Shooter/DumpFlywheelSpeed", 2083.33);
   private static LoggedNetworkNumber hoodDumpAngle =
       new LoggedNetworkNumber("Shooter/DumpHoodAngle", 45);
-
-  private static LoggedNetworkNumber trenchSetpointFlywheel =
-      new LoggedNetworkNumber("Setpoints/TrenchFlywheel", 4350);
-  private static LoggedNetworkNumber trenchSetpointHood =
-      new LoggedNetworkNumber("Setpoints/TrenchHood", 20);
-  private static LoggedNetworkNumber towerSetpointFlywheel =
-      new LoggedNetworkNumber("Setpoints/TowerFlywheel", 4100);
-  private static LoggedNetworkNumber towerSetpointHood =
-      new LoggedNetworkNumber("Setpoints/TowerHood", 22);
-  private static LoggedNetworkNumber sideTowerSetpointFlywheel =
-      new LoggedNetworkNumber("Setpoints/SideTowerFlywheel", 4275);
-  private static LoggedNetworkNumber sideTowerSetpointHood =
-      new LoggedNetworkNumber("Setpoints/SideTowerHood", 20);
-  private static LoggedNetworkNumber cornerSetpointFlywheel =
-      new LoggedNetworkNumber("Setpoints/CornerFlywheel", 4675);
-  private static LoggedNetworkNumber cornerSetpointHood =
-      new LoggedNetworkNumber("Setpoints/CornerHood", 25);
 
   private static LoggedNetworkNumber flywheelScale =
       new LoggedNetworkNumber("Shooter/FlywheelOperatorScale", 8);
   private static LoggedNetworkNumber hoodScale =
       new LoggedNetworkNumber("Shooter/HoodOperatorScale", 0.4);
 
-  // 75" away from hub (front to front) at 4000 rpm
   public static Command testShoot(Shooter shooter, Hood hood) {
     return Commands.run(
         () -> {
-          double rpm = MathUtil.clamp(flywheelSpeed.get(), 3000, ShooterConstants.FLYWHEEL_MAX_RPM);
+          double rpm = MathUtil.clamp(flywheelSpeed.get(), 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
           double hoodDegrees =
               MathUtil.clamp(
                   hoodAngle.get(),
@@ -106,7 +88,7 @@ public class ShooterCommands {
     return Commands.runOnce(
         () -> {
           double rpm =
-              MathUtil.clamp(flywheelDumpSpeed.get(), 3000, ShooterConstants.FLYWHEEL_MAX_RPM);
+              MathUtil.clamp(flywheelDumpSpeed.get(), 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
           double hoodDegrees =
               MathUtil.clamp(
                   hoodDumpAngle.get(),
@@ -374,7 +356,7 @@ public class ShooterCommands {
 
                       double rpm =
                           MathUtil.clamp(
-                              flywheelSpeed.get(), 3000, ShooterConstants.FLYWHEEL_MAX_RPM);
+                              flywheelSpeed.get(), 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
                       double hoodDegrees =
                           MathUtil.clamp(
                               hoodAngle.get(),
@@ -388,48 +370,6 @@ public class ShooterCommands {
                 .until(() -> DriverStation.isAutonomous() && shooter.atFlywheelSetpoint(100)));
     result.addRequirements(shooter, hood, drive);
     return result;
-  }
-
-  /**
-   * Spins up flywheel to setpoint, stores desired hood angle but does not command any movement on
-   * it.
-   *
-   * @param shooter IS a requirement
-   * @param hood is NOT a requirement here, it just sets it up for triggering
-   * @return
-   */
-  private static Command setpointShoot(
-      Shooter shooter, Hood hood, DoubleSupplier hoodDegrees, DoubleSupplier rpmSupplier) {
-    return Commands.startRun(
-        () -> {
-          Angle hoodAngle = Degrees.of(MathUtil.clamp(hoodDegrees.getAsDouble(), 5, 45));
-          hood.setDeferredSetpoint(hoodAngle);
-          shooter.setOperatorOverride(false);
-        },
-        () -> {
-          shooter.setVelocityFlywheel(MathUtil.clamp(rpmSupplier.getAsDouble(), 3000, 5000));
-        },
-        shooter);
-  }
-
-  public static Command trenchSetpointShoot(Shooter shooter, Hood hood) {
-    return setpointShoot(
-        shooter, hood, () -> trenchSetpointHood.get(), () -> trenchSetpointFlywheel.get());
-  }
-
-  public static Command towerSetpointShoot(Shooter shooter, Hood hood) {
-    return setpointShoot(
-        shooter, hood, () -> towerSetpointHood.get(), () -> towerSetpointFlywheel.get());
-  }
-
-  public static Command sideTowerSetpointShoot(Shooter shooter, Hood hood) {
-    return setpointShoot(
-        shooter, hood, () -> sideTowerSetpointHood.get(), () -> sideTowerSetpointFlywheel.get());
-  }
-
-  public static Command cornerSetpointShoot(Shooter shooter, Hood hood) {
-    return setpointShoot(
-        shooter, hood, () -> cornerSetpointHood.get(), () -> cornerSetpointFlywheel.get());
   }
 
   public static Command activateDeferredHood(Hood hood) {

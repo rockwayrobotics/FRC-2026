@@ -49,6 +49,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.hood.Hood;
+import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodIO;
 import frc.robot.subsystems.hood.HoodReal;
 import frc.robot.subsystems.hood.HoodSim;
@@ -72,6 +73,7 @@ import frc.robot.subsystems.kicker.KickerReal;
 import frc.robot.subsystems.kicker.KickerSim;
 import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterReal;
 import frc.robot.subsystems.shooter.ShooterSim;
@@ -181,9 +183,6 @@ public class RobotContainer {
     }
 
     // Pathplanner Named Commands
-    // NamedCommands.registerCommand("SetupShotFor2",(ShooterCommands.definitiveShoot(shooter,
-    // hood,
-    // 3556.33588,20)));
     NamedCommands.registerCommand(
         "StopShooter",
         Commands.runOnce(
@@ -203,11 +202,7 @@ public class RobotContainer {
             indexer,
             kicker));
     NamedCommands.registerCommand(
-        "SetupShootHub", ShooterCommands.definitiveShoot(shooter, hood, 3200, 15));
-    NamedCommands.registerCommand(
         "Shoot2", IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(3)));
-    NamedCommands.registerCommand(
-        "SetupShotFor2", ShooterCommands.definitiveShoot(shooter, hood, 3556.33588, 20));
     NamedCommands.registerCommand(
         "ExtendIntake", IntakeCommands.extend(intakeExtender).withTimeout(Seconds.of(1)));
     NamedCommands.registerCommand(
@@ -251,7 +246,11 @@ public class RobotContainer {
                     drive.setPose(new Pose2d(new Translation2d(13, 4), Rotation2d.kZero));
                   }
                 }),
-            ShooterCommands.definitiveShoot(shooter, hood, 3100, 15),
+            ShooterCommands.definitiveShoot(
+                shooter,
+                hood,
+                ShooterConstants.kRPMTable.getOutput(1.15),
+                HoodConstants.kHoodTable.getOutput(1.15)),
             Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
             NamedCommands.getCommand("Shoot2"),
             NamedCommands.getCommand("Stop")));
