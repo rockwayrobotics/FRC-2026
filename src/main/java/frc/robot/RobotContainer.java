@@ -458,23 +458,7 @@ public class RobotContainer {
     // controller.leftBumper().whileTrue(IntakeCommands.autoIntake(intakeExtender,
     // intake));
 
-    controller
-        .povUp()
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  climb.dutyCycle(0.5);
-                },
-                climb));
-
-    controller
-        .povDown()
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  climb.dutyCycle(-0.5);
-                },
-                climb));
+    
   }
 
   private void configureOperatorCommands() {
@@ -539,60 +523,10 @@ public class RobotContainer {
     // Unjam - DISABLED
     // operatorController.b().whileTrue(IndexerCommands.unjam(indexer, kicker));
 
-    // operatorController.a().whileTrue(ShooterCommands.cornerSetpointShoot(shooter, hood));
-    // operatorController
-    //     .b()
-    //     .whileTrue(
-    //         ShooterCommands.setupGoalShot(
-    //             shooter,
-    //             hood,
-    //             drive,
-    //             () -> GoalUtils.getRightTarget(),
-    //             () -> -controller.getLeftY(),
-    //             () -> -controller.getLeftX(),
-    //             () -> controller.rightBumper().getAsBoolean(),
-    //             () -> controller.leftBumper().getAsBoolean()));
-    // operatorController
-    //     .x()
-    //     .whileTrue(
-    //         ShooterCommands.setupGoalShot(
-    //             shooter,
-    //             hood,
-    //             drive,
-    //             () -> GoalUtils.getLeftTarget(),
-    //             () -> -controller.getLeftY(),
-    //             () -> -controller.getLeftX(),
-    //             () -> controller.rightBumper().getAsBoolean(),
-    //             () -> controller.leftBumper().getAsBoolean()));
-
-    // operatorController.b().whileTrue(ShooterCommands.trenchSetpointShoot(shooter, hood));
-    // operatorController.x().whileTrue(ShooterCommands.sideTowerSetpointShoot(shooter, hood));
-    // operatorController.y().whileTrue(ShooterCommands.towerSetpointShoot(shooter, hood));
-
-    // operatorController.leftTrigger().whileTrue(ShooterCommands.activateDeferredHood(hood));
-
     // Forward Augers
     new JoystickButton(operatorButtonBoard, 3).whileTrue(IndexerCommands.augersFeed(indexer));
     // Reverse Augers
     new JoystickButton(operatorButtonBoard, 4).whileTrue(IndexerCommands.augersReverse(indexer));
-
-    new POVButton(operatorButtonBoard, 0)
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  climb.setPos(ClimbConstants.EXTEND_HEIGHT.in(Millimeters), false);
-                },
-                climb));
-    new POVButton(operatorButtonBoard, 180)
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  climb.setPos(ClimbConstants.CLIMB_HEIGHT.in(Millimeters), false);
-                },
-                climb));
-
-    // Disabled configure PID for shooter:
-    // operatorController.back().onTrue(ShooterCommands.configureLeader(shooter));
 
     // XBox controller axes:
     // 0: left stick X
@@ -634,16 +568,6 @@ public class RobotContainer {
         .axisMagnitudeGreaterThan(1, 0.01) // -0.01 - 0.01 deadzone
         .whileTrue(ShooterCommands.manualHood(hood, () -> -operatorController.getLeftY()));
 
-    /*
-     * operatorController
-     * .axisMagnitudeGreaterThan(1, 0.1)
-     * .whileTrue(
-     * Commands.run(
-     * () -> {
-     * System.out.println("Left stick on: " + -operatorController.getLeftY());
-     * }));
-     */
-
     // Manual kicker forward
     new JoystickButton(operatorButtonBoard, 2)
         .whileTrue(
@@ -660,6 +584,50 @@ public class RobotContainer {
                   kicker.setVelocityKicker(KickerConstants.KICKER_AGITATE_RPM);
                 },
                 kicker));
+
+    operatorController
+        .povUp()
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  climb.dutyCycle(1.0);
+                },
+                climb));
+
+    operatorController
+        .povDown()
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  climb.dutyCycle(-1.0);
+                },
+                climb));
+
+    // POV Left - retract to 0 - do not do this while hanging on bar
+    new POVButton(operatorButtonBoard, 270)
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  climb.setPos(0, true);
+                },
+                climb));
+    // POV Right - go to extend height (either from hanging to lower robot, or to prepare for climb)
+    new POVButton(operatorButtonBoard, 90)
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  climb.setPos(ClimbConstants.EXTEND_HEIGHT.in(Millimeters), true);
+                },
+                climb));
+    // POV Down - go from extend height to climb height, raise robot
+    new POVButton(operatorButtonBoard, 180)
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  climb.setPos(ClimbConstants.CLIMB_HEIGHT.in(Millimeters), true);
+                },
+                climb));
+
 
     ////////////////////// Testing commands below here ///////////////////////
 
