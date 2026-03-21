@@ -71,9 +71,9 @@ public class HoodConstants {
   private static final Point2D[] kHoodAngles =
       new Point2D.Double[] {
         // (Hood Angle, Through Bore Encoder Angle)
-        new Point2D.Double(HOOD_FORWARD_LIMIT, HOOD_INTERNAL_FORWARD_LIMIT),
+        new Point2D.Double(HOOD_REVERSE_LIMIT, HOOD_INTERNAL_REVERSE_LIMIT),
         new Point2D.Double(HOOD_SAFE_FORWARD_LIMIT, HOOD_SAFE_INTERNAL_FORWARD_LIMIT),
-        new Point2D.Double(HOOD_REVERSE_LIMIT, HOOD_INTERNAL_REVERSE_LIMIT)
+        new Point2D.Double(HOOD_FORWARD_LIMIT, HOOD_INTERNAL_FORWARD_LIMIT)
       };
 
   public static final LinearInterpolationTable kHoodAnglesTable =
