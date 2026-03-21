@@ -352,69 +352,14 @@ public class RobotContainer {
   }
 
   private void configureDriverCommands() {
-    (controller.y().or(controller.x()).or(controller.b()))
-        .negate()
-        .and(controller.leftTrigger())
-        .whileTrue(ShooterCommands.dumpShort(shooter, hood));
-
-    controller
-        .y()
-        .and(controller.leftTrigger())
-        .whileTrue(ShooterCommands.hubShotWithoutAlign(shooter, hood, drive, controller));
-
-    controller
-        .x()
-        .and(controller.leftTrigger())
-        .whileTrue(
-            ShooterCommands.targetShotWithoutAlign(
-                shooter, hood, drive, controller, () -> GoalUtils.getLeftTarget()));
-    controller
-        .b()
-        .and(controller.leftTrigger())
-        .whileTrue(
-            ShooterCommands.targetShotWithoutAlign(
-                shooter, hood, drive, controller, () -> GoalUtils.getRightTarget()));
-    // ShooterCommands.setupHubShot(
-    //     shooter,
-    //     hood,
-    //     drive,
-    //     () -> -controller.getLeftY(),
-    //     () -> -controller.getLeftX(),
-    //     () -> controller.rightBumper().getAsBoolean(),
-    //     () -> controller.leftBumper().getAsBoolean()));
-    // .whileTrue(ShooterCommands.testShoot(shooter, hood));
+    controller.leftTrigger().whileTrue(ShooterCommands.magicTrigger(shooter, hood, drive, controller));
+    controller.y().whileTrue(ShooterCommands.hubShotWithoutAlign(shooter, hood, drive, controller));
+    controller.x().whileTrue(ShooterCommands.dumpShort(shooter, hood));
 
     controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
     controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
 
     controller.a().whileTrue(ShooterCommands.testShoot(shooter, hood));
-
-    controller
-        .x()
-        .whileTrue(
-            DriveCommands.joystickDrivePointAtTarget(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> GoalUtils.getLeftTarget()));
-
-    controller
-        .b()
-        .whileTrue(
-            DriveCommands.joystickDrivePointAtTarget(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> GoalUtils.getRightTarget()));
-
-    controller
-        .y()
-        .whileTrue(
-            DriveCommands.joystickDrivePointAtTarget(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> GoalUtils.getHubLocation()));
 
     controller
         .start()
@@ -427,37 +372,8 @@ public class RobotContainer {
                 },
                 climb));
 
-    // Point at Hub
-    // controller
-    // .leftTrigger()
-    // .and(controller.rightBumper().negate())
-    // .whileTrue(ShooterCommands.testShoot(shooter, hood));
-    // ShooterCommands.aimOnMove(
-    // shooter, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
-
-    // Point at Hub while slow down
-    // controller
-    // .rightBumper()
-    // .and(controller.leftTrigger())
-    // .whileTrue(
-    // ShooterCommands.aimOnMove(
-    // shooter,
-    // drive,
-    // () -> -controller.getLeftY() * SLOW_SPEED,
-    // () -> -controller.getLeftX() * SLOW_SPEED));
-
     // Shoot Sequence
     controller.rightTrigger().whileTrue(IndexerCommands.feedShooter(indexer, kicker));
-
-    // X-Stop
-    // FIXME: Change this to D-M1 and D-M2??
-    // Switch to X pattern when X button is pressed
-    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
-    // Auto-Intake
-    // controller.leftBumper().whileTrue(IntakeCommands.autoIntake(intakeExtender,
-    // intake));
-
     
   }
 

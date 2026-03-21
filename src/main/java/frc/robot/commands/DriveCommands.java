@@ -209,9 +209,7 @@ public class DriveCommands {
               double omega =
                   angleController.calculate(
                       drive.getRotation().getRadians(), targetAngle.getRadians());
-              if (angleController.atGoal()) {
-                omega = 0;
-              }
+
               Logger.recordOutput("Drive/Heading", drive.getRotation().getRadians());
               Logger.recordOutput("Drive/Target", targetAngle.getRadians());
               Logger.recordOutput("Drive/Omega", omega);
