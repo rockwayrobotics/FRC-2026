@@ -17,44 +17,29 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.Constants.CAN;
 import frc.robot.subsystems.climb.ClimbConstants.NEO2Constants;
 import frc.robot.util.SparkUtil;
+import java.util.function.DoubleSupplier;
 
 public class ClimbNEO2 implements ClimbIO {
   private final SparkBase motor = new SparkMax(CAN.CLIMB, MotorType.kBrushless);
   private final RelativeEncoder encoder = motor.getEncoder();
   private final SparkClosedLoopController controller = motor.getClosedLoopController();
 
+  private boolean limitsEnabled = true;
   private static final ClosedLoopSlot fastSlot = ClosedLoopSlot.kSlot0;
   private static final ClosedLoopSlot slowSlot = ClosedLoopSlot.kSlot1;
 
   public ClimbNEO2() {
-    var config = new SparkMaxConfig();
-    config.idleMode(IdleMode.kBrake).inverted(true).smartCurrentLimit(60).voltageCompensation(12.0);
-    // Convert wheel revolutions to mm
-    config.encoder.positionConversionFactor(
-        ClimbConstants.CLIMB_SPOOL_DIAMETER.in(Millimeters)
-            * Math.PI
-            / ClimbConstants.CLIMB_GEAR_RATIO);
-    config
-        .closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(NEO2Constants.CLIMB_KP, 0.0, 0.0)
-        .outputRange(-1, 1, fastSlot)
-        .outputRange(-0.3, 0.3, slowSlot);
-    config.closedLoop.feedForward.kS(NEO2Constants.CLIMB_KS).kG(NEO2Constants.CLIMB_KG);
-    config.signals.primaryEncoderPositionAlwaysOn(true);
-    SparkUtil.tryUntilOk(
-        motor,
-        5,
-        () ->
-            motor.configure(
-                config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
-
-    encoder.setPosition(0);
+    configure(true);
   }
 
   @Override
   public void updateInputs(ClimbIOInputs inputs) {
     SparkUtil.ifOk(motor, encoder::getPosition, (value) -> inputs.position = value);
+    SparkUtil.ifOk(
+        motor,
+        new DoubleSupplier[] {motor::getAppliedOutput, motor::getBusVoltage},
+        (values) -> inputs.appliedVolts = values[0] * values[1]);
+    inputs.limitsEnabled = limitsEnabled;
   }
 
   @Override
@@ -74,5 +59,47 @@ public class ClimbNEO2 implements ClimbIO {
   @Override
   public void dutyCycle(double value) {
     motor.set(value);
+  }
+
+  @Override
+  public boolean getLimitsEnabled() {
+    return limitsEnabled;
+  }
+
+  @Override
+  public void configure(boolean limitsEnabled) {
+    var config = new SparkMaxConfig();
+    config.idleMode(IdleMode.kBrake).inverted(true).smartCurrentLimit(60).voltageCompensation(12.0);
+    // Convert wheel revolutions to mm
+    config.encoder.positionConversionFactor(
+        ClimbConstants.CLIMB_SPOOL_DIAMETER.in(Millimeters)
+            * Math.PI
+            / ClimbConstants.CLIMB_GEAR_RATIO);
+    config
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .pid(NEO2Constants.CLIMB_KP, 0.0, 0.0, fastSlot)
+        .pid(NEO2Constants.CLIMB_KP, 0.0, 0.0, slowSlot)
+        .outputRange(-1, 1, fastSlot)
+        .outputRange(-0.8, 0.8, slowSlot);
+    config
+        .softLimit
+        .forwardSoftLimit(ClimbConstants.EXTEND_HEIGHT.in(Millimeters))
+        .reverseSoftLimit(0)
+        .forwardSoftLimitEnabled(limitsEnabled)
+        .reverseSoftLimitEnabled(limitsEnabled);
+    config.closedLoop.feedForward.kS(NEO2Constants.CLIMB_KS).kG(NEO2Constants.CLIMB_KG);
+    config.signals.primaryEncoderPositionAlwaysOn(true);
+    SparkUtil.tryUntilOk(
+        motor,
+        5,
+        () ->
+            motor.configure(
+                config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+
+    if (limitsEnabled) {
+      encoder.setPosition(0);
+    }
+    this.limitsEnabled = limitsEnabled;
   }
 }

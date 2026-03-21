@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.subsystems.vision.VisionConstants.camera_back;
 import static frc.robot.subsystems.vision.VisionConstants.camera_front;
@@ -30,11 +31,13 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IndexerCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbNEO2;
 import frc.robot.subsystems.climb.ClimbSimKraken;
@@ -56,9 +59,11 @@ import frc.robot.subsystems.indexer.IndexerSim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeReal;
 import frc.robot.subsystems.intake.IntakeSim;
 import frc.robot.subsystems.intakeExtender.IntakeExtender;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderIO;
+import frc.robot.subsystems.intakeExtender.IntakeExtenderReal;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderSim;
 import frc.robot.subsystems.kicker.Kicker;
 import frc.robot.subsystems.kicker.KickerConstants;
@@ -124,8 +129,8 @@ public class RobotContainer {
 
         indexer = new Indexer(new IndexerReal());
         kicker = new Kicker(new KickerReal());
-        intake = new Intake(new IntakeSim()); // IntakeReal());
-        intakeExtender = new IntakeExtender(new IntakeExtenderSim()); // IntakeExtenderReal());
+        intake = new Intake(new IntakeReal()); // IntakeReal());
+        intakeExtender = new IntakeExtender(new IntakeExtenderReal()); // IntakeExtenderReal());
         shooter = new Shooter(new ShooterReal());
         hood = new Hood(new HoodReal());
         climb = new Climb(new ClimbNEO2());
@@ -411,6 +416,18 @@ public class RobotContainer {
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> GoalUtils.getHubLocation()));
+
+    controller
+        .start()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  if (DriverStation.isTestEnabled()) {
+                    climb.toggleLimits();
+                  }
+                },
+                climb));
+
     // Point at Hub
     // controller
     // .leftTrigger()
@@ -559,6 +576,21 @@ public class RobotContainer {
     new JoystickButton(operatorButtonBoard, 3).whileTrue(IndexerCommands.augersFeed(indexer));
     // Reverse Augers
     new JoystickButton(operatorButtonBoard, 4).whileTrue(IndexerCommands.augersReverse(indexer));
+
+    new POVButton(operatorButtonBoard, 0)
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  climb.setPos(ClimbConstants.EXTEND_HEIGHT.in(Millimeters), false);
+                },
+                climb));
+    new POVButton(operatorButtonBoard, 180)
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  climb.setPos(ClimbConstants.CLIMB_HEIGHT.in(Millimeters), false);
+                },
+                climb));
 
     // Disabled configure PID for shooter:
     // operatorController.back().onTrue(ShooterCommands.configureLeader(shooter));
