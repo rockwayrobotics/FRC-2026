@@ -36,23 +36,30 @@ public class ShooterCommands {
   private static LinearInterpolationTable m_hoodTable = HoodConstants.kHoodTable;
   private static LinearInterpolationTable m_rpmTable = ShooterConstants.kRPMTable;
 
-  private static LoggedNetworkNumber flywheelSpeed = new LoggedNetworkNumber("Shooter/FlywheelSpeedSetter", 4000);
-  private static LoggedNetworkNumber hoodAngle = new LoggedNetworkNumber("Shooter/HoodAngleSetter", 45);
+  private static LoggedNetworkNumber flywheelSpeed =
+      new LoggedNetworkNumber("Shooter/FlywheelSpeedSetter", 4000);
+  private static LoggedNetworkNumber hoodAngle =
+      new LoggedNetworkNumber("Shooter/HoodAngleSetter", 45);
 
-  private static LoggedNetworkNumber flywheelDumpSpeed = new LoggedNetworkNumber("Shooter/DumpFlywheelSpeed", 2083.33);
-  private static LoggedNetworkNumber hoodDumpAngle = new LoggedNetworkNumber("Shooter/DumpHoodAngle", 45);
+  private static LoggedNetworkNumber flywheelDumpSpeed =
+      new LoggedNetworkNumber("Shooter/DumpFlywheelSpeed", 2083.33);
+  private static LoggedNetworkNumber hoodDumpAngle =
+      new LoggedNetworkNumber("Shooter/DumpHoodAngle", 45);
 
-  private static LoggedNetworkNumber flywheelScale = new LoggedNetworkNumber("Shooter/FlywheelOperatorScale", 8);
-  private static LoggedNetworkNumber hoodScale = new LoggedNetworkNumber("Shooter/HoodOperatorScale", 0.4);
+  private static LoggedNetworkNumber flywheelScale =
+      new LoggedNetworkNumber("Shooter/FlywheelOperatorScale", 8);
+  private static LoggedNetworkNumber hoodScale =
+      new LoggedNetworkNumber("Shooter/HoodOperatorScale", 0.4);
 
   public static Command testShoot(Shooter shooter, Hood hood) {
     return Commands.run(
         () -> {
           double rpm = MathUtil.clamp(flywheelSpeed.get(), 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
-          double hoodDegrees = MathUtil.clamp(
-              hoodAngle.get(),
-              HoodConstants.HOOD_REVERSE_LIMIT,
-              HoodConstants.HOOD_FORWARD_LIMIT);
+          double hoodDegrees =
+              MathUtil.clamp(
+                  hoodAngle.get(),
+                  HoodConstants.HOOD_REVERSE_LIMIT,
+                  HoodConstants.HOOD_FORWARD_LIMIT);
           shooter.setOperatorOverride(false);
           shooter.setVelocityFlywheel(rpm);
           hood.setOperatorOverride(false);
@@ -66,8 +73,9 @@ public class ShooterCommands {
     return Commands.runOnce(
         () -> {
           double rpm = MathUtil.clamp(flywheel, 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
-          double hoodDegrees = MathUtil.clamp(
-              hoodangle, HoodConstants.HOOD_REVERSE_LIMIT, HoodConstants.HOOD_FORWARD_LIMIT);
+          double hoodDegrees =
+              MathUtil.clamp(
+                  hoodangle, HoodConstants.HOOD_REVERSE_LIMIT, HoodConstants.HOOD_FORWARD_LIMIT);
           shooter.setOperatorOverride(false);
           shooter.setVelocityFlywheel(rpm);
           hood.setOperatorOverride(false);
@@ -79,11 +87,13 @@ public class ShooterCommands {
   public static Command dumpShort(Shooter shooter, Hood hood) {
     return Commands.runOnce(
         () -> {
-          double rpm = MathUtil.clamp(flywheelDumpSpeed.get(), 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
-          double hoodDegrees = MathUtil.clamp(
-              hoodDumpAngle.get(),
-              HoodConstants.HOOD_REVERSE_LIMIT,
-              HoodConstants.HOOD_FORWARD_LIMIT);
+          double rpm =
+              MathUtil.clamp(flywheelDumpSpeed.get(), 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
+          double hoodDegrees =
+              MathUtil.clamp(
+                  hoodDumpAngle.get(),
+                  HoodConstants.HOOD_REVERSE_LIMIT,
+                  HoodConstants.HOOD_FORWARD_LIMIT);
           shooter.setOperatorOverride(false);
           shooter.setVelocityFlywheel(rpm);
           hood.setOperatorOverride(false);
@@ -101,85 +111,99 @@ public class ShooterCommands {
       BooleanSupplier slowModeSupplier,
       BooleanSupplier ignoreSlewLimitSupplier) {
     ProfiledPIDController angleController = DriveCommands.getRotatePIDController();
-    Command result = Commands.parallel(
-        // Turn until facing hub
-        Commands.startRun(
-            () -> {
-              angleController.reset(
-                  MathUtil.angleModulus(drive.getPose().getRotation().getRadians()));
-            },
-            () -> {
-              Rotation2d targetAngle = GoalUtils.getHubLocation()
-                  .minus(drive.getPose().getTranslation())
-                  .getAngle();
+    Command result =
+        Commands.parallel(
+            // Turn until facing hub
+            Commands.startRun(
+                    () -> {
+                      angleController.reset(
+                          MathUtil.angleModulus(drive.getPose().getRotation().getRadians()));
+                    },
+                    () -> {
+                      Rotation2d targetAngle =
+                          GoalUtils.getHubLocation()
+                              .minus(drive.getPose().getTranslation())
+                              .getAngle();
 
-              // Calculate angular speed
-              double omega = angleController.calculate(
-                  drive.getRotation().getRadians(), targetAngle.getRadians());
+                      // Calculate angular speed
+                      double omega =
+                          angleController.calculate(
+                              drive.getRotation().getRadians(), targetAngle.getRadians());
 
-              ChassisSpeeds speeds = null;
-              if (DriverStation.isAutonomous()) {
-                speeds = new ChassisSpeeds(0, 0, omega);
-              } else {
-                double slowModeMultiplier = drive
-                    .getSlowModeSlewRateLimiter()
-                    .calculate(slowModeSupplier.getAsBoolean() ? DriveCommands.SLOW_MODE_MULTIPLIER : 1.0);
+                      ChassisSpeeds speeds = null;
+                      if (DriverStation.isAutonomous()) {
+                        speeds = new ChassisSpeeds(0, 0, omega);
+                      } else {
+                        double slowModeMultiplier =
+                            drive
+                                .getSlowModeSlewRateLimiter()
+                                .calculate(
+                                    slowModeSupplier.getAsBoolean()
+                                        ? DriveCommands.SLOW_MODE_MULTIPLIER
+                                        : 1.0);
 
-                // Get linear velocity
-                Translation2d linearVelocity = DriveCommands.getLinearVelocityFromJoysticks(
-                    xSupplier.getAsDouble(), ySupplier.getAsDouble())
-                    .times(slowModeMultiplier);
+                        // Get linear velocity
+                        Translation2d linearVelocity =
+                            DriveCommands.getLinearVelocityFromJoysticks(
+                                    xSupplier.getAsDouble(), ySupplier.getAsDouble())
+                                .times(slowModeMultiplier);
 
-                // Do NOT Square rotation value for more precise control in auto
-                // but dampen rotation during teleop because the controller is held down.
-                if (!DriverStation.isAutonomous()) {
-                  omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
-                }
+                        // Do NOT Square rotation value for more precise control in auto
+                        // but dampen rotation during teleop because the controller is held down.
+                        if (!DriverStation.isAutonomous()) {
+                          omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
+                        }
 
-                Translation2d targetVelocity = linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
-                double targetSpeed = targetVelocity.getNorm();
-                double limitedSpeed = targetSpeed;
-                if (!ignoreSlewLimitSupplier.getAsBoolean()) {
-                  limitedSpeed = drive.getDriveSlewRateLimiter().calculate(targetSpeed);
-                }
-                double xSpeed = targetSpeed < 0.001
-                    ? 0.0
-                    : targetVelocity.getX() * limitedSpeed / targetSpeed;
-                double ySpeed = targetSpeed < 0.001
-                    ? 0.0
-                    : targetVelocity.getY() * limitedSpeed / targetSpeed;
+                        Translation2d targetVelocity =
+                            linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
+                        double targetSpeed = targetVelocity.getNorm();
+                        double limitedSpeed = targetSpeed;
+                        if (!ignoreSlewLimitSupplier.getAsBoolean()) {
+                          limitedSpeed = drive.getDriveSlewRateLimiter().calculate(targetSpeed);
+                        }
+                        double xSpeed =
+                            targetSpeed < 0.001
+                                ? 0.0
+                                : targetVelocity.getX() * limitedSpeed / targetSpeed;
+                        double ySpeed =
+                            targetSpeed < 0.001
+                                ? 0.0
+                                : targetVelocity.getY() * limitedSpeed / targetSpeed;
 
-                // Convert to field relative speeds & send command
-                speeds = new ChassisSpeeds(
-                    xSpeed, ySpeed, omega * drive.getMaxAngularSpeedRadPerSec());
-              }
+                        // Convert to field relative speeds & send command
+                        speeds =
+                            new ChassisSpeeds(
+                                xSpeed, ySpeed, omega * drive.getMaxAngularSpeedRadPerSec());
+                      }
 
-              boolean isFlipped = DriverStation.getAlliance().isPresent()
-                  && DriverStation.getAlliance().get() == Alliance.Red;
+                      boolean isFlipped =
+                          DriverStation.getAlliance().isPresent()
+                              && DriverStation.getAlliance().get() == Alliance.Red;
 
-              drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      speeds,
-                      isFlipped
-                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                          : drive.getRotation()));
-            })
-            .until(() -> DriverStation.isAutonomous() && angleController.atGoal())
-            .andThen(Commands.runOnce(() -> drive.stop(), drive)),
+                      drive.runVelocity(
+                          ChassisSpeeds.fromFieldRelativeSpeeds(
+                              speeds,
+                              isFlipped
+                                  ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                                  : drive.getRotation()));
+                    })
+                .until(() -> DriverStation.isAutonomous() && angleController.atGoal())
+                .andThen(Commands.runOnce(() -> drive.stop(), drive)),
 
-        // Spin up flywheel based on table
-        // Raise hood based on table
-        Commands.run(
-            () -> {
-              double distance = GoalUtils.getHubLocation().getDistance(drive.getPose().getTranslation());
-              double rpm = ShooterConstants.kRPMTable.getOutput(distance);
-              double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
-              shooter.setOperatorOverride(false);
-              shooter.setVelocityFlywheel(rpm);
-              hood.setOperatorOverride(false);
-              hood.setPositionHood(Degrees.of(hoodAngle));
-            })
-            .until(() -> DriverStation.isAutonomous() && shooter.atFlywheelSetpoint(100)));
+            // Spin up flywheel based on table
+            // Raise hood based on table
+            Commands.run(
+                    () -> {
+                      double distance =
+                          GoalUtils.getHubLocation().getDistance(drive.getPose().getTranslation());
+                      double rpm = ShooterConstants.kRPMTable.getOutput(distance);
+                      double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
+                      shooter.setOperatorOverride(false);
+                      shooter.setVelocityFlywheel(rpm);
+                      hood.setOperatorOverride(false);
+                      hood.setPositionHood(Degrees.of(hoodAngle));
+                    })
+                .until(() -> DriverStation.isAutonomous() && shooter.atFlywheelSetpoint(100)));
     result.addRequirements(shooter, hood, drive);
     return result;
   }
@@ -187,21 +211,22 @@ public class ShooterCommands {
   public static Command hubShotWithoutAlign(
       Shooter shooter, Hood hood, Drive drive, CommandXboxController controller) {
     return Commands.run(
-        () -> {
-          double distance = GoalUtils.getHubLocation().getDistance(drive.getPose().getTranslation());
-          Logger.recordOutput("Shooter/TargetShotDistance", distance);
-          double rpm = ShooterConstants.kRPMTable.getOutput(distance);
-          double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
-          shooter.setOperatorOverride(false);
-          shooter.setVelocityFlywheel(rpm);
-          hood.setOperatorOverride(false);
-          hood.setPositionHood(Degrees.of(hoodAngle));
-          if (shooter.atFlywheelSetpoint(100)) {
-            controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
-          }
-        },
-        shooter,
-        hood)
+            () -> {
+              double distance =
+                  GoalUtils.getHubLocation().getDistance(drive.getPose().getTranslation());
+              Logger.recordOutput("Shooter/TargetShotDistance", distance);
+              double rpm = ShooterConstants.kRPMTable.getOutput(distance);
+              double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
+              shooter.setOperatorOverride(false);
+              shooter.setVelocityFlywheel(rpm);
+              hood.setOperatorOverride(false);
+              hood.setPositionHood(Degrees.of(hoodAngle));
+              if (shooter.atFlywheelSetpoint(100)) {
+                controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+              }
+            },
+            shooter,
+            hood)
         .finallyDo(
             () -> {
               controller.setRumble(GenericHID.RumbleType.kBothRumble, 0);
@@ -215,21 +240,21 @@ public class ShooterCommands {
       CommandXboxController controller,
       Supplier<Translation2d> targetSupplier) {
     return Commands.run(
-        () -> {
-          double distance = targetSupplier.get().getDistance(drive.getPose().getTranslation());
-          Logger.recordOutput("Shooter/TargetShotDistance", distance);
-          double rpm = ShooterConstants.kRPMGoalTable.getOutput(distance);
-          double hoodAngle = HoodConstants.kHoodGoalTable.getOutput(distance);
-          shooter.setOperatorOverride(false);
-          shooter.setVelocityFlywheel(rpm);
-          hood.setOperatorOverride(false);
-          hood.setPositionHood(Degrees.of(hoodAngle));
-          if (shooter.atFlywheelSetpoint(100)) {
-            controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
-          }
-        },
-        shooter,
-        hood)
+            () -> {
+              double distance = targetSupplier.get().getDistance(drive.getPose().getTranslation());
+              Logger.recordOutput("Shooter/TargetShotDistance", distance);
+              double rpm = ShooterConstants.kRPMGoalTable.getOutput(distance);
+              double hoodAngle = HoodConstants.kHoodGoalTable.getOutput(distance);
+              shooter.setOperatorOverride(false);
+              shooter.setVelocityFlywheel(rpm);
+              hood.setOperatorOverride(false);
+              hood.setPositionHood(Degrees.of(hoodAngle));
+              if (shooter.atFlywheelSetpoint(100)) {
+                controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+              }
+            },
+            shooter,
+            hood)
         .finallyDo(
             () -> {
               controller.setRumble(GenericHID.RumbleType.kBothRumble, 0);
@@ -246,94 +271,109 @@ public class ShooterCommands {
       BooleanSupplier slowModeSupplier,
       BooleanSupplier ignoreSlewLimitSupplier) {
     ProfiledPIDController angleController = DriveCommands.getRotatePIDController();
-    Command result = Commands.parallel(
-        // Turn until facing goal
-        Commands.startRun(
-            () -> {
-              angleController.reset(
-                  MathUtil.angleModulus(drive.getPose().getRotation().getRadians()));
-            },
-            () -> {
-              Rotation2d targetAngle = goalSupplier.get().minus(drive.getPose().getTranslation()).getAngle();
-              Logger.recordOutput("SetupGoal/Goal", goalSupplier.get());
-              Logger.recordOutput("SetupGoal/TargetAngle", targetAngle);
+    Command result =
+        Commands.parallel(
+            // Turn until facing goal
+            Commands.startRun(
+                    () -> {
+                      angleController.reset(
+                          MathUtil.angleModulus(drive.getPose().getRotation().getRadians()));
+                    },
+                    () -> {
+                      Rotation2d targetAngle =
+                          goalSupplier.get().minus(drive.getPose().getTranslation()).getAngle();
+                      Logger.recordOutput("SetupGoal/Goal", goalSupplier.get());
+                      Logger.recordOutput("SetupGoal/TargetAngle", targetAngle);
 
-              // Calculate angular speed
-              double omega = angleController.calculate(
-                  drive.getRotation().getRadians(), targetAngle.getRadians());
+                      // Calculate angular speed
+                      double omega =
+                          angleController.calculate(
+                              drive.getRotation().getRadians(), targetAngle.getRadians());
 
-              ChassisSpeeds speeds = null;
-              if (DriverStation.isAutonomous()) {
-                speeds = new ChassisSpeeds(0, 0, omega);
-              } else {
-                double slowModeMultiplier = drive
-                    .getSlowModeSlewRateLimiter()
-                    .calculate(slowModeSupplier.getAsBoolean() ? DriveCommands.SLOW_MODE_MULTIPLIER : 1.0);
+                      ChassisSpeeds speeds = null;
+                      if (DriverStation.isAutonomous()) {
+                        speeds = new ChassisSpeeds(0, 0, omega);
+                      } else {
+                        double slowModeMultiplier =
+                            drive
+                                .getSlowModeSlewRateLimiter()
+                                .calculate(
+                                    slowModeSupplier.getAsBoolean()
+                                        ? DriveCommands.SLOW_MODE_MULTIPLIER
+                                        : 1.0);
 
-                // Get linear velocity
-                Translation2d linearVelocity = DriveCommands.getLinearVelocityFromJoysticks(
-                    xSupplier.getAsDouble(), ySupplier.getAsDouble())
-                    .times(slowModeMultiplier);
+                        // Get linear velocity
+                        Translation2d linearVelocity =
+                            DriveCommands.getLinearVelocityFromJoysticks(
+                                    xSupplier.getAsDouble(), ySupplier.getAsDouble())
+                                .times(slowModeMultiplier);
 
-                // Do NOT Square rotation value for more precise control
-                // omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
-                Translation2d targetVelocity = linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
-                double targetSpeed = targetVelocity.getNorm();
-                double limitedSpeed = targetSpeed;
-                if (!ignoreSlewLimitSupplier.getAsBoolean()) {
-                  limitedSpeed = drive.getDriveSlewRateLimiter().calculate(targetSpeed);
-                }
-                double xSpeed = targetSpeed < 0.001
-                    ? 0.0
-                    : targetVelocity.getX() * limitedSpeed / targetSpeed;
-                double ySpeed = targetSpeed < 0.001
-                    ? 0.0
-                    : targetVelocity.getY() * limitedSpeed / targetSpeed;
+                        // Do NOT Square rotation value for more precise control
+                        // omega = Math.copySign(omega * omega, omega) * slowModeMultiplier;
+                        Translation2d targetVelocity =
+                            linearVelocity.times(drive.getMaxLinearSpeedMetersPerSec());
+                        double targetSpeed = targetVelocity.getNorm();
+                        double limitedSpeed = targetSpeed;
+                        if (!ignoreSlewLimitSupplier.getAsBoolean()) {
+                          limitedSpeed = drive.getDriveSlewRateLimiter().calculate(targetSpeed);
+                        }
+                        double xSpeed =
+                            targetSpeed < 0.001
+                                ? 0.0
+                                : targetVelocity.getX() * limitedSpeed / targetSpeed;
+                        double ySpeed =
+                            targetSpeed < 0.001
+                                ? 0.0
+                                : targetVelocity.getY() * limitedSpeed / targetSpeed;
 
-                // Convert to field relative speeds & send command
-                speeds = new ChassisSpeeds(
-                    xSpeed, ySpeed, omega * drive.getMaxAngularSpeedRadPerSec());
-              }
+                        // Convert to field relative speeds & send command
+                        speeds =
+                            new ChassisSpeeds(
+                                xSpeed, ySpeed, omega * drive.getMaxAngularSpeedRadPerSec());
+                      }
 
-              boolean isFlipped = DriverStation.getAlliance().isPresent()
-                  && DriverStation.getAlliance().get() == Alliance.Red;
+                      boolean isFlipped =
+                          DriverStation.getAlliance().isPresent()
+                              && DriverStation.getAlliance().get() == Alliance.Red;
 
-              drive.runVelocity(
-                  ChassisSpeeds.fromFieldRelativeSpeeds(
-                      speeds,
-                      isFlipped
-                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                          : drive.getRotation()));
-            })
-            .until(() -> DriverStation.isAutonomous() && angleController.atGoal())
-            .andThen(Commands.runOnce(() -> drive.stop(), drive)),
+                      drive.runVelocity(
+                          ChassisSpeeds.fromFieldRelativeSpeeds(
+                              speeds,
+                              isFlipped
+                                  ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                                  : drive.getRotation()));
+                    })
+                .until(() -> DriverStation.isAutonomous() && angleController.atGoal())
+                .andThen(Commands.runOnce(() -> drive.stop(), drive)),
 
-        // Spin up flywheel based on table
-        // Raise hood based on table
-        Commands.run(
-            () -> {
-              // WARNING: Disabled table for goal shot because we don't have data
+            // Spin up flywheel based on table
+            // Raise hood based on table
+            Commands.run(
+                    () -> {
+                      // WARNING: Disabled table for goal shot because we don't have data
 
-              // double distance =
-              //
-              // GoalUtils.getHubLocation().getDistance(drive.getPose().getTranslation());
-              // double rpm = ShooterConstants.kRPMTable.getOutput(distance);
-              // double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
-              // shooter.setVelocityFlywheel(rpm);
-              // hood.setPositionHood(Degrees.of(hoodAngle));
+                      // double distance =
+                      //
+                      // GoalUtils.getHubLocation().getDistance(drive.getPose().getTranslation());
+                      // double rpm = ShooterConstants.kRPMTable.getOutput(distance);
+                      // double hoodAngle = HoodConstants.kHoodTable.getOutput(distance);
+                      // shooter.setVelocityFlywheel(rpm);
+                      // hood.setPositionHood(Degrees.of(hoodAngle));
 
-              double rpm = MathUtil.clamp(
-                  flywheelSpeed.get(), 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
-              double hoodDegrees = MathUtil.clamp(
-                  hoodAngle.get(),
-                  HoodConstants.HOOD_REVERSE_LIMIT,
-                  HoodConstants.HOOD_FORWARD_LIMIT);
-              shooter.setOperatorOverride(false);
-              shooter.setVelocityFlywheel(rpm);
-              hood.setOperatorOverride(false);
-              hood.setPositionHood(Degrees.of(hoodDegrees));
-            })
-            .until(() -> DriverStation.isAutonomous() && shooter.atFlywheelSetpoint(100)));
+                      double rpm =
+                          MathUtil.clamp(
+                              flywheelSpeed.get(), 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
+                      double hoodDegrees =
+                          MathUtil.clamp(
+                              hoodAngle.get(),
+                              HoodConstants.HOOD_REVERSE_LIMIT,
+                              HoodConstants.HOOD_FORWARD_LIMIT);
+                      shooter.setOperatorOverride(false);
+                      shooter.setVelocityFlywheel(rpm);
+                      hood.setOperatorOverride(false);
+                      hood.setPositionHood(Degrees.of(hoodDegrees));
+                    })
+                .until(() -> DriverStation.isAutonomous() && shooter.atFlywheelSetpoint(100)));
     result.addRequirements(shooter, hood, drive);
     return result;
   }
@@ -350,103 +390,114 @@ public class ShooterCommands {
   public static Command aimOnMove(
       Shooter shooter, Hood hood, Drive drive, DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
     // Create PID controller
-    ProfiledPIDController angleController = new ProfiledPIDController(
-        DriveCommands.ANGLE_KP,
-        0.0,
-        DriveCommands.ANGLE_KD,
-        new TrapezoidProfile.Constraints(
-            DriveCommands.ANGLE_MAX_VELOCITY, DriveCommands.ANGLE_MAX_ACCELERATION));
+    ProfiledPIDController angleController =
+        new ProfiledPIDController(
+            DriveCommands.ANGLE_KP,
+            0.0,
+            DriveCommands.ANGLE_KD,
+            new TrapezoidProfile.Constraints(
+                DriveCommands.ANGLE_MAX_VELOCITY, DriveCommands.ANGLE_MAX_ACCELERATION));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
     return Commands.run(
-        () -> {
-          Pose2d robotPose = drive.getPose();
-          Translation2d fieldRelativeShooterOffset = ShooterConstants.kShooterOffset.rotateBy(robotPose.getRotation());
-          Translation2d shooterLocation = robotPose.getTranslation().plus(fieldRelativeShooterOffset);
-          FieldRelativeSpeed robotVel = drive.getFieldRelativeSpeed();
-          FieldRelativeAccel robotAccel = drive.getFieldRelativeAccel();
+            () -> {
+              Pose2d robotPose = drive.getPose();
+              Translation2d fieldRelativeShooterOffset =
+                  ShooterConstants.kShooterOffset.rotateBy(robotPose.getRotation());
+              Translation2d shooterLocation =
+                  robotPose.getTranslation().plus(fieldRelativeShooterOffset);
+              FieldRelativeSpeed robotVel = drive.getFieldRelativeSpeed();
+              FieldRelativeAccel robotAccel = drive.getFieldRelativeAccel();
 
-          Translation2d target = GoalUtils.getHubLocation();
+              Translation2d target = GoalUtils.getHubLocation();
 
-          Translation2d robotToGoal = target.minus(shooterLocation);
-          double dist = robotToGoal.getDistance(new Translation2d());
+              Translation2d robotToGoal = target.minus(shooterLocation);
+              double dist = robotToGoal.getDistance(new Translation2d());
 
-          double shotTime = m_timeTable.getOutput(dist);
-          Translation2d movingGoalLocation = new Translation2d();
-          for (int i = 0; i < 5; i++) {
+              double shotTime = m_timeTable.getOutput(dist);
+              Translation2d movingGoalLocation = new Translation2d();
+              for (int i = 0; i < 5; i++) {
 
-            double virtualGoalX = target.getX()
-                - shotTime
-                    * (robotVel.vx + robotAccel.ax * ShooterConstants.ACCEL_COMP_FACTOR);
-            double virtualGoalY = target.getY()
-                - shotTime
-                    * (robotVel.vy + robotAccel.ay * ShooterConstants.ACCEL_COMP_FACTOR);
+                double virtualGoalX =
+                    target.getX()
+                        - shotTime
+                            * (robotVel.vx + robotAccel.ax * ShooterConstants.ACCEL_COMP_FACTOR);
+                double virtualGoalY =
+                    target.getY()
+                        - shotTime
+                            * (robotVel.vy + robotAccel.ay * ShooterConstants.ACCEL_COMP_FACTOR);
 
-            Translation2d testGoalLocation = new Translation2d(virtualGoalX, virtualGoalY);
+                Translation2d testGoalLocation = new Translation2d(virtualGoalX, virtualGoalY);
 
-            Translation2d toTestGoal = testGoalLocation.minus(shooterLocation);
+                Translation2d toTestGoal = testGoalLocation.minus(shooterLocation);
 
-            double newShotTime = m_timeTable.getOutput(toTestGoal.getDistance(new Translation2d()));
+                double newShotTime =
+                    m_timeTable.getOutput(toTestGoal.getDistance(new Translation2d()));
 
-            if (Math.abs(newShotTime - shotTime) <= 0.010) {
-              i = 4;
-            }
+                if (Math.abs(newShotTime - shotTime) <= 0.010) {
+                  i = 4;
+                }
 
-            if (i == 4) {
-              movingGoalLocation = testGoalLocation;
-            } else {
-              shotTime = newShotTime;
-            }
-          }
+                if (i == 4) {
+                  movingGoalLocation = testGoalLocation;
+                } else {
+                  shotTime = newShotTime;
+                }
+              }
 
-          double newDist = movingGoalLocation.minus(shooterLocation).getDistance(new Translation2d());
+              double newDist =
+                  movingGoalLocation.minus(shooterLocation).getDistance(new Translation2d());
 
-          // Get linear velocity
-          Translation2d linearVelocity = DriveCommands.getLinearVelocityFromJoysticks(
-              xSupplier.getAsDouble(), ySupplier.getAsDouble());
+              // Get linear velocity
+              Translation2d linearVelocity =
+                  DriveCommands.getLinearVelocityFromJoysticks(
+                      xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
-          Rotation2d targetAngle = movingGoalLocation.minus(shooterLocation).getAngle();
+              Rotation2d targetAngle = movingGoalLocation.minus(shooterLocation).getAngle();
 
-          drive.setTargetAngle(targetAngle);
-          // Calculate angular speed
-          double omega = angleController.calculate(
-              drive.getRotation().getRadians(), targetAngle.getRadians());
+              drive.setTargetAngle(targetAngle);
+              // Calculate angular speed
+              double omega =
+                  angleController.calculate(
+                      drive.getRotation().getRadians(), targetAngle.getRadians());
 
-          // Convert to field relative speeds & send command
-          ChassisSpeeds speeds = new ChassisSpeeds(
-              linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-              linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-              omega);
-          boolean isFlipped = DriverStation.getAlliance().isPresent()
-              && DriverStation.getAlliance().get() == Alliance.Red;
-          drive.runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  speeds,
-                  isFlipped
-                      ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                      : drive.getRotation()));
+              // Convert to field relative speeds & send command
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega);
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds,
+                      isFlipped
+                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          : drive.getRotation()));
 
-          /*
-           * // FIXME: This would allow tuning from dashboard:
-           * if (SmartDashboard.getBoolean("Adjust Shot?", false)) {
-           * // FIXME: This should be a speed
-           * shooter.setVoltageShooter(m_rpmTable.getOutput(newDist) +
-           * SmartDashboard.getNumber("SetShotAdjust", 0));
-           * shooter.setVoltageHood(m_hoodTable.getOutput(newDist) +
-           * SmartDashboard.getNumber("SetHoodAdjust", 0));
-           * } else {
-           */
-          shooter.setOperatorOverride(false);
-          shooter.setVelocityFlywheel(m_rpmTable.getOutput(newDist));
-          Angle hoodAngleAsAngle = Degrees.of(m_hoodTable.getOutput(newDist));
-          hood.setOperatorOverride(false);
-          hood.setPositionHood(hoodAngleAsAngle);
+              /*
+               * // FIXME: This would allow tuning from dashboard:
+               * if (SmartDashboard.getBoolean("Adjust Shot?", false)) {
+               * // FIXME: This should be a speed
+               * shooter.setVoltageShooter(m_rpmTable.getOutput(newDist) +
+               * SmartDashboard.getNumber("SetShotAdjust", 0));
+               * shooter.setVoltageHood(m_hoodTable.getOutput(newDist) +
+               * SmartDashboard.getNumber("SetHoodAdjust", 0));
+               * } else {
+               */
+              shooter.setOperatorOverride(false);
+              shooter.setVelocityFlywheel(m_rpmTable.getOutput(newDist));
+              Angle hoodAngleAsAngle = Degrees.of(m_hoodTable.getOutput(newDist));
+              hood.setOperatorOverride(false);
+              hood.setPositionHood(hoodAngleAsAngle);
 
-          // }
+              // }
 
-        },
-        drive,
-        shooter,
-        hood)
+            },
+            drive,
+            shooter,
+            hood)
         .finallyDo(
             () -> {
               shooter.stop();
@@ -460,9 +511,10 @@ public class ShooterCommands {
           double rpmChange = rpmSupplier.getAsDouble();
           if (shooter.isOperatorOverriding()) {
             double currentSpeed = Math.max(shooter.getFlywheelRPMSetpoint(), 2000);
-            double newSpeed = Math.min(
-                ShooterConstants.FLYWHEEL_MAX_RPM,
-                currentSpeed + flywheelScale.getAsDouble() * rpmChange);
+            double newSpeed =
+                Math.min(
+                    ShooterConstants.FLYWHEEL_MAX_RPM,
+                    currentSpeed + flywheelScale.getAsDouble() * rpmChange);
             if (newSpeed < 2000 && rpmChange < 0) {
               shooter.stop();
               shooter.setOperatorOverride(false);
@@ -482,10 +534,11 @@ public class ShooterCommands {
           double angleChange = angleSupplier.getAsDouble();
           if (hood.isOperatorOverriding()) {
             double currentAngle = hood.getHoodSetpoint().in(Degrees);
-            double newAngle = MathUtil.clamp(
-                currentAngle + hoodScale.getAsDouble() * angleChange,
-                HoodConstants.HOOD_REVERSE_LIMIT,
-                HoodConstants.HOOD_FORWARD_LIMIT);
+            double newAngle =
+                MathUtil.clamp(
+                    currentAngle + hoodScale.getAsDouble() * angleChange,
+                    HoodConstants.HOOD_REVERSE_LIMIT,
+                    HoodConstants.HOOD_FORWARD_LIMIT);
             hood.setPositionHood(Degrees.of(newAngle));
           }
 
@@ -494,90 +547,99 @@ public class ShooterCommands {
         hood);
   }
 
-  public static Command magicTrigger(Shooter shooter, Hood hood, Drive drive, CommandXboxController controller) {
+  public static Command magicTrigger(
+      Shooter shooter, Hood hood, Drive drive, CommandXboxController controller) {
     ProfiledPIDController angleController = DriveCommands.getRotatePIDController();
 
-    return Commands.run(() -> {
-      var pose = drive.getPose();
-      var field = GoalUtils.getField();
-      Translation2d target = GoalUtils.getHubLocation();
-      LinearInterpolationTable shotTable = ShooterConstants.kRPMGoalTable;
-      LinearInterpolationTable hoodTable = HoodConstants.kHoodGoalTable;
+    return Commands.run(
+            () -> {
+              var pose = drive.getPose();
+              var field = GoalUtils.getField();
+              Translation2d target = GoalUtils.getHubLocation();
+              LinearInterpolationTable shotTable = ShooterConstants.kRPMGoalTable;
+              LinearInterpolationTable hoodTable = HoodConstants.kHoodGoalTable;
 
-      if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-        // Red alliance
-        // First check if we are close to our alliance zone, if so we want the shoot at
-        // hub speed
-        if (pose.getX() >= field.getTagPose(3).get().toPose2d().getX()) {
-          shotTable = ShooterConstants.kRPMTable;
-          hoodTable = HoodConstants.kHoodTable;
-        } else if (pose.getY() > field.getFieldWidth() / 2) {
-          // Then assume we are aiming for the left or right target based on our
-          // y-position
-          target = GoalUtils.getRightTarget();
-        } else {
-          target = GoalUtils.getLeftTarget();
-        }
-      } else {
-        // Blue alliance
-        // First check if we are close to our alliance zone, if so we want the shoot at
-        // hub speed
-        if (pose.getX() <= field.getTagPose(25).get().toPose2d().getX()) {
-          shotTable = ShooterConstants.kRPMTable;
-          hoodTable = HoodConstants.kHoodTable;
-        } else if (pose.getY() > field.getFieldWidth() / 2) {
-          // Then assume we are aiming for the left or right target based on our
-          // y-position
-          target = GoalUtils.getLeftTarget();
-        } else {
-          target = GoalUtils.getRightTarget();
-        }
-      }
+              if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+                // Red alliance
+                // First check if we are close to our alliance zone, if so we want the shoot at
+                // hub speed
+                if (pose.getX() >= field.getTagPose(3).get().toPose2d().getX()) {
+                  shotTable = ShooterConstants.kRPMTable;
+                  hoodTable = HoodConstants.kHoodTable;
+                } else if (pose.getY() > field.getFieldWidth() / 2) {
+                  // Then assume we are aiming for the left or right target based on our
+                  // y-position
+                  target = GoalUtils.getRightTarget();
+                } else {
+                  target = GoalUtils.getLeftTarget();
+                }
+              } else {
+                // Blue alliance
+                // First check if we are close to our alliance zone, if so we want the shoot at
+                // hub speed
+                if (pose.getX() <= field.getTagPose(25).get().toPose2d().getX()) {
+                  shotTable = ShooterConstants.kRPMTable;
+                  hoodTable = HoodConstants.kHoodTable;
+                } else if (pose.getY() > field.getFieldWidth() / 2) {
+                  // Then assume we are aiming for the left or right target based on our
+                  // y-position
+                  target = GoalUtils.getLeftTarget();
+                } else {
+                  target = GoalUtils.getRightTarget();
+                }
+              }
 
-      // Flywheel and Hood
-      double distance = target.getDistance(drive.getPose().getTranslation());
-      Logger.recordOutput("Shooter/TargetShotDistance", distance);
-      double rpm = shotTable.getOutput(distance);
-      double hoodAngle = hoodTable.getOutput(distance);
-      shooter.setOperatorOverride(false);
-      shooter.setVelocityFlywheel(rpm);
-      hood.setOperatorOverride(false);
-      hood.setPositionHood(Degrees.of(hoodAngle));
-      if (shooter.atFlywheelSetpoint(100)) {
-        controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
-      }
+              // Flywheel and Hood
+              double distance = target.getDistance(drive.getPose().getTranslation());
+              Logger.recordOutput("Shooter/TargetShotDistance", distance);
+              double rpm = shotTable.getOutput(distance);
+              double hoodAngle = hoodTable.getOutput(distance);
+              shooter.setOperatorOverride(false);
+              shooter.setVelocityFlywheel(rpm);
+              hood.setOperatorOverride(false);
+              hood.setPositionHood(Degrees.of(hoodAngle));
+              if (shooter.atFlywheelSetpoint(100)) {
+                controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+              }
 
-      // Point at target
-      // Get linear velocity
-      Translation2d linearVelocity = DriveCommands.getLinearVelocityFromJoysticks(-controller.getLeftY(),
-          -controller.getLeftX());
+              // Point at target
+              // Get linear velocity
+              Translation2d linearVelocity =
+                  DriveCommands.getLinearVelocityFromJoysticks(
+                      -controller.getLeftY(), -controller.getLeftX());
 
-      Rotation2d targetAngle = target.minus(drive.getPose().getTranslation()).getAngle();
+              Rotation2d targetAngle = target.minus(drive.getPose().getTranslation()).getAngle();
 
-      // Calculate angular speed
-      double omega = angleController.calculate(
-          drive.getRotation().getRadians(), targetAngle.getRadians());
+              // Calculate angular speed
+              double omega =
+                  angleController.calculate(
+                      drive.getRotation().getRadians(), targetAngle.getRadians());
 
-      Logger.recordOutput("Drive/Heading", drive.getRotation().getRadians());
-      Logger.recordOutput("Drive/Target", targetAngle.getRadians());
-      Logger.recordOutput("Drive/Omega", omega);
+              Logger.recordOutput("Drive/Heading", drive.getRotation().getRadians());
+              Logger.recordOutput("Drive/Target", targetAngle.getRadians());
+              Logger.recordOutput("Drive/Omega", omega);
 
-      // Convert to field relative speeds & send command
-      ChassisSpeeds speeds = new ChassisSpeeds(
-          linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-          linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-          omega);
-      boolean isFlipped = DriverStation.getAlliance().isPresent()
-          && DriverStation.getAlliance().get() == Alliance.Red;
-      drive.runVelocity(
-          ChassisSpeeds.fromFieldRelativeSpeeds(
-              speeds,
-              isFlipped
-                  ? drive.getRotation().plus(new Rotation2d(Math.PI))
-                  : drive.getRotation()));
-
-    }, shooter, hood, drive)
-        .beforeStarting(() -> angleController.reset(MathUtil.angleModulus(drive.getRotation().getRadians())));
+              // Convert to field relative speeds & send command
+              ChassisSpeeds speeds =
+                  new ChassisSpeeds(
+                      linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
+                      linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
+                      omega);
+              boolean isFlipped =
+                  DriverStation.getAlliance().isPresent()
+                      && DriverStation.getAlliance().get() == Alliance.Red;
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      speeds,
+                      isFlipped
+                          ? drive.getRotation().plus(new Rotation2d(Math.PI))
+                          : drive.getRotation()));
+            },
+            shooter,
+            hood,
+            drive)
+        .beforeStarting(
+            () -> angleController.reset(MathUtil.angleModulus(drive.getRotation().getRadians())));
   }
 
   public static Command spinUp(Shooter shooter, Drive drive) {
@@ -627,7 +689,8 @@ public class ShooterCommands {
   private static final LoggedNetworkNumber flywheelKp = new LoggedNetworkNumber("Flywheel/kp", 0);
   private static final LoggedNetworkNumber flywheelKi = new LoggedNetworkNumber("Flywheel/ki", 0);
   private static final LoggedNetworkNumber flywheelKd = new LoggedNetworkNumber("Flywheel/kd", 0);
-  private static final LoggedNetworkNumber flywheelKv = new LoggedNetworkNumber("Flywheel/kv", 0.00117);
+  private static final LoggedNetworkNumber flywheelKv =
+      new LoggedNetworkNumber("Flywheel/kv", 0.00117);
 
   public static Command configureLeader(Shooter shooter) {
     return Commands.runOnce(

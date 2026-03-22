@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IndexerCommands;
 import frc.robot.commands.IntakeCommands;
@@ -40,7 +41,7 @@ import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbNEO2;
-import frc.robot.subsystems.climb.ClimbSimKraken;
+import frc.robot.subsystems.climb.ClimbSimNEO;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.GyroIO;
@@ -81,7 +82,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.util.GoalUtils;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -159,7 +159,7 @@ public class RobotContainer {
         intakeExtender = new IntakeExtender(new IntakeExtenderSim());
         shooter = new Shooter(new ShooterSim());
         hood = new Hood(new HoodSim());
-        climb = new Climb(new ClimbSimKraken());
+        climb = new Climb(new ClimbSimNEO());
         break;
 
       default:
@@ -352,14 +352,19 @@ public class RobotContainer {
   }
 
   private void configureDriverCommands() {
-    controller.leftTrigger().whileTrue(ShooterCommands.magicTrigger(shooter, hood, drive, controller));
+    controller
+        .leftTrigger()
+        .whileTrue(ShooterCommands.magicTrigger(shooter, hood, drive, controller));
     controller.y().whileTrue(ShooterCommands.hubShotWithoutAlign(shooter, hood, drive, controller));
     controller.x().whileTrue(ShooterCommands.dumpShort(shooter, hood));
 
     controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
     controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
 
-    controller.a().whileTrue(ShooterCommands.testShoot(shooter, hood));
+    controller.b().whileTrue(ClimbCommands.rightClimb(climb));
+    controller.a().whileTrue(ClimbCommands.leftClimb(climb));
+
+    controller.back().whileTrue(ShooterCommands.testShoot(shooter, hood));
 
     controller
         .start()
@@ -374,7 +379,6 @@ public class RobotContainer {
 
     // Shoot Sequence
     controller.rightTrigger().whileTrue(IndexerCommands.feedShooter(indexer, kicker));
-    
   }
 
   private void configureOperatorCommands() {
@@ -543,7 +547,6 @@ public class RobotContainer {
                   climb.setPos(ClimbConstants.CLIMB_HEIGHT.in(Millimeters), true);
                 },
                 climb));
-
 
     ////////////////////// Testing commands below here ///////////////////////
 
