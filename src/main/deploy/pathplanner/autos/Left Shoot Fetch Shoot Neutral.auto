@@ -1,0 +1,50 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootInit"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Left Trench to Neutral"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Agitate"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootSequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Neutral"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Left",
+  "choreoAuto": false
+}

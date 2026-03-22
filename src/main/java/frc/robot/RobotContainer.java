@@ -219,6 +219,48 @@ public class RobotContainer {
             shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false));
     NamedCommands.registerCommand("Agitate", IndexerCommands.agitate(indexer, kicker));
 
+    NamedCommands.registerCommand(
+        "ShootInit",
+        Commands.sequence(
+            ShooterCommands.setupHubShot(
+                shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false),
+            IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(1)),
+            Commands.runOnce(
+                () -> {
+                  indexer.stop();
+                  kicker.stop();
+                },
+                indexer,
+                kicker),
+            Commands.runOnce(
+                () -> {
+                  shooter.stop();
+                  hood.stop();
+                },
+                shooter,
+                hood)));
+
+    NamedCommands.registerCommand(
+        "ShootSequence",
+        Commands.sequence(
+            ShooterCommands.setupHubShot(
+                shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false),
+            IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(2.2)),
+            Commands.runOnce(
+                () -> {
+                  indexer.stop();
+                  kicker.stop();
+                },
+                indexer,
+                kicker),
+            Commands.runOnce(
+                () -> {
+                  shooter.stop();
+                  hood.stop();
+                },
+                shooter,
+                hood)));
+
     new EventTrigger("ExpelBalls")
         .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE));
 
@@ -257,19 +299,23 @@ public class RobotContainer {
 
     // Set up SysId routines
     // autoChooser.addOption(
-    //     "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    // "Drive Wheel Radius Characterization",
+    // DriveCommands.wheelRadiusCharacterization(drive));
     // autoChooser.addOption(
-    //     "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    // "Drive Simple FF Characterization",
+    // DriveCommands.feedforwardCharacterization(drive));
     // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Forward)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    // "Drive SysId (Quasistatic Forward)",
+    // drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     // autoChooser.addOption(
-    //     "Drive SysId (Quasistatic Reverse)",
-    //     drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    // "Drive SysId (Quasistatic Reverse)",
+    // drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     // autoChooser.addOption(
-    //     "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    // "Drive SysId (Dynamic Forward)",
+    // drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     // autoChooser.addOption(
-    //     "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // "Drive SysId (Dynamic Reverse)",
+    // drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
     SmartDashboard.putData("Auto Choices", autoChooser.getSendableChooser());
 
     // Configure the button bindings
@@ -531,7 +577,8 @@ public class RobotContainer {
                   climb.setPos(0, true);
                 },
                 climb));
-    // POV Right - go to extend height (either from hanging to lower robot, or to prepare for climb)
+    // POV Right - go to extend height (either from hanging to lower robot, or to
+    // prepare for climb)
     new POVButton(operatorButtonBoard, 90)
         .whileTrue(
             Commands.run(

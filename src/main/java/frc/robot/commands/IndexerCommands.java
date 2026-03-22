@@ -72,17 +72,7 @@ public class IndexerCommands {
   public static Command agitate(Indexer indexer, Kicker kicker) {
     return Commands.run(
         () -> {
-          indexer.augersFeed();
-          kicker.setVelocityKicker(KickerConstants.KICKER_AGITATE_RPM);
-        },
-        indexer,
-        kicker);
-  }
-
-  public static Command unjam(Indexer indexer, Kicker kicker) {
-    return Commands.run(
-        () -> {
-          indexer.augersReverse();
+          indexer.augersAgitate();
           kicker.setVelocityKicker(KickerConstants.KICKER_AGITATE_RPM);
         },
         indexer,

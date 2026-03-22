@@ -20,7 +20,7 @@
         "y": 2.872
       },
       "prevControl": {
-        "x": 1.4179999999999997,
+        "x": 1.418,
         "y": 2.872
       },
       "nextControl": null,
@@ -45,7 +45,7 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Teleop",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

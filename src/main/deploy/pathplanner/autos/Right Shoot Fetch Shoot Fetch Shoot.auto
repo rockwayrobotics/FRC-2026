@@ -7,25 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "SetupHubShot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIndexer"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopShooter"
+            "name": "ShootInit"
           }
         },
         {
@@ -48,46 +30,40 @@
           }
         },
         {
-          "type": "sequential",
+          "type": "named",
+          "data": {
+            "name": "ShootSequence"
+          }
+        },
+        {
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "SetupHubShot"
+                  "pathName": "Right Trench to Neutral Repeat"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot2"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "StopIndexer"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "StopShooter"
+                  "name": "Agitate"
                 }
               }
             ]
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Right Neutral"
+            "name": "ShootSequence"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Right",
   "choreoAuto": false
 }

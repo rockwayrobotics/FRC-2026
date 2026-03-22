@@ -37,6 +37,11 @@ public class Indexer extends SubsystemBase { // Defines every Subsystem
     // setVelocityAugers(IndexerConstants.FEED_VELOCITY_RPM); // References preset value
   }
 
+  public void augersAgitate() { // Sets voltage to forward value
+    setAugers(IndexerConstants.AGITATE_DUTY_CYCLE);
+    // setVelocityAugers(IndexerConstants.FEED_VELOCITY_RPM); // References preset value
+  }
+
   public void augersReverse() { // Sets voltage to reverse value
     setAugers(IndexerConstants.REVERSE_DUTY_CYCLE);
     // setVelocityAugers(IndexerConstants.REVERSE_VELOCITY_RPM); // References preset value
