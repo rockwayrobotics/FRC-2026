@@ -34,6 +34,8 @@ public interface ModuleIO {
     public double[] odometryDrivePositionsRad = new double[] {};
     public Rotation2d[] odometryTurnPositions = new Rotation2d[] {};
   }
+  /** Sets the Relative encoder to the Absolute encoder. */
+  public default void resetEncoder() {}
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ModuleIOInputs inputs) {}

@@ -33,7 +33,7 @@ public class ShooterReal implements ShooterIO {
     flywheelLeaderConfig
         .idleMode(IdleMode.kCoast)
         .inverted(true)
-        .smartCurrentLimit(60)
+        .smartCurrentLimit(80)
         .voltageCompensation(12.0);
     flywheelLeaderConfig
         .closedLoop
@@ -57,7 +57,7 @@ public class ShooterReal implements ShooterIO {
     var flywheelFollowerConfig = new SparkFlexConfig();
     flywheelFollowerConfig
         .idleMode(IdleMode.kCoast)
-        .smartCurrentLimit(60)
+        .smartCurrentLimit(80)
         .voltageCompensation(12.0)
         .follow(CAN.FLYWHEEL_LEADER, true);
     // SparkUtil.tryUntilOk(

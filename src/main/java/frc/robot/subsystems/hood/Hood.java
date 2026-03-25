@@ -46,6 +46,10 @@ public class Hood extends SubsystemBase {
     return hoodAngle;
   }
 
+  public boolean atSetpoint(double degrees) {
+    return Math.abs(getPositionHood().minus(getHoodSetpoint()).in(Degrees)) < degrees;
+  }
+
   public Angle getHoodSetpoint() {
     return hoodAngleSetpoint;
   }

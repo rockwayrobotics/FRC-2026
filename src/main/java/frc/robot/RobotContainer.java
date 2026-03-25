@@ -261,6 +261,9 @@ public class RobotContainer {
                 shooter,
                 hood)));
 
+    NamedCommands.registerCommand("LeftClimbSequence", ClimbCommands.leftClimb(climb));
+    NamedCommands.registerCommand("RightClimbSequence", ClimbCommands.rightClimb(climb));
+
     new EventTrigger("ExpelBalls")
         .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE));
 
@@ -269,7 +272,8 @@ public class RobotContainer {
         .whileTrue(
             Commands.sequence(
                 Commands.waitUntil(() -> intakeExtender.getExtendAngle() > 30),
-                IntakeCommands.intakeFancy(intake, IntakeConstants.ROLLER_DUTY_CYCLE)))
+                IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE)))
+        // IntakeCommands.intakeFancy(intake, IntakeConstants.ROLLER_DUTY_CYCLE)))
         .onFalse(
             Commands.parallel(
                 IntakeCommands.intakeManual(intake, 0), NamedCommands.getCommand("RetractIntake")));
@@ -282,10 +286,10 @@ public class RobotContainer {
         Commands.sequence(
             Commands.runOnce(
                 () -> {
-                  if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-                    drive.setPose(new Pose2d(new Translation2d(3.5, 4), Rotation2d.k180deg));
+                  if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+                    drive.setPose(new Pose2d(new Translation2d(3.5, 4), Rotation2d.kZero));
                   } else {
-                    drive.setPose(new Pose2d(new Translation2d(13, 4), Rotation2d.kZero));
+                    drive.setPose(new Pose2d(new Translation2d(13, 4), Rotation2d.k180deg));
                   }
                 }),
             ShooterCommands.definitiveShoot(
@@ -295,7 +299,40 @@ public class RobotContainer {
                 HoodConstants.kHoodTable.getOutput(1.15)),
             Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
             NamedCommands.getCommand("Shoot2"),
-            NamedCommands.getCommand("Stop")));
+            Commands.runOnce(
+                () -> {
+                  shooter.stop();
+                  hood.stop();
+                },
+                shooter,
+                hood)));
+
+    autoChooser.addOption(
+        "Center Shoot Hub Climb",
+        Commands.sequence(
+            Commands.runOnce(
+                () -> {
+                  if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+                    drive.setPose(new Pose2d(new Translation2d(3.5, 4), Rotation2d.kZero));
+                  } else {
+                    drive.setPose(new Pose2d(new Translation2d(13, 4), Rotation2d.k180deg));
+                  }
+                }),
+            ShooterCommands.definitiveShoot(
+                shooter,
+                hood,
+                ShooterConstants.kRPMTable.getOutput(1.15),
+                HoodConstants.kHoodTable.getOutput(1.15)),
+            Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
+            NamedCommands.getCommand("Shoot2"),
+            Commands.runOnce(
+                () -> {
+                  shooter.stop();
+                  hood.stop();
+                },
+                shooter,
+                hood),
+            ClimbCommands.centerLeftClimb(climb)));
 
     // Set up SysId routines
     // autoChooser.addOption(
@@ -401,8 +438,8 @@ public class RobotContainer {
     controller
         .leftTrigger()
         .whileTrue(ShooterCommands.magicTrigger(shooter, hood, drive, controller));
-    controller.y().whileTrue(ShooterCommands.hubShotWithoutAlign(shooter, hood, drive, controller));
-    controller.x().whileTrue(ShooterCommands.dumpShort(shooter, hood));
+    controller.y().whileTrue(ShooterCommands.againstHubShot(shooter, hood, controller));
+    controller.x().whileTrue(ShooterCommands.dumpShort(shooter, hood, controller));
 
     controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
     controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
@@ -438,9 +475,10 @@ public class RobotContainer {
         .b()
         .onTrue(
             Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                    () -> {
+                      drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
+                      drive.resetEncoders();
+                    },
                     drive)
                 .ignoringDisable(true));
 

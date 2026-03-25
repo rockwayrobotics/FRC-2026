@@ -84,22 +84,58 @@ public class ShooterCommands {
         shooter);
   }
 
-  public static Command dumpShort(Shooter shooter, Hood hood) {
-    return Commands.runOnce(
-        () -> {
-          double rpm =
-              MathUtil.clamp(flywheelDumpSpeed.get(), 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
-          double hoodDegrees =
-              MathUtil.clamp(
-                  hoodDumpAngle.get(),
-                  HoodConstants.HOOD_REVERSE_LIMIT,
-                  HoodConstants.HOOD_FORWARD_LIMIT);
-          shooter.setOperatorOverride(false);
-          shooter.setVelocityFlywheel(rpm);
-          hood.setOperatorOverride(false);
-          hood.setPositionHood(Degrees.of(hoodDegrees));
-        },
-        shooter);
+  public static Command againstHubShot(
+      Shooter shooter, Hood hood, CommandXboxController controller) {
+    return Commands.run(
+            () -> {
+              // Note: Intentionally a little harder than 1.15 because the intake
+              // is closed.
+              double rpm = ShooterConstants.kRPMTable.getOutput(1.20);
+              double hoodDegrees =
+                  MathUtil.clamp(
+                      HoodConstants.kHoodTable.getOutput(1.15),
+                      HoodConstants.HOOD_REVERSE_LIMIT,
+                      HoodConstants.HOOD_FORWARD_LIMIT);
+              shooter.setOperatorOverride(false);
+              shooter.setVelocityFlywheel(rpm);
+              hood.setOperatorOverride(false);
+              hood.setPositionHood(Degrees.of(hoodDegrees));
+              if (shooter.atFlywheelSetpoint(80) && hood.atSetpoint(1)) {
+                controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+              }
+            },
+            shooter,
+            hood)
+        .finallyDo(
+            () -> {
+              controller.setRumble(GenericHID.RumbleType.kBothRumble, 0);
+            });
+  }
+
+  public static Command dumpShort(Shooter shooter, Hood hood, CommandXboxController controller) {
+    return Commands.run(
+            () -> {
+              double rpm =
+                  MathUtil.clamp(flywheelDumpSpeed.get(), 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
+              double hoodDegrees =
+                  MathUtil.clamp(
+                      hoodDumpAngle.get(),
+                      HoodConstants.HOOD_REVERSE_LIMIT,
+                      HoodConstants.HOOD_FORWARD_LIMIT);
+              shooter.setOperatorOverride(false);
+              shooter.setVelocityFlywheel(rpm);
+              hood.setOperatorOverride(false);
+              hood.setPositionHood(Degrees.of(hoodDegrees));
+              if (shooter.atFlywheelSetpoint(80) && hood.atSetpoint(1)) {
+                controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
+              }
+            },
+            shooter,
+            hood)
+        .finallyDo(
+            () -> {
+              controller.setRumble(GenericHID.RumbleType.kBothRumble, 0);
+            });
   }
 
   public static Command setupHubShot(
@@ -221,7 +257,7 @@ public class ShooterCommands {
               shooter.setVelocityFlywheel(rpm);
               hood.setOperatorOverride(false);
               hood.setPositionHood(Degrees.of(hoodAngle));
-              if (shooter.atFlywheelSetpoint(100)) {
+              if (shooter.atFlywheelSetpoint(80) && hood.atSetpoint(1)) {
                 controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
               }
             },
@@ -249,7 +285,7 @@ public class ShooterCommands {
               shooter.setVelocityFlywheel(rpm);
               hood.setOperatorOverride(false);
               hood.setPositionHood(Degrees.of(hoodAngle));
-              if (shooter.atFlywheelSetpoint(100)) {
+              if (shooter.atFlywheelSetpoint(80) && hood.atSetpoint(1)) {
                 controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
               }
             },
@@ -598,7 +634,7 @@ public class ShooterCommands {
               shooter.setVelocityFlywheel(rpm);
               hood.setOperatorOverride(false);
               hood.setPositionHood(Degrees.of(hoodAngle));
-              if (shooter.atFlywheelSetpoint(100)) {
+              if (shooter.atFlywheelSetpoint(80) && hood.atSetpoint(1)) {
                 controller.setRumble(GenericHID.RumbleType.kBothRumble, 1.0);
               }
 
@@ -639,7 +675,11 @@ public class ShooterCommands {
             hood,
             drive)
         .beforeStarting(
-            () -> angleController.reset(MathUtil.angleModulus(drive.getRotation().getRadians())));
+            () -> angleController.reset(MathUtil.angleModulus(drive.getRotation().getRadians())))
+        .finallyDo(
+            () -> {
+              controller.setRumble(GenericHID.RumbleType.kBothRumble, 0.0);
+            });
   }
 
   public static Command spinUp(Shooter shooter, Drive drive) {

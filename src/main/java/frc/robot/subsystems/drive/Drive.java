@@ -150,6 +150,12 @@ public class Drive extends SubsystemBase {
         });
   }
 
+  public void resetEncoders() {
+    for (var module : modules) {
+      module.resetEncoder();
+    }
+  }
+
   @Override
   public void periodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data

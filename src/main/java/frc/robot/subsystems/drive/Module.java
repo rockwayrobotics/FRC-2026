@@ -37,6 +37,10 @@ public class Module {
             "Disconnected turn motor on module " + Integer.toString(index) + ".", AlertType.kError);
   }
 
+  public void resetEncoder() {
+    io.resetEncoder();
+  }
+
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);

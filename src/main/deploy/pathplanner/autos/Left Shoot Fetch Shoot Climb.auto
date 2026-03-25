@@ -17,7 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Trench to Neutral"
+                  "pathName": "Left Trench to Neutral"
                 }
               },
               {
@@ -36,34 +36,21 @@
           }
         },
         {
-          "type": "race",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Right Trench After Shot"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Agitate"
-                }
-              }
-            ]
+            "pathName": "Left Trench to Climb"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ShootSequence"
+            "name": "LeftClimbSequence"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Right",
+  "folder": "Left",
   "choreoAuto": false
 }

@@ -15,6 +15,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.Constants.CAN;
 import frc.robot.util.SparkUtil;
+import java.util.function.DoubleSupplier;
 
 public class KickerReal implements KickerIO {
   private final SparkBase kickerMotor = new SparkMax(CAN.KICKER, MotorType.kBrushless);
@@ -43,6 +44,10 @@ public class KickerReal implements KickerIO {
   public void updateInputs(KickerIOInputs inputs) {
     SparkUtil.ifOk(
         kickerMotor, kickerEncoder::getVelocity, (value) -> inputs.kickerVelocity = value);
+    SparkUtil.ifOk(
+        kickerMotor,
+        new DoubleSupplier[] {kickerMotor::getAppliedOutput, kickerMotor::getBusVoltage},
+        (values) -> inputs.appliedVolts = values[0] * values[1]);
     double kickerTemp = kickerMotor.getMotorTemperature();
     REVLibError kickerMotorLastError = kickerMotor.getLastError();
     if (kickerMotorLastError != REVLibError.kOk || kickerTemp == 0) {

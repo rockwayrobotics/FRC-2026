@@ -8,10 +8,10 @@ public class ShooterConstants {
   public static final Translation2d kShooterOffset = new Translation2d(-0.2278, 0.04319);
 
   // Flywheel PIDV Constants
-  public static final double FLYWHEEL_KP = 0.00067; // 0.0008; // 0.001;
+  public static final double FLYWHEEL_KP = 0.0008; // 0.00067; // 0.0008; // 0.001;
   public static final double FLYWHEEL_KI = 0.0;
-  public static final double FLYWHEEL_KD = 0.0167; // 0.02;
-  public static final double FLYWHEEL_KV = 0.00075; // 0.0009;
+  public static final double FLYWHEEL_KD = 0.02; // 0.0167; // 0.02;
+  public static final double FLYWHEEL_KV = 0.00109; // 0.00075; // 0.0009;
   public static final double HOOD_KCOSRATIO = 0; // 0.76744186046511627906976744186047;
 
   public static final double FLYWHEEL_GEAR_RATIO = 0.6; // 18 / 30
@@ -37,13 +37,13 @@ public class ShooterConstants {
         new Point2D.Double(1.15, 2416.67), // 5 degrees
 
         //        new Point2D.Double(2.5, 2916.67), // 15 degrees
-        new Point2D.Double(2.5, 2833.33), // 20 degrees
+        new Point2D.Double(2.5, 2900), // 20 degrees
         //        new Point2D.Double(2.5, 2750), // 25 degrees
         //        new Point2D.Double(2.5, 2791.67), // 30 degrees - sketchy angle
 
         //        new Point2D.Double(3.15, 3250), // 15 degrees
         //        new Point2D.Double(3.15, 3083.33), // 20 degrees
-        new Point2D.Double(3.15, 3000), // 25 degrees
+        new Point2D.Double(3.15, 3100), // 25 degrees
         //        new Point2D.Double(3.15, 2916.67), // 30 degrees
         //        new Point2D.Double(3.15, 2833.33), // 35 degrees
 
@@ -53,13 +53,13 @@ public class ShooterConstants {
         //        new Point2D.Double(3.5,3208.33), // 20 Degrees
         // new Point2D.Double(3.5, 3187.5), // 22.5 Degrees
         // new Point2D.Double(3.5, 3125), // 25 Degrees
-        new Point2D.Double(3.5, 3083.33), // 27.5 Degrees
+        new Point2D.Double(3.5, 3150), // 27.5 Degrees
         //        new Point2D.Double(3.5,3041.67), // 30 Degrees
         //        new Point2D.Double(3.5,2916.67), // 35 Degrees
 
         //        new Point2D.Double(4.00, 3333.33), // 20 degrees
         //        new Point2D.Double(4.01, 3312.5), // 25 degrees
-        new Point2D.Double(4.01, 3250), // 30 degrees
+        new Point2D.Double(4.01, 3175), // 30 degrees
         //        new Point2D.Double(4.01, 3208.33), // 35 degrees
         //        new Point2D.Double(4.01, 3208.33), // 40 degrees
 
@@ -68,7 +68,7 @@ public class ShooterConstants {
         //        new Point2D.Double(5.36, 3958.33), //20 degrees
         // new Point2D.Double(5.36, 3875), // 25 degrees
         //        new Point2D.Double(5.36, 3833.33), //30 degrees
-        new Point2D.Double(5.36, 3750), // 35 degrees
+        new Point2D.Double(5.29, 3825), // 35 degrees
         //        new Point2D.Double(5.36, 3666.67), //40 degrees
         //        new Point2D.Double(5.36, 3458.33), //45 degrees
 

@@ -38,16 +38,16 @@ public class GoalUtils {
 
   public static Translation2d getLeftTarget() {
     var field = getField();
-    double redX =
-        (field.getTagPose(7).get().toPose2d().getX() + field.getTagPose(16).get().toPose2d().getX())
-            / 2;
+    double redX = field.getTagPose(16).get().toPose2d().getX() - 1;
+    // (field.getTagPose(7).get().toPose2d().getX() + field.getTagPose(16).get().toPose2d().getX())
+    //     / 2;
     double redY = (field.getTagPose(9).get().toPose2d().getY()) / 2;
     Translation2d redTarget = new Translation2d(redX, redY);
 
-    double blueX =
-        (field.getTagPose(26).get().toPose2d().getX()
-                + field.getTagPose(28).get().toPose2d().getX())
-            / 2;
+    double blueX = 1;
+    // (field.getTagPose(26).get().toPose2d().getX()
+    //         + field.getTagPose(28).get().toPose2d().getX())
+    //     / 2;
     double blueY = field.getFieldWidth() - (field.getTagPose(25).get().toPose2d().getY() / 2);
     Translation2d blueTarget = new Translation2d(blueX, blueY);
 
@@ -60,16 +60,16 @@ public class GoalUtils {
 
   public static Translation2d getRightTarget() {
     var field = getField();
-    double redX =
-        (field.getTagPose(7).get().toPose2d().getX() + field.getTagPose(16).get().toPose2d().getX())
-            / 2;
+    double redX = field.getTagPose(16).get().toPose2d().getX() - 1;
+    // (field.getTagPose(7).get().toPose2d().getX() + field.getTagPose(16).get().toPose2d().getX())
+    //     / 2;
     double redY = field.getFieldWidth() - (field.getTagPose(25).get().toPose2d().getY() / 2);
     Translation2d redTarget = new Translation2d(redX, redY);
 
-    double blueX =
-        (field.getTagPose(26).get().toPose2d().getX()
-                + field.getTagPose(28).get().toPose2d().getX())
-            / 2;
+    double blueX = 1;
+    // (field.getTagPose(26).get().toPose2d().getX()
+    //         + field.getTagPose(28).get().toPose2d().getX())
+    //     / 2;
     double blueY = (field.getTagPose(9).get().toPose2d().getY()) / 2;
     Translation2d blueTarget = new Translation2d(blueX, blueY);
 

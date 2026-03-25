@@ -151,7 +151,15 @@ public class ModuleIOSpark implements ModuleIO {
         SparkOdometryThread.getInstance().registerSignal(driveSpark, driveEncoder::getPosition);
     turnPositionQueue =
         SparkOdometryThread.getInstance()
-            .registerSignal(turnSpark, turnEncoder::getVirtualPosition);
+            .registerSignal(turnSpark, () -> turnSpark.getEncoder().getPosition());
+    // turnPositionQueue =
+    //     SparkOdometryThread.getInstance()
+    //         .registerSignal(turnSpark, turnEncoder::getVirtualPosition);
+    turnSpark.getEncoder().setPosition(turnEncoder.getVirtualPosition());
+  }
+
+  @Override
+  public void resetEncoder() {
     turnSpark.getEncoder().setPosition(turnEncoder.getVirtualPosition());
   }
 
