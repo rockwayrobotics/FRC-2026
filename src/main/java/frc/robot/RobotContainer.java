@@ -261,7 +261,7 @@ public class RobotContainer {
                 shooter,
                 hood)));
 
-    NamedCommands.registerCommand("LeftClimbSequence", ClimbCommands.leftClimb(climb));
+    NamedCommands.registerCommand("LeftClimbSequence", ClimbCommands.leftAutoLeftClimb(climb));
     NamedCommands.registerCommand("RightClimbSequence", ClimbCommands.rightClimb(climb));
 
     new EventTrigger("ExpelBalls")

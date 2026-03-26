@@ -36,12 +36,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Left Trench to Climb"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "LeftClimbSequence"
