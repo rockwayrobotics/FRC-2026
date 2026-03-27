@@ -487,6 +487,8 @@ public class RobotContainer {
     // Retract
     operatorController.rightBumper().onTrue(IntakeCommands.retract(intakeExtender));
 
+    operatorController.start().whileTrue(ShooterCommands.unsafeFixHood(hood, operatorController));
+
     // Manual extend
     new JoystickButton(operatorButtonBoard, 5)
         .whileTrue(IntakeCommands.extendManual(intakeExtender, 0.2));

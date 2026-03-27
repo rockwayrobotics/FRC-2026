@@ -17,4 +17,8 @@ public interface HoodIO {
   public default void setPositionHood(Angle angle) {}
 
   public default void stopHood() {}
+
+  public default void unsafeMoveMotorUp() {}
+
+  public default void reconfigure(boolean enableForwardLimit) {}
 }

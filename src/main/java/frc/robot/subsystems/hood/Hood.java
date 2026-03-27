@@ -70,4 +70,12 @@ public class Hood extends SubsystemBase {
   public boolean isOperatorOverriding() {
     return this.operatorOverride;
   }
+
+  public void reconfigure(boolean enableForwardLimit) {
+    hoodIO.reconfigure(enableForwardLimit);
+  }
+
+  public void unsafeMoveMotorUp() {
+    hoodIO.unsafeMoveMotorUp();
+  }
 }
