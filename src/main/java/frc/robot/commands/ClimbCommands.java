@@ -20,8 +20,7 @@ public class ClimbCommands {
           Commands.parallel(
               Commands.run(
                       () -> {
-                        climb.exten
-                        d();
+                        climb.extend();
                       },
                       climb)
                   .until(() -> climb.atSetpoint(2)),

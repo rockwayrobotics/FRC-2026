@@ -41,14 +41,14 @@ public class GoalUtils {
     double redX = field.getTagPose(16).get().toPose2d().getX() - 1;
     // (field.getTagPose(7).get().toPose2d().getX() + field.getTagPose(16).get().toPose2d().getX())
     //     / 2;
-    double redY = (field.getTagPose(9).get().toPose2d().getY()) / 2;
+    double redY = (field.getTagPose(9).get().toPose2d().getY()) / 2 + 1;
     Translation2d redTarget = new Translation2d(redX, redY);
 
     double blueX = 1;
     // (field.getTagPose(26).get().toPose2d().getX()
     //         + field.getTagPose(28).get().toPose2d().getX())
     //     / 2;
-    double blueY = field.getFieldWidth() - (field.getTagPose(25).get().toPose2d().getY() / 2);
+    double blueY = field.getFieldWidth() - ((field.getTagPose(25).get().toPose2d().getY() / 2) - 1);
     Translation2d blueTarget = new Translation2d(blueX, blueY);
 
     if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
@@ -63,14 +63,14 @@ public class GoalUtils {
     double redX = field.getTagPose(16).get().toPose2d().getX() - 1;
     // (field.getTagPose(7).get().toPose2d().getX() + field.getTagPose(16).get().toPose2d().getX())
     //     / 2;
-    double redY = field.getFieldWidth() - (field.getTagPose(25).get().toPose2d().getY() / 2);
+    double redY = field.getFieldWidth() - ((field.getTagPose(25).get().toPose2d().getY() / 2) - 1);
     Translation2d redTarget = new Translation2d(redX, redY);
 
     double blueX = 1;
     // (field.getTagPose(26).get().toPose2d().getX()
     //         + field.getTagPose(28).get().toPose2d().getX())
     //     / 2;
-    double blueY = (field.getTagPose(9).get().toPose2d().getY()) / 2;
+    double blueY = (field.getTagPose(9).get().toPose2d().getY()) / 2 + 1;
     Translation2d blueTarget = new Translation2d(blueX, blueY);
 
     if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {

@@ -90,7 +90,7 @@ public class ShooterCommands {
             () -> {
               // Note: Intentionally a little harder than 1.15 because the intake
               // is closed.
-              double rpm = ShooterConstants.kRPMTable.getOutput(1.20);
+              double rpm = ShooterConstants.kRPMTable.getOutput(1.35);
               double hoodDegrees =
                   MathUtil.clamp(
                       HoodConstants.kHoodTable.getOutput(1.15),
