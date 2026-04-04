@@ -626,7 +626,10 @@ public class ShooterCommands {
               }
 
               // Flywheel and Hood
-              double distance = target.getDistance(drive.getPose().getTranslation());
+              Translation2d futurePosition = drive.getPose().getTranslation();
+              futurePosition =
+                  futurePosition.plus(drive.getFieldRelativeSpeed().getTranslation2d().times(1));
+              double distance = target.getDistance(futurePosition);
               Logger.recordOutput("Shooter/TargetShotDistance", distance);
               double rpm = shotTable.getOutput(distance);
               double hoodAngle = hoodTable.getOutput(distance);
@@ -660,14 +663,19 @@ public class ShooterCommands {
               Logger.recordOutput("Drive/RequestLinearSpeedX", targetVelocity.getX());
               Logger.recordOutput("Drive/RequestLinearSpeedY", targetVelocity.getY());
 
-              Translation2d limitedVelocity =
-                  drive.getSlowModeSlewRateLimiter().calculate2d(targetVelocity);
+              double targetSpeed = targetVelocity.getNorm();
+              Rotation2d angle = targetSpeed != 0 ? targetVelocity.getAngle() : new Rotation2d();
+              double limitedSpeed =
+                  drive.getSlowModeSlewRateLimiter().calculate(targetSpeed, angle);
+              double xSpeed =
+                  targetSpeed < 0.001 ? 0.0 : targetVelocity.getX() * limitedSpeed / targetSpeed;
+              double ySpeed =
+                  targetSpeed < 0.001 ? 0.0 : targetVelocity.getY() * limitedSpeed / targetSpeed;
 
-              Logger.recordOutput("Drive/ActualLinearSpeedX", limitedVelocity.getX());
-              Logger.recordOutput("Drive/ActualLinearSpeedY", limitedVelocity.getY());
+              Logger.recordOutput("Drive/ActualLinearSpeedX", xSpeed);
+              Logger.recordOutput("Drive/ActualLinearSpeedY", ySpeed);
               // Convert to field relative speeds & send command
-              ChassisSpeeds speeds =
-                  new ChassisSpeeds(limitedVelocity.getX(), limitedVelocity.getY(), omega);
+              ChassisSpeeds speeds = new ChassisSpeeds(xSpeed, ySpeed, omega);
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
@@ -683,9 +691,13 @@ public class ShooterCommands {
             drive)
         .beforeStarting(
             () -> {
-              drive
-                  .getSlowModeSlewRateLimiter()
-                  .reset2d(drive.getFieldRelativeSpeed().getTranslation2d());
+              var translation2d = drive.getFieldRelativeSpeed().getTranslation2d();
+              var norm = translation2d.getNorm();
+              var angle = new Rotation2d();
+              if (norm != 0) {
+                angle = translation2d.getAngle();
+              }
+              drive.getSlowModeSlewRateLimiter().reset(norm, angle);
               angleController.reset(MathUtil.angleModulus(drive.getRotation().getRadians()));
             })
         .finallyDo(

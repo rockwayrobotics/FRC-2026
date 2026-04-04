@@ -2,7 +2,7 @@ package frc.robot.util;
 
 import edu.wpi.first.math.MathSharedStore;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class SlowModeSlewRateLimiter {
@@ -14,7 +14,7 @@ public class SlowModeSlewRateLimiter {
   private double prevVal;
   private double prevTime;
 
-  private Translation2d prev2d;
+  private Rotation2d prevAngle;
 
   /**
    * Creates a new SlewRateLimiter with the given positive rate limit and negative rate limit. The
@@ -30,7 +30,7 @@ public class SlowModeSlewRateLimiter {
     this.positiveRateLimit = positiveRateLimit;
     this.negativeRateLimit = negativeRateLimit;
     this.prevVal = initialValue;
-    this.prev2d = new Translation2d();
+    this.prevAngle = new Rotation2d();
     this.loggedPositiveRate = new LoggedNetworkNumber(ntKeyBase + "Up", positiveRateLimit);
     this.loggedNegativeRate = new LoggedNetworkNumber(ntKeyBase + "Down", negativeRateLimit);
     prevTime = MathSharedStore.getTimestamp();
@@ -45,29 +45,27 @@ public class SlowModeSlewRateLimiter {
     }
   }
 
-  public Translation2d calculate2d(Translation2d input) {
-    double currentTime = MathSharedStore.getTimestamp();
-    double elapsedTime = currentTime - prevTime;
-    Translation2d delta = input.minus(prev2d);
-    if (delta.getNorm() < 0.00001) {
-      prev2d = input;
-      return input;
-    }
-    double scaledNorm =
-        MathUtil.clamp(
-            delta.getNorm(), negativeRateLimit * elapsedTime, positiveRateLimit * elapsedTime);
-    Translation2d result = input.times(scaledNorm / delta.getNorm());
-    prev2d = result;
-    prevTime = currentTime;
-    return prev2d;
-  }
-
   public double calculate(double input) {
     double currentTime = MathSharedStore.getTimestamp();
     double elapsedTime = currentTime - prevTime;
     prevVal +=
         MathUtil.clamp(
             input - prevVal, negativeRateLimit * elapsedTime, positiveRateLimit * elapsedTime);
+    prevTime = currentTime;
+    return prevVal;
+  }
+
+  public double calculate(double input, Rotation2d angle) {
+    double currentTime = MathSharedStore.getTimestamp();
+    double elapsedTime = currentTime - prevTime;
+    if (Math.abs(angle.minus(prevAngle).getDegrees()) >= 90) {
+      prevVal = 0;
+    } else {
+      prevVal +=
+          MathUtil.clamp(
+              input - prevVal, negativeRateLimit * elapsedTime, positiveRateLimit * elapsedTime);
+    }
+    prevAngle = angle;
     prevTime = currentTime;
     return prevVal;
   }
@@ -91,8 +89,8 @@ public class SlowModeSlewRateLimiter {
     prevTime = MathSharedStore.getTimestamp();
   }
 
-  public void reset2d(Translation2d value) {
-    prev2d = value;
-    prevTime = MathSharedStore.getTimestamp();
+  public void reset(double value, Rotation2d angle) {
+    this.reset(value);
+    this.prevAngle = angle;
   }
 }
