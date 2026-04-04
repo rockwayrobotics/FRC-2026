@@ -1,6 +1,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class FieldRelativeSpeed {
@@ -27,5 +28,9 @@ public class FieldRelativeSpeed {
     this.vx = 0.0;
     this.vy = 0.0;
     this.omega = 0.0;
+  }
+
+  public Translation2d getTranslation2d() {
+    return new Translation2d(this.vx, this.vy);
   }
 }
