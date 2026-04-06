@@ -34,7 +34,7 @@ public class DriveConstants {
       };
 
   // Drive motor configuration
-  public static final int driveMotorCurrentLimit = 80;
+  public static final int driveMotorCurrentLimit = 60;
   public static final double wheelRadiusMeters = Units.inchesToMeters(2);
   public static final double driveMotorReduction =
       50 * 17 * 45 / 14 / 27 / 15; // L2 gearing for SDS Mk4i

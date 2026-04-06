@@ -308,7 +308,7 @@ public class RobotContainer {
                 hood)));
 
     autoChooser.addOption(
-        "Center Shoot Hub Climb",
+        "Center Shoot Hub Left Climb",
         Commands.sequence(
             Commands.runOnce(
                 () -> {
@@ -333,6 +333,33 @@ public class RobotContainer {
                 shooter,
                 hood),
             ClimbCommands.centerLeftClimb(climb)));
+
+    autoChooser.addOption(
+        "Center Shoot Hub Right Climb",
+        Commands.sequence(
+            Commands.runOnce(
+                () -> {
+                  if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+                    drive.setPose(new Pose2d(new Translation2d(3.5, 4), Rotation2d.kZero));
+                  } else {
+                    drive.setPose(new Pose2d(new Translation2d(13, 4), Rotation2d.k180deg));
+                  }
+                }),
+            ShooterCommands.definitiveShoot(
+                shooter,
+                hood,
+                ShooterConstants.kRPMTable.getOutput(1.15),
+                HoodConstants.kHoodTable.getOutput(1.15)),
+            Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
+            NamedCommands.getCommand("Shoot2"),
+            Commands.runOnce(
+                () -> {
+                  shooter.stop();
+                  hood.stop();
+                },
+                shooter,
+                hood),
+            ClimbCommands.centerAutoRightClimb(climb)));
 
     // Set up SysId routines
     // autoChooser.addOption(

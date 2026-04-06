@@ -118,12 +118,74 @@ public class ClimbCommands {
                       climb)
                   .until(() -> climb.atSetpoint(2)),
               AutoBuilder.followPath(preClimbPath)),
-          AutoBuilder.followPath(climbPath));
-      // Commands.run(
-      // () -> {
-      // climb.climb();
-      // })
-      // .until(() -> climb.atSetpoint(2)));
+          AutoBuilder.followPath(climbPath),
+          Commands.run(
+                  () -> {
+                    climb.climb();
+                  })
+              .until(() -> climb.atSetpoint(2)));
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Commands.none();
+    }
+  }
+
+  public static Command centerAutoRightClimb(Climb climb) {
+    try {
+      // Load the path you want to follow using its name in the GUI
+      PathPlannerPath alignPath = PathPlannerPath.fromPathFile("Center Right Climb Align");
+      PathPlannerPath preClimbPath = PathPlannerPath.fromPathFile("Teleop Right PreClimb");
+      PathPlannerPath climbPath = PathPlannerPath.fromPathFile("Center Auto Right Climb");
+
+      // Create a path following command using AutoBuilder. This will also trigger
+      // event markers.
+      return Commands.sequence(
+          AutoBuilder.followPath(alignPath),
+          Commands.parallel(
+              Commands.run(
+                      () -> {
+                        climb.extend();
+                      },
+                      climb)
+                  .until(() -> climb.atSetpoint(2)),
+              AutoBuilder.followPath(preClimbPath)),
+          AutoBuilder.followPath(climbPath),
+          Commands.run(
+                  () -> {
+                    climb.climb();
+                  })
+              .until(() -> climb.atSetpoint(2)));
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Commands.none();
+    }
+  }
+
+  public static Command AutoRightClimb(Climb climb) {
+    try {
+      // Load the path you want to follow using its name in the GUI
+      PathPlannerPath preClimbPath = PathPlannerPath.fromPathFile("Auto Right PreClimb");
+      PathPlannerPath climbPath = PathPlannerPath.fromPathFile("Auto Right Climb");
+
+      // Create a path following command using AutoBuilder. This will also trigger
+      // event markers.
+      return Commands.sequence(
+          Commands.parallel(
+              Commands.run(
+                      () -> {
+                        climb.extend();
+                      },
+                      climb)
+                  .until(() -> climb.atSetpoint(2)),
+              AutoBuilder.followPath(preClimbPath)),
+          AutoBuilder.followPath(climbPath),
+          Commands.run(
+                  () -> {
+                    climb.climb();
+                  })
+              .until(() -> climb.atSetpoint(2)));
 
     } catch (Exception e) {
       e.printStackTrace();
