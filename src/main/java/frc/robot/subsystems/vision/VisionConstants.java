@@ -7,8 +7,10 @@
 
 package frc.robot.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -32,12 +34,16 @@ public class VisionConstants {
   public static Transform3d robotToCameraFront =
       new Transform3d(
           Inches.of(11.75).in(Meters),
-          Inches.of(27.5 * 0.5 - 0.9375).in(Meters),
+          Inches.of(27.5 * 0.5 - 0.7375).in(Meters),
           Inches.of(20.5).in(Meters),
-          new Rotation3d(0.0, -10 * Math.PI / 180.0, 0));
+          new Rotation3d(0.0, -10 * Math.PI / 180.0, Degrees.of(-5).in(Radians)));
   public static Transform3d robotToCameraBack =
       new Transform3d(
-          -Inches.of(27.5 * 0.5).in(Meters) + 0.012, -0.042, 0.42, new Rotation3d(0, 0, Math.PI));
+          -Inches.of(27.5 * 0.5).in(Meters) + 0.0014,
+          -Inches.of(27.5 * 0.5).in(Meters) + 0.304,
+          0.422,
+          new Rotation3d(0, 0, Math.PI + Degrees.of(1.060911690264227).in(Radians)));
+  // -Inches.of(27.5 * 0.5).in(Meters) + 0.012, -0.042, 0.42, new Rotation3d(0, 0, Math.PI));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
