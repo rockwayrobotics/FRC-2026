@@ -61,7 +61,7 @@ import frc.robot.subsystems.indexer.IndexerSim;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeIO;
-import frc.robot.subsystems.intake.IntakeReal;
+import frc.robot.subsystems.intake.IntakeKraken;
 import frc.robot.subsystems.intake.IntakeSim;
 import frc.robot.subsystems.intakeExtender.IntakeExtender;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderIO;
@@ -131,7 +131,7 @@ public class RobotContainer {
 
         indexer = new Indexer(new IndexerReal());
         kicker = new Kicker(new KickerReal());
-        intake = new Intake(new IntakeReal()); // IntakeReal());
+        intake = new Intake(new IntakeKraken()); // IntakeReal());
         intakeExtender = new IntakeExtender(new IntakeExtenderReal()); // IntakeExtenderReal());
         shooter = new Shooter(new ShooterReal());
         hood = new Hood(new HoodReal());
@@ -470,6 +470,7 @@ public class RobotContainer {
 
     controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
     controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
+    controller.povUp().whileTrue(Commands.run(() -> intake.intakeTest(), intake));
 
     controller.b().whileTrue(ClimbCommands.rightClimb(climb));
     controller.a().whileTrue(ClimbCommands.leftClimb(climb));
