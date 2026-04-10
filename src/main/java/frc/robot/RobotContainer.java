@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -85,9 +86,12 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
@@ -110,24 +114,24 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     led = new Led();
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIONavX(),
-                new ModuleIOSpark(DriveConstants.swerveModuleConfigs[0]), // FL
-                new ModuleIOSpark(DriveConstants.swerveModuleConfigs[1]), // FR
-                new ModuleIOSpark(DriveConstants.swerveModuleConfigs[2]), // BL
-                new ModuleIOSpark(DriveConstants.swerveModuleConfigs[3])); // BR
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVision(camera_front, robotToCameraFront),
-                new VisionIOPhotonVision(camera_back, robotToCameraBack));
+        drive = new Drive(
+            new GyroIONavX(),
+            new ModuleIOSpark(DriveConstants.swerveModuleConfigs[0]), // FL
+            new ModuleIOSpark(DriveConstants.swerveModuleConfigs[1]), // FR
+            new ModuleIOSpark(DriveConstants.swerveModuleConfigs[2]), // BL
+            new ModuleIOSpark(DriveConstants.swerveModuleConfigs[3])); // BR
+        vision = new Vision(
+            drive::addVisionMeasurement,
+            new VisionIOPhotonVision(camera_front, robotToCameraFront),
+            new VisionIOPhotonVision(camera_back, robotToCameraBack));
 
         indexer = new Indexer(new IndexerReal());
         kicker = new Kicker(new KickerReal());
@@ -140,18 +144,17 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera_front, robotToCameraFront, drive::getPose),
-                new VisionIOPhotonVisionSim(camera_back, robotToCameraBack, drive::getPose));
+        drive = new Drive(
+            new GyroIO() {
+            },
+            new ModuleIOSim(),
+            new ModuleIOSim(),
+            new ModuleIOSim(),
+            new ModuleIOSim());
+        vision = new Vision(
+            drive::addVisionMeasurement,
+            new VisionIOPhotonVisionSim(camera_front, robotToCameraFront, drive::getPose),
+            new VisionIOPhotonVisionSim(camera_back, robotToCameraBack, drive::getPose));
 
         indexer = new Indexer(new IndexerSim());
         kicker = new Kicker(new KickerSim());
@@ -164,21 +167,34 @@ public class RobotContainer {
 
       default:
         // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-        indexer = new Indexer(new IndexerIO() {});
-        kicker = new Kicker(new KickerIO() {});
-        intake = new Intake(new IntakeIO() {});
-        intakeExtender = new IntakeExtender(new IntakeExtenderIO() {});
-        shooter = new Shooter(new ShooterIO() {});
-        hood = new Hood(new HoodIO() {});
-        climb = new Climb(new ClimbIO() {});
+        drive = new Drive(
+            new GyroIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            });
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {
+        }, new VisionIO() {
+        });
+        indexer = new Indexer(new IndexerIO() {
+        });
+        kicker = new Kicker(new KickerIO() {
+        });
+        intake = new Intake(new IntakeIO() {
+        });
+        intakeExtender = new IntakeExtender(new IntakeExtenderIO() {
+        });
+        shooter = new Shooter(new ShooterIO() {
+        });
+        hood = new Hood(new HoodIO() {
+        });
+        climb = new Climb(new ClimbIO() {
+        });
         break;
     }
 
@@ -489,7 +505,10 @@ public class RobotContainer {
                 climb));
 
     // Shoot Sequence
-    controller.rightTrigger().whileTrue(IndexerCommands.feedShooter(indexer, kicker));
+    controller.rightTrigger()
+        .whileTrue(Commands.parallel(IndexerCommands.feedShooter(indexer, kicker),
+            new SequentialCommandGroup(IntakeCommands.retract(intakeExtender).withTimeout(5),
+                IntakeCommands.extend(intakeExtender).withTimeout(5)).repeatedly()));
   }
 
   private void configureOperatorCommands() {
@@ -503,11 +522,11 @@ public class RobotContainer {
         .b()
         .onTrue(
             Commands.runOnce(
-                    () -> {
-                      drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
-                      drive.resetEncoders();
-                    },
-                    drive)
+                () -> {
+                  drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero));
+                  drive.resetEncoders();
+                },
+                drive)
                 .ignoringDisable(true));
 
     // Extend
@@ -698,9 +717,11 @@ public class RobotContainer {
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+   * it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
