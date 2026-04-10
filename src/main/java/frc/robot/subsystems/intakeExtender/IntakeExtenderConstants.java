@@ -1,7 +1,8 @@
 package frc.robot.subsystems.intakeExtender;
 
 public class IntakeExtenderConstants {
-  public static final double RETRACT_GEAR_RATIO = 5 * 9 * 60 / 48.0;
+  // 45:1 gearbox * 4/3 gears
+  public static final double RETRACT_GEAR_RATIO = 60;
 
   // Limits in degrees (was from 12 to -110)
   public static final double EXTEND_LIMIT = 122.0;

@@ -36,12 +36,7 @@ public class IntakeCommands {
   }
 
   public static Command extendManual(IntakeExtender intakeExtender, double dutyCycle) {
-    return Commands.startRun(
-        () -> {
-          intakeExtender.setHoldingPosition(true);
-        },
-        () -> intakeExtender.extend(dutyCycle),
-        intakeExtender);
+    return Commands.run(() -> intakeExtender.extend(dutyCycle), intakeExtender);
   }
 
   public static Command intakeManual(Intake intake, double dutyCycle) {

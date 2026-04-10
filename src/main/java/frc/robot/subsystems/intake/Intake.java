@@ -35,6 +35,7 @@ public class Intake extends SubsystemBase {
   public void intake(double dutyCycle) {
     intakeIO.intake(dutyCycle);
   }
+
   public void intakeTest() {
     intakeIO.intake(1);
   }
