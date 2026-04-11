@@ -11,7 +11,7 @@ public class Intake extends SubsystemBase {
   private final IntakeIOInputsAutoLogged intakeInputs = new IntakeIOInputsAutoLogged();
 
   private final LoggedNetworkNumber rollerTest =
-      new LoggedNetworkNumber("Intake/RollerTestDuty", -0.4);
+      new LoggedNetworkNumber("Intake/RollerTestDuty", -0.7);
   private final LoggedNetworkBoolean rollerOvercurrent =
       new LoggedNetworkBoolean("Intake/RollerOverCurrent", false);
   private boolean rollerOverCurrentAuto = false;

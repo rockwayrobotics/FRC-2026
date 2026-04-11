@@ -273,7 +273,6 @@ public class RobotContainer {
             Commands.sequence(
                 Commands.waitUntil(() -> intakeExtender.getExtendAngle() > 30),
                 IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE)))
-        // IntakeCommands.intakeFancy(intake, IntakeConstants.ROLLER_DUTY_CYCLE)))
         .onFalse(
             Commands.parallel(
                 IntakeCommands.intakeManual(intake, 0), NamedCommands.getCommand("RetractIntake")));

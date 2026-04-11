@@ -69,37 +69,6 @@ public class IntakeCommands {
     return Commands.run(() -> intake.intake(dutyCycle), intake);
   }
 
-  public static Command intakeFancy(Intake intake, double dutyCycle) {
-    AtomicInteger overCurrentCount = new AtomicInteger(0);
-    AtomicInteger recoveryCountdown = new AtomicInteger(0);
-    return Commands.run(
-            () -> {
-              int recoveryCountdownValue = recoveryCountdown.get();
-              if (recoveryCountdownValue > 0) {
-                recoveryCountdown.decrementAndGet();
-                intake.intake(IntakeConstants.ROLLER_EJECT_DUTY_CYCLE);
-              } else {
-                if (intake.getOverCurrentAuto()) {
-                  int overCurrentValue = overCurrentCount.incrementAndGet();
-                  if (overCurrentValue > 10) {
-                    recoveryCountdown.set(12); // 240 ms
-                  }
-                } else {
-                  if (overCurrentCount.get() > 0) {
-                    overCurrentCount.decrementAndGet();
-                  }
-                }
-                intake.intake(dutyCycle);
-              }
-            },
-            intake)
-        .finallyDo(
-            () -> {
-              recoveryCountdown.set(0);
-              overCurrentCount.set(0);
-            });
-  }
-
   public static Command intakeManualWithRumble(
       Intake intake, double dutyCycle, CommandXboxController controller) {
     return Commands.run(
