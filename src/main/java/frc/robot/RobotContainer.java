@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -390,6 +389,14 @@ public class RobotContainer {
     CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
   }
 
+  public void disabledInit() {
+    intakeExtender.enableCoastMode();
+  }
+
+  public void enabledInit() {
+    intakeExtender.enableBrakeMode();
+  }
+
   private void configureDefaultCommands() {
     // Default command, normal field-relative drive
     // Strafe
@@ -492,13 +499,7 @@ public class RobotContainer {
     // Shoot Sequence
     controller
         .rightTrigger()
-        .whileTrue(
-            Commands.parallel(
-                IndexerCommands.feedShooter(indexer, kicker),
-                new SequentialCommandGroup(
-                        IntakeCommands.retract(intakeExtender).withTimeout(5),
-                        IntakeCommands.extend(intakeExtender).withTimeout(5))
-                    .repeatedly()));
+        .whileTrue(Commands.parallel(IndexerCommands.feedShooter(indexer, kicker)));
   }
 
   private void configureOperatorCommands() {
@@ -523,6 +524,11 @@ public class RobotContainer {
     operatorController.rightTrigger().onTrue(IntakeCommands.extend(intakeExtender));
     // Retract
     operatorController.rightBumper().onTrue(IntakeCommands.retract(intakeExtender));
+
+    operatorController
+        .rightTrigger()
+        .and(operatorController.rightBumper())
+        .whileTrue(IntakeCommands.trashCompact(intakeExtender));
 
     operatorController.start().whileTrue(ShooterCommands.unsafeFixHood(hood, operatorController));
 

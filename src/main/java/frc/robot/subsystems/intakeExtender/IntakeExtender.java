@@ -31,11 +31,15 @@ public class IntakeExtender extends SubsystemBase {
     intakeIO.extend(0.0);
   }
 
-  public boolean motorCurrentWithinLimit() {
-    return outputCurrent < IntakeExtenderConstants.CURRENT_LIMIT;
-  }
-
   public void extend(double dutyCycle) {
     intakeIO.extend(dutyCycle);
+  }
+
+  public void enableBrakeMode() {
+    intakeIO.enableBrakeMode();
+  }
+
+  public void enableCoastMode() {
+    intakeIO.enableCoastMode();
   }
 }

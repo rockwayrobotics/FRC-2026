@@ -28,9 +28,9 @@ public class IntakeKraken implements IntakeIO {
     // Configure drive motor
     var config = new TalonFXConfiguration();
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.CurrentLimits.StatorCurrentLimit = 80;
+    config.CurrentLimits.StatorCurrentLimit = IntakeConstants.ROLLER_STATOR_CURRENT_LIMIT;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.CurrentLimits.SupplyCurrentLimit = 60;
+    config.CurrentLimits.SupplyCurrentLimit = IntakeConstants.ROLLER_CURRENT_LIMIT;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     tryUntilOk(5, () -> motor.getConfigurator().apply(config, 0.25));
 

@@ -8,6 +8,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intakeExtender.IntakeExtender;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderConstants;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class IntakeCommands {
@@ -30,6 +31,31 @@ public class IntakeCommands {
             intakeExtender.extend(IntakeExtenderConstants.RETRACT_DUTY_CYCLE);
           } else {
             intakeExtender.extend(0.0);
+          }
+        },
+        intakeExtender);
+  }
+
+  public static Command trashCompact(IntakeExtender intakeExtender) {
+    AtomicBoolean retracting = new AtomicBoolean(true);
+    return Commands.run(
+        () -> {
+          if (retracting.get()) {
+            if (intakeExtender.getExtendAngle()
+                > IntakeExtenderConstants.TRASH_COMPACT_RETRACT_LIMIT) {
+              intakeExtender.extend(IntakeExtenderConstants.RETRACT_DUTY_CYCLE);
+            } else {
+              retracting.set(false);
+              intakeExtender.extend(0.0);
+            }
+          } else {
+            if (intakeExtender.getExtendAngle()
+                < IntakeExtenderConstants.TRASH_COMPACT_EXTEND_LIMIT) {
+              intakeExtender.extend(IntakeExtenderConstants.EXTEND_DUTY_CYCLE);
+            } else {
+              retracting.set(true);
+              intakeExtender.extend(0.0);
+            }
           }
         },
         intakeExtender);

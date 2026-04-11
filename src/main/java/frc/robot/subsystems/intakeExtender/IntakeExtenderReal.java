@@ -17,21 +17,21 @@ public class IntakeExtenderReal implements IntakeExtenderIO {
   public final SparkBase extendRetractMotor =
       new SparkMax(CAN.INTAKE_RETRACTION, MotorType.kBrushless);
   private final RelativeEncoder extendRetractEncoder = extendRetractMotor.getEncoder();
+  private final SparkMaxConfig extendRetractConfig;
 
   public IntakeExtenderReal() {
-    var extendRetractConfig = new SparkMaxConfig();
+    extendRetractConfig = new SparkMaxConfig();
     extendRetractConfig
         .idleMode(IdleMode.kBrake)
-        .inverted(true)
-        .smartCurrentLimit(28)
+        .inverted(false)
+        .smartCurrentLimit(IntakeExtenderConstants.CURRENT_LIMIT)
         .voltageCompensation(12.0);
-    // Convert from revolutions to degrees, accounting for the gear ratio.
-    extendRetractConfig.encoder.positionConversionFactor(
-        360.0 / IntakeExtenderConstants.RETRACT_GEAR_RATIO);
+    // No conversion, we keep our limits in motor revolutions
+    extendRetractConfig.encoder.positionConversionFactor(1);
     extendRetractConfig
         .softLimit
         .forwardSoftLimit(IntakeExtenderConstants.EXTEND_LIMIT)
-        .reverseSoftLimit(IntakeExtenderConstants.RETRACT_LIMIT)
+        .reverseSoftLimit(IntakeExtenderConstants.FULL_RETRACT_LIMIT)
         .forwardSoftLimitEnabled(true)
         .reverseSoftLimitEnabled(true);
     SparkUtil.tryUntilOk(
@@ -44,7 +44,7 @@ public class IntakeExtenderReal implements IntakeExtenderIO {
                 PersistMode.kPersistParameters));
 
     // Set the encoder position to 0 on startup so that the soft limits work correctly.
-    extendRetractEncoder.setPosition(0);
+    extendRetractEncoder.setPosition(IntakeExtenderConstants.FULL_RETRACT_LIMIT);
     // FIXME: What do we do if we lose power during a match? This will set the position to 0 at
     // startup.
   }
@@ -78,5 +78,31 @@ public class IntakeExtenderReal implements IntakeExtenderIO {
   @Override
   public void extend(double dutyCycle) {
     extendRetractMotor.set(dutyCycle);
+  }
+
+  @Override
+  public void enableBrakeMode() {
+    extendRetractConfig.idleMode(IdleMode.kBrake);
+    SparkUtil.tryUntilOk(
+        extendRetractMotor,
+        5,
+        () ->
+            extendRetractMotor.configure(
+                extendRetractConfig,
+                ResetMode.kNoResetSafeParameters,
+                PersistMode.kNoPersistParameters));
+  }
+
+  @Override
+  public void enableCoastMode() {
+    extendRetractConfig.idleMode(IdleMode.kCoast);
+    SparkUtil.tryUntilOk(
+        extendRetractMotor,
+        5,
+        () ->
+            extendRetractMotor.configure(
+                extendRetractConfig,
+                ResetMode.kNoResetSafeParameters,
+                PersistMode.kNoPersistParameters));
   }
 }

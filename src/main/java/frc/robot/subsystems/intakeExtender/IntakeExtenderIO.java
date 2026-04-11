@@ -14,4 +14,8 @@ public interface IntakeExtenderIO {
   public default void updateInputs(IntakeExtenderIOInputs inputs) {}
 
   public default void extend(double dutyCycle) {}
+
+  public default void enableCoastMode() {}
+
+  public default void enableBrakeMode() {}
 }
