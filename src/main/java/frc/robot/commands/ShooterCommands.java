@@ -627,8 +627,11 @@ public class ShooterCommands {
 
               // Flywheel and Hood
               Translation2d futurePosition = drive.getPose().getTranslation();
-              // futurePosition =
-              //    futurePosition.plus(drive.getFieldRelativeSpeed().getTranslation2d().times(1));
+              if (shotTable == ShooterConstants.kRPMGoalTable) {
+                futurePosition =
+                    futurePosition.plus(drive.getFieldRelativeSpeed().getTranslation2d().times(1));
+              }
+
               double distance = target.getDistance(futurePosition);
               Logger.recordOutput("Shooter/TargetShotDistance", distance);
               double rpm = shotTable.getOutput(distance);

@@ -33,10 +33,14 @@ public class VisionConstants {
   // 11 3/4" from center
   public static Transform3d robotToCameraFront =
       new Transform3d(
-          Inches.of(11.75).in(Meters),
-          Inches.of(27.5 * 0.5 - 0.7375).in(Meters),
-          Inches.of(20.5).in(Meters),
-          new Rotation3d(0.0, -10 * Math.PI / 180.0, Degrees.of(-5).in(Radians)));
+          0.20246, // was 298 mm
+          0.326567, // was 330 mm
+          0.526307, // was 520.7 mm
+          new Rotation3d(0, 0, 0));
+  //   Inches.of(11.75).in(Meters),
+  //   Inches.of(27.5 * 0.5 - 0.7375).in(Meters),
+  //   Inches.of(20.5).in(Meters),
+  //  new Rotation3d(0.0, -10 * Math.PI / 180.0, Degrees.of(-5).in(Radians)));
   public static Transform3d robotToCameraBack =
       new Transform3d(
           -Inches.of(27.5 * 0.5).in(Meters) + 0.0014,
