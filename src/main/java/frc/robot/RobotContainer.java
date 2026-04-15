@@ -268,7 +268,7 @@ public class RobotContainer {
             ShooterCommands.setupHubShot(
                 shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false),
             Commands.race(
-                IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(2.2)),
+                IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(3)),
                 Commands.sequence(
                     new WaitCommand(0.5), IntakeCommands.trashCompactAuto(intakeExtender))),
             Commands.runOnce(
@@ -306,6 +306,7 @@ public class RobotContainer {
                   intake.setAutoSpin(false);
                   intakeExtender.setAutoControlled(false);
                 }));
+    
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Autos", AutoBuilder.buildAutoChooser());
