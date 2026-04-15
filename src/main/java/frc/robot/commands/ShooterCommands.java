@@ -93,7 +93,7 @@ public class ShooterCommands {
               double rpm = ShooterConstants.kRPMTable.getOutput(1.35);
               double hoodDegrees =
                   MathUtil.clamp(
-                      HoodConstants.kHoodTable.getOutput(1.15),
+                      HoodConstants.kHoodTable.getOutput(1.8),
                       HoodConstants.HOOD_REVERSE_LIMIT,
                       HoodConstants.HOOD_FORWARD_LIMIT);
               shooter.setOperatorOverride(false);

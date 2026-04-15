@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -261,6 +262,30 @@ public class RobotContainer {
                 shooter,
                 hood)));
 
+    NamedCommands.registerCommand(
+        "ShootSequenceCompact",
+        Commands.sequence(
+            ShooterCommands.setupHubShot(
+                shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false),
+            Commands.race(
+                IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(2.2)),
+                Commands.sequence(
+                    new WaitCommand(0.5), IntakeCommands.trashCompactAuto(intakeExtender))),
+            Commands.runOnce(
+                () -> {
+                  indexer.stop();
+                  kicker.stop();
+                },
+                indexer,
+                kicker),
+            Commands.runOnce(
+                () -> {
+                  shooter.stop();
+                  hood.stop();
+                },
+                shooter,
+                hood)));
+
     NamedCommands.registerCommand("LeftClimbSequence", ClimbCommands.leftAutoLeftClimb(climb));
     NamedCommands.registerCommand("RightClimbSequence", ClimbCommands.rightClimb(climb));
 
@@ -268,14 +293,19 @@ public class RobotContainer {
         .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE));
 
     new EventTrigger("IntakeZone")
-        .onTrue(NamedCommands.getCommand("ExtendIntake"))
-        .whileTrue(
-            Commands.sequence(
-                Commands.waitUntil(() -> intakeExtender.getExtendAngle() > 30),
-                IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE)))
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  intakeExtender.setAutoControlled(true);
+                  intakeExtender.setAutoExtending(true);
+                  intake.setAutoSpin(true);
+                }))
         .onFalse(
-            Commands.parallel(
-                IntakeCommands.intakeManual(intake, 0), NamedCommands.getCommand("RetractIntake")));
+            Commands.runOnce(
+                () -> {
+                  intake.setAutoSpin(false);
+                  intakeExtender.setAutoControlled(false);
+                }));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Autos", AutoBuilder.buildAutoChooser());
@@ -452,7 +482,14 @@ public class RobotContainer {
 
     // Retract intake by default
     // intakeExtender.setDefaultCommand(IntakeCommands.autoRetract(intakeExtender));
-    intakeExtender.setDefaultCommand(Commands.run(() -> intakeExtender.stop(), intakeExtender));
+    intakeExtender.setDefaultCommand(
+        Commands.run(
+            () -> {
+              if (!DriverStation.isAutonomous()) {
+                intakeExtender.stop();
+              }
+            },
+            intakeExtender));
 
     // Stop intake rollers by default
     intake.setDefaultCommand(
@@ -477,7 +514,7 @@ public class RobotContainer {
 
     controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
     controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
-    controller.povUp().whileTrue(Commands.run(() -> intake.intakeTest(), intake));
+    // controller.povUp().whileTrue(Commands.run(() -> intake.intakeTest(), intake));
 
     controller.b().whileTrue(ClimbCommands.rightClimb(climb));
     controller.a().whileTrue(ClimbCommands.leftClimb(climb));
@@ -520,14 +557,22 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Extend
-    operatorController.rightTrigger().onTrue(IntakeCommands.extend(intakeExtender));
+    operatorController
+        .rightTrigger()
+        .and(operatorController.rightBumper().negate())
+        .onTrue(IntakeCommands.extend(intakeExtender));
     // Retract
-    operatorController.rightBumper().onTrue(IntakeCommands.retract(intakeExtender));
+    operatorController
+        .rightBumper()
+        .and(operatorController.rightTrigger().negate())
+        .onTrue(IntakeCommands.retract(intakeExtender));
 
     operatorController
         .rightTrigger()
         .and(operatorController.rightBumper())
-        .whileTrue(IntakeCommands.trashCompact(intakeExtender));
+        .whileTrue(IntakeCommands.trashCompact(intakeExtender, intake));
+
+    operatorController.povRight().whileTrue(IntakeCommands.trashCompact(intakeExtender, intake));
 
     operatorController.start().whileTrue(ShooterCommands.unsafeFixHood(hood, operatorController));
 

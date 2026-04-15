@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.7453068181818177,
-        "y": 7.544
+        "x": 3.743,
+        "y": 0.526
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9953068181818177,
-        "y": 7.544
+        "x": 3.993,
+        "y": 0.5259999999999998
       },
       "isLocked": false,
       "linkedName": null
@@ -17,47 +17,47 @@
     {
       "anchor": {
         "x": 5.323,
-        "y": 7.544
+        "y": 0.526
       },
       "prevControl": {
         "x": 5.073,
-        "y": 7.544
+        "y": 0.5259999999999998
       },
       "nextControl": {
         "x": 5.573,
-        "y": 7.544
+        "y": 0.5259999999999998
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.5,
-        "y": 6.558
+        "x": 8.795647727272728,
+        "y": 2.097318181818182
       },
       "prevControl": {
-        "x": 7.5,
-        "y": 6.808
+        "x": 8.867795454545455,
+        "y": 0.15963636363636402
       },
       "nextControl": {
-        "x": 7.5,
-        "y": 6.308
+        "x": 8.786345662471163,
+        "y": 2.3471450650602184
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.5,
-        "y": 5.033
+        "x": 8.795647727272728,
+        "y": 2.96309090909091
       },
       "prevControl": {
-        "x": 7.5,
-        "y": 5.994000000000001
+        "x": 8.795647727272728,
+        "y": 2.0020909090909096
       },
       "nextControl": {
-        "x": 7.5,
-        "y": 4.072336956956689
+        "x": 8.795647727272728,
+        "y": 3.9237539521342213
       },
       "isLocked": false,
       "linkedName": null
@@ -65,27 +65,27 @@
     {
       "anchor": {
         "x": 6.323,
-        "y": 7.544
+        "y": 0.526
       },
       "prevControl": {
         "x": 7.675000000000001,
-        "y": 7.544
+        "y": 0.5259999999999999
       },
       "nextControl": {
         "x": 4.970544315411912,
-        "y": 7.544
+        "y": 0.5260000000000001
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.1165909090909087,
-        "y": 7.364102272727273
+        "x": 3.2299659090909087,
+        "y": 0.6543636363636369
       },
       "prevControl": {
-        "x": 3.497943181818181,
-        "y": 7.61146590909091
+        "x": 3.894965909090909,
+        "y": 0.6543636363636369
       },
       "nextControl": null,
       "isLocked": false,
@@ -95,22 +95,14 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1.8128342245989257,
-      "rotationDegrees": -90.0
+      "rotationDegrees": 90.0
     },
     {
-      "waypointRelativePos": 3.113207547169811,
-      "rotationDegrees": -90.0
+      "waypointRelativePos": 3.1367924528301874,
+      "rotationDegrees": 90.0
     },
     {
-      "waypointRelativePos": 3.6006289308176145,
-      "rotationDegrees": -90.0
-    },
-    {
-      "waypointRelativePos": 4.048742138364792,
-      "rotationDegrees": 0.0
-    },
-    {
-      "waypointRelativePos": 4.71698113207549,
+      "waypointRelativePos": 4.001572327044015,
       "rotationDegrees": 0.0
     }
   ],
@@ -122,21 +114,21 @@
         "y": 4.35
       },
       "rotationOffset": 0.0,
-      "minWaypointRelativePos": 3.438061041292637,
-      "maxWaypointRelativePos": 3.922800718132855,
+      "minWaypointRelativePos": 3.3752244165170557,
+      "maxWaypointRelativePos": 3.886894075403951,
       "name": "Point Towards Zone"
     }
   ],
   "eventMarkers": [
     {
-      "name": "ExpelBalls",
-      "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": 0.4039497307001794,
+      "name": "EjectBalls",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": 0.4,
       "command": null
     },
     {
       "name": "IntakeZone",
-      "waypointRelativePos": 1.2028725314183126,
+      "waypointRelativePos": 1.35,
       "endWaypointRelativePos": 3.389830508474576,
       "command": null
     }
@@ -154,10 +146,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "Left",
+  "folder": "Right",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 78.0
   },
   "useDefaultConstraints": true
 }
