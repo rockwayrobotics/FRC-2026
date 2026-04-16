@@ -286,6 +286,9 @@ public class RobotContainer {
                 shooter,
                 hood)));
 
+    NamedCommands.registerCommand("Drift", Commands.runOnce(() -> {
+      drive.enableCoastMode();
+    }));
     NamedCommands.registerCommand("LeftClimbSequence", ClimbCommands.leftAutoLeftClimb(climb));
     NamedCommands.registerCommand("RightClimbSequence", ClimbCommands.rightClimb(climb));
 
@@ -434,6 +437,7 @@ public class RobotContainer {
 
   public void enabledInit() {
     intakeExtender.enableBrakeMode();
+    drive.enableBrakeMode();
   }
 
   private void configureDefaultCommands() {

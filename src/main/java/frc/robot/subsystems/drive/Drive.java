@@ -265,6 +265,18 @@ public class Drive extends SubsystemBase {
     }
   }
 
+  public void enableCoastMode() {
+    for (int i = 0; i < 4; i++) {
+      modules[i].enableCoastMode();
+    }
+  }
+
+  public void enableBrakeMode() {
+    for (int i = 0; i < 4; i++) {
+      modules[i].enableBrakeMode();
+    }
+  }
+
   /** Stops the drive. */
   public void stop() {
     runVelocity(new ChassisSpeeds());

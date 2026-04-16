@@ -138,4 +138,12 @@ public class Module {
   public double getFFCharacterizationVelocity() {
     return inputs.driveVelocityRadPerSec;
   }
+
+  public void enableCoastMode() {
+    io.enableCoastMode();
+  }
+
+  public void enableBrakeMode() {
+    io.enableBrakeMode();
+  }
 }
