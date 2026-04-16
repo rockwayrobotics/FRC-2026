@@ -289,8 +289,18 @@ public class RobotContainer {
     NamedCommands.registerCommand("LeftClimbSequence", ClimbCommands.leftAutoLeftClimb(climb));
     NamedCommands.registerCommand("RightClimbSequence", ClimbCommands.rightClimb(climb));
 
-    new EventTrigger("ExpelBalls")
-        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE));
+    new EventTrigger("FoldingIntake")
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  intakeExtender.setAutoControlled(true);
+                  intakeExtender.setAutoExtending(false);
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  intakeExtender.setAutoControlled(false);
+                }));
 
     new EventTrigger("IntakeZone")
         .onTrue(
@@ -306,7 +316,6 @@ public class RobotContainer {
                   intake.setAutoSpin(false);
                   intakeExtender.setAutoControlled(false);
                 }));
-    
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Autos", AutoBuilder.buildAutoChooser());
