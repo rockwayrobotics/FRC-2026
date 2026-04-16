@@ -340,8 +340,8 @@ public class RobotContainer {
             ShooterCommands.definitiveShoot(
                 shooter,
                 hood,
-                ShooterConstants.kRPMTable.getOutput(1.15),
-                HoodConstants.kHoodTable.getOutput(1.15)),
+                ShooterConstants.kRPMTable.getOutput(1.17),
+                HoodConstants.kHoodTable.getOutput(1.17)),
             Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
             NamedCommands.getCommand("Shoot2"),
             Commands.runOnce(
@@ -366,8 +366,8 @@ public class RobotContainer {
             ShooterCommands.definitiveShoot(
                 shooter,
                 hood,
-                ShooterConstants.kRPMTable.getOutput(1.15),
-                HoodConstants.kHoodTable.getOutput(1.15)),
+                ShooterConstants.kRPMTable.getOutput(1.17),
+                HoodConstants.kHoodTable.getOutput(1.17)),
             Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
             NamedCommands.getCommand("Shoot2"),
             Commands.runOnce(
@@ -393,8 +393,8 @@ public class RobotContainer {
             ShooterCommands.definitiveShoot(
                 shooter,
                 hood,
-                ShooterConstants.kRPMTable.getOutput(1.15),
-                HoodConstants.kHoodTable.getOutput(1.15)),
+                ShooterConstants.kRPMTable.getOutput(1.17),
+                HoodConstants.kHoodTable.getOutput(1.17)),
             Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
             NamedCommands.getCommand("Shoot2"),
             Commands.runOnce(

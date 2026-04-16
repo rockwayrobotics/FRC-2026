@@ -20,12 +20,12 @@
         "y": 1.9
       },
       "prevControl": {
-        "x": 1.0,
-        "y": 1.65
+        "x": 1.125,
+        "y": 1.6834936490538903
       },
       "nextControl": {
-        "x": 1.0,
-        "y": 2.15
+        "x": 0.8750000000000002,
+        "y": 2.1165063509461093
       },
       "isLocked": false,
       "linkedName": null
@@ -33,11 +33,11 @@
     {
       "anchor": {
         "x": 0.65,
-        "y": 2.74
+        "y": 2.62
       },
       "prevControl": {
         "x": 0.15000000000000002,
-        "y": 2.74
+        "y": 2.62
       },
       "nextControl": null,
       "isLocked": true,
@@ -50,16 +50,30 @@
       "rotationDegrees": 0.0
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.9515260323159778,
+      "maxWaypointRelativePos": 1.1346499102333931,
+      "constraints": {
+        "maxVelocity": 0.25,
+        "maxAcceleration": 5.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [
     {
       "fieldPosition": {
         "x": 4.0,
-        "y": 4.2
+        "y": 4.3
       },
       "rotationOffset": 0.0,
       "minWaypointRelativePos": 0.3,
-      "maxWaypointRelativePos": 1.55,
+      "maxWaypointRelativePos": 1.605026929982046,
       "name": "Point Towards Tag"
     }
   ],
