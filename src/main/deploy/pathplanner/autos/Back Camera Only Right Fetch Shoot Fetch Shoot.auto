@@ -5,19 +5,13 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "ShootInit"
-          }
-        },
-        {
           "type": "race",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Trench to Neutral"
+                  "pathName": "Back Camera only Right Trench to Neutral"
                 }
               },
               {
@@ -42,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Trench After Shot"
+                  "pathName": "Right Trench to Neutral Repeat"
                 }
               },
               {
