@@ -123,17 +123,7 @@
       },
       "rotationOffset": 0.0,
       "minWaypointRelativePos": 3.3752244165170557,
-      "maxWaypointRelativePos": 3.886894075403951,
-      "name": "Point Towards Zone"
-    },
-    {
-      "fieldPosition": {
-        "x": 11.3,
-        "y": 4.35
-      },
-      "rotationOffset": 0.0,
-      "minWaypointRelativePos": 1.1868990384615385,
-      "maxWaypointRelativePos": 1.6253937334217512,
+      "maxWaypointRelativePos": 3.7864203415119357,
       "name": "Point Towards Zone"
     }
   ],

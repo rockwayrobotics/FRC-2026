@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.2612820300680783,
-        "y": 7.505983772220121
+        "x": 3.425057032428356,
+        "y": 7.630926246700604
       },
       "isLocked": false,
       "linkedName": null
@@ -20,7 +20,7 @@
         "y": 7.544
       },
       "prevControl": {
-        "x": 4.921300436338466,
+        "x": 4.92130043633846,
         "y": 7.540044797422205
       },
       "nextControl": {
@@ -80,15 +80,15 @@
     },
     {
       "anchor": {
-        "x": 5.026280789050681,
+        "x": 5.0269277903469085,
         "y": 7.544
       },
       "prevControl": {
-        "x": 6.222389224592968,
+        "x": 6.223036225889196,
         "y": 7.541781411772783
       },
       "nextControl": {
-        "x": 3.6969975061459914,
+        "x": 3.6976445074422193,
         "y": 7.546465606089259
       },
       "isLocked": false,
@@ -163,9 +163,9 @@
       "command": null
     },
     {
-      "name": "IntakeZoneHub",
-      "waypointRelativePos": 1.5688204575596814,
-      "endWaypointRelativePos": 3.54633620689655,
+      "name": "IntakeZone",
+      "waypointRelativePos": 1.5698151525198958,
+      "endWaypointRelativePos": 4.3003149867373995,
       "command": null
     }
   ],
