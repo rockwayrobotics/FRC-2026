@@ -295,6 +295,20 @@ public class RobotContainer {
     NamedCommands.registerCommand("LeftClimbSequence", ClimbCommands.leftAutoLeftClimb(climb));
     NamedCommands.registerCommand("RightClimbSequence", ClimbCommands.rightClimb(climb));
 
+    new EventTrigger("SpinUpShooter")
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  // Arbitrary spin-up value
+                  shooter.setAutoSetpointRPM(3000);
+                  shooter.setAutoControlled(true);
+                }))
+        .onFalse(
+            Commands.runOnce(
+                () -> {
+                  shooter.setAutoControlled(false);
+                }));
+
     new EventTrigger("FoldingIntake")
         .onTrue(
             Commands.runOnce(
