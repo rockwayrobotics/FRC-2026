@@ -40,8 +40,8 @@
         "y": 7.680784313725491
       },
       "nextControl": {
-        "x": 7.568710400942837,
-        "y": 6.509627620550379
+        "x": 7.568710400942838,
+        "y": 6.509627620550376
       },
       "isLocked": false,
       "linkedName": null
@@ -158,7 +158,7 @@
     },
     {
       "name": "IntakeZone",
-      "waypointRelativePos": 1.2,
+      "waypointRelativePos": 0.9156193895870736,
       "endWaypointRelativePos": 3.2382501657824903,
       "command": null
     }

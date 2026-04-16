@@ -170,7 +170,7 @@
   "eventMarkers": [
     {
       "name": "IntakeZone",
-      "waypointRelativePos": 1.05,
+      "waypointRelativePos": 0.6786355475763015,
       "endWaypointRelativePos": 3.3931777378815053,
       "command": null
     }

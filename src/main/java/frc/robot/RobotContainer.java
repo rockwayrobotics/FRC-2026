@@ -270,7 +270,7 @@ public class RobotContainer {
             Commands.race(
                 IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(3)),
                 Commands.sequence(
-                    new WaitCommand(0.5), IntakeCommands.trashCompactAuto(intakeExtender))),
+                    new WaitCommand(0.5), IntakeCommands.trashCompactAuto(intakeExtender, intake))),
             Commands.runOnce(
                 () -> {
                   indexer.stop();

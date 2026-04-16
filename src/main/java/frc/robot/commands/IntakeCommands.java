@@ -63,27 +63,32 @@ public class IntakeCommands {
             .repeatedly());
   }
 
-  public static Command trashCompactAuto(IntakeExtender intakeExtender) {
-    return new SequentialCommandGroup(
-            Commands.run(
-                    () -> {
-                      intakeExtender.extend(IntakeExtenderConstants.RETRACT_DUTY_CYCLE);
-                    })
-                .until(
-                    () ->
-                        intakeExtender.getExtendAngle()
-                            <= IntakeExtenderConstants.TRASH_COMPACT_RETRACT_LIMIT)
-                .withTimeout(1),
-            Commands.run(
-                    () -> {
-                      intakeExtender.extend(IntakeExtenderConstants.EXTEND_DUTY_CYCLE);
-                    })
-                .until(
-                    () ->
-                        intakeExtender.getExtendAngle()
-                            >= IntakeExtenderConstants.TRASH_COMPACT_EXTEND_LIMIT)
-                .withTimeout(1))
-        .repeatedly();
+  public static Command trashCompactAuto(IntakeExtender intakeExtender, Intake intake) {
+    return Commands.parallel(
+        Commands.run(
+            () -> {
+              intake.intake(IntakeConstants.TRASH_COMPACT_DUTY_CYCLE);
+            }),
+        new SequentialCommandGroup(
+                Commands.run(
+                        () -> {
+                          intakeExtender.extend(IntakeExtenderConstants.RETRACT_DUTY_CYCLE);
+                        })
+                    .until(
+                        () ->
+                            intakeExtender.getExtendAngle()
+                                <= IntakeExtenderConstants.TRASH_COMPACT_RETRACT_LIMIT)
+                    .withTimeout(0.5),
+                Commands.run(
+                        () -> {
+                          intakeExtender.extend(IntakeExtenderConstants.EXTEND_DUTY_CYCLE);
+                        })
+                    .until(
+                        () ->
+                            intakeExtender.getExtendAngle()
+                                >= IntakeExtenderConstants.TRASH_COMPACT_EXTEND_LIMIT)
+                    .withTimeout(0.5))
+            .repeatedly());
   }
 
   public static Command extendManual(IntakeExtender intakeExtender, double dutyCycle) {

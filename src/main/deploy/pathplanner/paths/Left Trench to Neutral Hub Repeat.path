@@ -138,7 +138,7 @@
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 5.665090460526318,
+      "waypointRelativePos": 5.71698113207549,
       "rotationDegrees": 0.0
     }
   ],
@@ -157,14 +157,14 @@
   ],
   "eventMarkers": [
     {
-      "name": "ExpelBalls",
-      "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": 0.4039497307001794,
+      "name": "FoldingIntake",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": 0.4,
       "command": null
     },
     {
       "name": "IntakeZone",
-      "waypointRelativePos": 1.5698151525198958,
+      "waypointRelativePos": 0.6463195691202872,
       "endWaypointRelativePos": 4.3003149867373995,
       "command": null
     }
@@ -185,7 +185,7 @@
   "folder": "Left",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": -70.0
   },
   "useDefaultConstraints": true
 }

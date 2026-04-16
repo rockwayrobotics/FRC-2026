@@ -41,7 +41,7 @@
       },
       "nextControl": {
         "x": 8.673227369811274,
-        "y": 6.310920593366214
+        "y": 6.310920593366212
       },
       "isLocked": false,
       "linkedName": null
@@ -133,14 +133,14 @@
   ],
   "eventMarkers": [
     {
-      "name": "ExpelBalls",
-      "waypointRelativePos": 0.0,
-      "endWaypointRelativePos": 0.4039497307001794,
+      "name": "FoldingIntake",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": 0.4,
       "command": null
     },
     {
       "name": "IntakeZone",
-      "waypointRelativePos": 1.2900986405835542,
+      "waypointRelativePos": 0.7630161579892281,
       "endWaypointRelativePos": 3.389830508474576,
       "command": null
     }

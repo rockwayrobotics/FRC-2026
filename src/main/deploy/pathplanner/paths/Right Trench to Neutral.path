@@ -9,83 +9,115 @@
       "prevControl": null,
       "nextControl": {
         "x": 4.333,
-        "y": 0.5259999999999998
+        "y": 0.526
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.32607619249623,
+        "x": 5.291329545454545,
         "y": 0.526
       },
       "prevControl": {
-        "x": 5.07607619249623,
-        "y": 0.5259999999999998
+        "x": 5.041329545454545,
+        "y": 0.526
       },
       "nextControl": {
-        "x": 5.57607619249623,
-        "y": 0.5259999999999998
+        "x": 5.541329545454545,
+        "y": 0.526
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.693,
-        "y": 1.592
+        "x": 7.5,
+        "y": 1.32
       },
       "prevControl": {
-        "x": 7.693,
-        "y": 0.8554490852104353
+        "x": 7.5,
+        "y": 1.07
       },
       "nextControl": {
-        "x": 7.693,
-        "y": 1.842
+        "x": 7.5,
+        "y": 1.57
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.692818181818181,
-        "y": 3.0970795454545454
+        "x": 7.5,
+        "y": 3.07
       },
       "prevControl": {
-        "x": 7.692818181818181,
-        "y": 2.136079545454545
+        "x": 7.5,
+        "y": 2.109
       },
       "nextControl": {
-        "x": 7.692818181818181,
-        "y": 4.057742588497857
+        "x": 7.5,
+        "y": 3.32
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.563622116111951,
-        "y": 0.634
+        "x": 7.13625,
+        "y": 2.73634
       },
       "prevControl": {
-        "x": 7.1190167712183525,
-        "y": 0.9406131530036075
+        "x": 7.213041042138009,
+        "y": 3.005
       },
       "nextControl": {
-        "x": 5.120509821766263,
-        "y": 0.5466497848903179
+        "x": 7.0385863,
+        "y": 2.39421464
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.766,
-        "y": 0.6749772727262189
+        "x": 6.280700532616893,
+        "y": 0.82351
       },
       "prevControl": {
-        "x": 3.0111258536619125,
-        "y": 0.625851761364824
+        "x": 6.553022836538462,
+        "y": 1.00087
+      },
+      "nextControl": {
+        "x": 6.007328393797873,
+        "y": 0.645464
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.796602272727272,
+        "y": 0.526
+      },
+      "prevControl": {
+        "x": 5.415799337763952,
+        "y": 0.51234
+      },
+      "nextControl": {
+        "x": 4.455732876261477,
+        "y": 0.533521
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.7,
+        "y": 0.526
+      },
+      "prevControl": {
+        "x": 4.1658741633672705,
+        "y": 0.5320566
       },
       "nextControl": null,
       "isLocked": false,
@@ -94,7 +126,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.0398249040570173,
+      "waypointRelativePos": 1.11,
       "rotationDegrees": 90.0
     },
     {
@@ -102,11 +134,23 @@
       "rotationDegrees": 90.0
     },
     {
-      "waypointRelativePos": 3.136792452830183,
+      "waypointRelativePos": 2.0463438870614024,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 3.1,
       "rotationDegrees": 90.0
     },
     {
       "waypointRelativePos": 4.0,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 5.4,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 6.7688679245283065,
       "rotationDegrees": 0.0
     }
   ],
@@ -118,16 +162,16 @@
         "y": 4.35
       },
       "rotationOffset": 0.0,
-      "minWaypointRelativePos": 3.5278276481148985,
-      "maxWaypointRelativePos": 3.8576031996021207,
-      "name": "Point Towards Zone"
+      "minWaypointRelativePos": 3.5,
+      "maxWaypointRelativePos": 4.803,
+      "name": "Point Towards AprilTag"
     }
   ],
   "eventMarkers": [
     {
       "name": "IntakeZone",
-      "waypointRelativePos": 1.35,
-      "endWaypointRelativePos": 3.36624775583483,
+      "waypointRelativePos": 0.6283662477558348,
+      "endWaypointRelativePos": 3.2,
       "command": null
     }
   ],
@@ -141,7 +185,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 70.0
   },
   "reversed": false,
   "folder": "Right",
