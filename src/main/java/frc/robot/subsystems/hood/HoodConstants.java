@@ -60,9 +60,9 @@ public class HoodConstants {
         new Point2D.Double(4.5, 20),
         new Point2D.Double(6.0, 35),
         new Point2D.Double(8, 45),
-        new Point2D.Double(10.8, 47),
-        new Point2D.Double(12.13, 48),
-        new Point2D.Double(14.0, 48),
+        new Point2D.Double(10.8, 46), // 47),
+        new Point2D.Double(12.13, 46), // 48),
+        new Point2D.Double(14.0, 46), // 48),
       };
 
   public static final LinearInterpolationTable kHoodGoalTable =

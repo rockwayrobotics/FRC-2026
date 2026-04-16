@@ -88,6 +88,23 @@ public class ShooterReal implements ShooterIO {
         (values) -> inputs.flywheelAppliedVolts = values[0] * values[1]);
     // FIXME: Should we log applied for followers?
 
+    SparkUtil.ifOk(
+        flywheelLeader,
+        flywheelLeader::getOutputCurrent,
+        (value) -> inputs.flywheelLeaderCurrent = value);
+    SparkUtil.ifOk(
+        flywheelFollower2,
+        flywheelFollower2::getOutputCurrent,
+        (value) -> inputs.flywheelFollower2Current = value);
+    SparkUtil.ifOk(
+        flywheelLeader,
+        flywheelLeader::getAppliedOutput,
+        (value) -> inputs.flywheelLeaderAppliedOutput = value);
+    SparkUtil.ifOk(
+        flywheelFollower2,
+        flywheelFollower2::getAppliedOutput,
+        (value) -> inputs.flywheelFollower2AppliedOutput = value);
+
     double flywheelLeaderTemp = flywheelLeader.getMotorTemperature();
     REVLibError flywheelLeaderLastError = flywheelLeader.getLastError();
     // double flywheelFollower1Temp = flywheelFollower1.getMotorTemperature();

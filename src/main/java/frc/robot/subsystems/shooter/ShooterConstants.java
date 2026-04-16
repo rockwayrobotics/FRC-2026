@@ -18,7 +18,7 @@ public class ShooterConstants {
 
   public static final double ACCEL_COMP_FACTOR = 0.100; // in units of seconds
 
-  public static final double FLYWHEEL_MAX_RPM = 6666.67;
+  public static final double FLYWHEEL_MAX_RPM = 8000;
 
   // meters, RPM
   private static final Point2D[] kRPMPoints =
@@ -81,9 +81,9 @@ public class ShooterConstants {
     new Point2D.Double(4.5, 3333.33),
     new Point2D.Double(6.0, 3666.67),
     new Point2D.Double(8, 3875),
-    new Point2D.Double(10.8, 5083.33),
-    new Point2D.Double(12.13, 5500),
-    new Point2D.Double(14, 6083.33),
+    new Point2D.Double(10.8, 6000),
+    new Point2D.Double(12.13, 6500),
+    new Point2D.Double(14, 6500),
   };
 
   public static final LinearInterpolationTable kRPMGoalTable =
