@@ -129,14 +129,8 @@
   ],
   "eventMarkers": [
     {
-      "name": "EjectBalls",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": 0.4,
-      "command": null
-    },
-    {
       "name": "IntakeZone",
-      "waypointRelativePos": 1.35,
+      "waypointRelativePos": 0.7719928186714552,
       "endWaypointRelativePos": 3.389830508474576,
       "command": null
     }

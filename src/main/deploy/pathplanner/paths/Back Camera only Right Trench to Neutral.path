@@ -98,11 +98,11 @@
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 1.8128342245989257,
+      "waypointRelativePos": 1.81,
       "rotationDegrees": 90.0
     },
     {
-      "waypointRelativePos": 3.136792452830183,
+      "waypointRelativePos": 3.14,
       "rotationDegrees": 90.0
     },
     {
@@ -126,7 +126,7 @@
   "eventMarkers": [
     {
       "name": "IntakeZone",
-      "waypointRelativePos": 1.35,
+      "waypointRelativePos": 0.3231597845601436,
       "endWaypointRelativePos": 3.36624775583483,
       "command": null
     }

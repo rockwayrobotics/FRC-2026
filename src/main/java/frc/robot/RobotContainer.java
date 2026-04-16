@@ -286,9 +286,12 @@ public class RobotContainer {
                 shooter,
                 hood)));
 
-    NamedCommands.registerCommand("Drift", Commands.runOnce(() -> {
-      drive.enableCoastMode();
-    }));
+    NamedCommands.registerCommand(
+        "Drift",
+        Commands.runOnce(
+            () -> {
+              drive.enableCoastMode();
+            }));
     NamedCommands.registerCommand("LeftClimbSequence", ClimbCommands.leftAutoLeftClimb(climb));
     NamedCommands.registerCommand("RightClimbSequence", ClimbCommands.rightClimb(climb));
 
