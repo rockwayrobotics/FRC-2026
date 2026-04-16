@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.766,
-        "y": 0.788
+        "x": 2.7,
+        "y": 0.526
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.425057032428356,
-        "y": 0.439073753299396
+        "x": 3.4067559328007517,
+        "y": 0.5317764332706769
       },
       "isLocked": false,
       "linkedName": null
@@ -20,12 +20,12 @@
         "y": 0.526
       },
       "prevControl": {
-        "x": 4.92130043633846,
-        "y": 0.529955202577795
+        "x": 4.921300470623409,
+        "y": 0.5299573687924363
       },
       "nextControl": {
-        "x": 6.088421012197427,
-        "y": 0.511488098052194
+        "x": 6.088420886403663,
+        "y": 0.5114801500662567
       },
       "isLocked": false,
       "linkedName": null
@@ -33,15 +33,15 @@
     {
       "anchor": {
         "x": 5.761299404311648,
-        "y": 2.4003567629538575
+        "y": 2.4
       },
       "prevControl": {
-        "x": 5.747416970026475,
-        "y": 1.404841504349471
+        "x": 5.747415864352443,
+        "y": 1.4044847568148227
       },
       "nextControl": {
-        "x": 5.764785308861328,
-        "y": 2.650332458711407
+        "x": 5.764785586498093,
+        "y": 2.6499756918857575
       },
       "isLocked": false,
       "linkedName": null
@@ -49,15 +49,15 @@
     {
       "anchor": {
         "x": 5.761299404311648,
-        "y": 3.294085370177761
+        "y": 3.294
       },
       "prevControl": {
-        "x": 5.75749379491301,
-        "y": 2.9957470333774585
+        "x": 5.757492890963032,
+        "y": 2.99566167473187
       },
       "nextControl": {
-        "x": 5.767664636803209,
-        "y": 3.793083737051474
+        "x": 5.767666148742867,
+        "y": 3.7929983475850917
       },
       "isLocked": false,
       "linkedName": null
@@ -65,15 +65,15 @@
     {
       "anchor": {
         "x": 6.897354210003782,
-        "y": 3.294085370177761
+        "y": 3.294
       },
       "prevControl": {
-        "x": 6.751186649016642,
-        "y": 3.68204312830938
+        "x": 6.751189894292504,
+        "y": 3.6819589808112387
       },
       "nextControl": {
-        "x": 7.247386828956138,
-        "y": 2.365029229372057
+        "x": 7.247379057379451,
+        "y": 2.3649409312002416
       },
       "isLocked": false,
       "linkedName": null
@@ -84,12 +84,12 @@
         "y": 0.526
       },
       "prevControl": {
-        "x": 6.223036225889196,
-        "y": 0.528218588227217
+        "x": 6.223036236497146,
+        "y": 0.5282128617678414
       },
       "nextControl": {
-        "x": 3.6976445074422193,
-        "y": 0.523534393910741
+        "x": 3.6976444956531784,
+        "y": 0.5235407579547444
       },
       "isLocked": false,
       "linkedName": null
@@ -100,8 +100,8 @@
         "y": 0.788
       },
       "prevControl": {
-        "x": 4.424780103536309,
-        "y": 0.538234564107412
+        "x": 4.424779237609159,
+        "y": 0.5382288132483692
       },
       "nextControl": null,
       "isLocked": false,
@@ -138,7 +138,7 @@
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 5.71698113207549,
+      "waypointRelativePos": 5.665090460526318,
       "rotationDegrees": 0.0
     }
   ],
@@ -151,20 +151,20 @@
       },
       "rotationOffset": 0.0,
       "minWaypointRelativePos": 3.9,
-      "maxWaypointRelativePos": 4.85
+      "maxWaypointRelativePos": 4.85,
       "name": "Point Towards Zone"
     }
   ],
   "eventMarkers": [
     {
       "name": "FoldingIntake",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": 0.4,
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": 0.4039497307001794,
       "command": null
     },
     {
       "name": "IntakeZone",
-      "waypointRelativePos": 0.6463195691202872,
+      "waypointRelativePos": 1.1,
       "endWaypointRelativePos": 4.3003149867373995,
       "command": null
     }
@@ -185,7 +185,7 @@
   "folder": "Right",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 70
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": true
 }

@@ -36,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Left Trench to Neutral Hub Repeat"
+                  "pathName": "Left Trench to Neutral Repeat"
                 }
               },
               {
@@ -52,6 +52,12 @@
           "type": "named",
           "data": {
             "name": "ShootSequenceCompact"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Neutral Far"
           }
         }
       ]

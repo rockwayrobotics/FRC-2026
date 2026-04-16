@@ -1,0 +1,92 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.923,
+        "y": 7.238
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.446820782424812,
+        "y": 7.600451950187971
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.011001527255639,
+        "y": 7.595710232612783
+      },
+      "prevControl": {
+        "x": 4.569009515977443,
+        "y": 7.610894384398495
+      },
+      "nextControl": {
+        "x": 5.428748167015385,
+        "y": 7.581359004028945
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.9966090812969925,
+        "y": 6.826379875469924
+      },
+      "prevControl": {
+        "x": 6.703581590695489,
+        "y": 7.2419994125939855
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.2203090734649124,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 0.9864651864035088,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "FoldingIntake",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": 0.39510112732095487,
+      "command": null
+    },
+    {
+      "name": "IntakeZone",
+      "waypointRelativePos": 0.74181448938992,
+      "endWaypointRelativePos": 2.0,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.8,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 4.0,
+    "rotation": -55.62773176690073
+  },
+  "reversed": false,
+  "folder": "Left",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -65.0
+  },
+  "useDefaultConstraints": true
+}
