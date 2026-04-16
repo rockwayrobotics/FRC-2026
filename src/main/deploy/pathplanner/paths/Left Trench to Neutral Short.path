@@ -170,7 +170,7 @@
   "eventMarkers": [
     {
       "name": "IntakeZone",
-      "waypointRelativePos": 1.05,
+      "waypointRelativePos": 0.7,
       "endWaypointRelativePos": 3.3931777378815053,
       "command": null
     }
@@ -185,7 +185,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -61.1531593790561
   },
   "reversed": false,
   "folder": "Left",
