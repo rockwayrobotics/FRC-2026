@@ -9,7 +9,7 @@ public class IntakeExtenderConstants {
   public static final double RETRACT_LIMIT = 5.0;
   public static final double FULL_RETRACT_LIMIT = 0.0;
   public static final double TRASH_COMPACT_EXTEND_LIMIT = 20.0;
-  public static final double TRASH_COMPACT_RETRACT_LIMIT = 5.0;
+  public static final double TRASH_COMPACT_RETRACT_LIMIT = 11.5;
 
   // 20% Duty cycle on the retract seems to make it work perfectly (rotates and slides in)
   // 10% duty cycle on the extend works as well.
