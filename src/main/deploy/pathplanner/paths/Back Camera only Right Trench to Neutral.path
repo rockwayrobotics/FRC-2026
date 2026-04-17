@@ -133,6 +133,12 @@
       "waypointRelativePos": 0.3231597845601436,
       "endWaypointRelativePos": 3.36624775583483,
       "command": null
+    },
+    {
+      "name": "SpinUpShooter",
+      "waypointRelativePos": 4.486152927740864,
+      "endWaypointRelativePos": 5.0,
+      "command": null
     }
   ],
   "globalConstraints": {

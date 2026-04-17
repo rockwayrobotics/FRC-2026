@@ -8,8 +8,18 @@
     "Teleop"
   ],
   "autoFolders": [
+    "Center and Test",
     "Left",
-    "Right"
+    "Left Cheat",
+    "Left Alternate",
+    "Left Climb",
+    "Left Normal",
+    "Left Short",
+    "Right Alternate",
+    "Right Cheat",
+    "Right Climb",
+    "Right Normal",
+    "Right Short"
   ],
   "defaultMaxVel": 4.8,
   "defaultMaxAccel": 5.0,

@@ -57,13 +57,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": " Right Neutral Far"
+            "pathName": " Right Neutral Run"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Right",
+  "folder": "Right Normal",
   "choreoAuto": false
 }

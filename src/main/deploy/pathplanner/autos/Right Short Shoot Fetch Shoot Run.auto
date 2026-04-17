@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Left Trench to Neutral"
+                  "pathName": "Short Right Trench to Neutral"
                 }
               },
               {
@@ -36,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Left Trench to Neutral Repeat"
+                  "pathName": "Right Trench to Neutral Repeat"
                 }
               },
               {
@@ -57,13 +57,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left Neutral Run"
+            "pathName": " Right Neutral Run"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Left Normal",
+  "folder": "Right Short",
   "choreoAuto": false
 }
