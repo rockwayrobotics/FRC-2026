@@ -5,19 +5,13 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "ShootInit"
-          }
-        },
-        {
           "type": "race",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Trench to Neutral"
+                  "pathName": "Short Right Trench to Neutral"
                 }
               },
               {
@@ -36,15 +30,34 @@
           }
         },
         {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Cheat Right Trench to Neutral Repeat"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Agitate"
+                }
+              }
+            ]
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "RightClimbSequence"
+            "name": "ShootSequenceCompact"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Right Normal",
+  "folder": "Right Cheat",
   "choreoAuto": false
 }

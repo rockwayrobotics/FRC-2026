@@ -49,31 +49,31 @@
     {
       "anchor": {
         "x": 5.761299404311648,
-        "y": 4.775914629822239
+        "y": 4.942
       },
       "prevControl": {
-        "x": 5.75749379491301,
-        "y": 5.0742529666225415
+        "x": 5.672956509907188,
+        "y": 5.175870761336774
       },
       "nextControl": {
-        "x": 5.767664636803209,
-        "y": 4.276916262948526
+        "x": 5.888395571526814,
+        "y": 4.605537428901628
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.897354210003782,
-        "y": 4.775914629822239
+        "x": 6.857965909090909,
+        "y": 4.942
       },
       "prevControl": {
-        "x": 6.751186649016642,
-        "y": 4.38795687169062
+        "x": 6.7425320891772405,
+        "y": 4.720245556481636
       },
       "nextControl": {
-        "x": 7.247386828956138,
-        "y": 5.704970770627943
+        "x": 7.249625,
+        "y": 5.694397727272727
       },
       "isLocked": false,
       "linkedName": null
@@ -131,7 +131,7 @@
     },
     {
       "waypointRelativePos": 4.2,
-      "rotationDegrees": -90.0
+      "rotationDegrees": 90.0
     },
     {
       "waypointRelativePos": 5.048742138364792,
@@ -150,8 +150,8 @@
         "y": 4.35
       },
       "rotationOffset": 0.0,
-      "minWaypointRelativePos": 3.9,
-      "maxWaypointRelativePos": 4.85,
+      "minWaypointRelativePos": 4.599640933572705,
+      "maxWaypointRelativePos": 4.901256732495511,
       "name": "Point Towards Zone"
     }
   ],
@@ -164,13 +164,13 @@
     },
     {
       "name": "IntakeZone",
-      "waypointRelativePos": 1.1,
-      "endWaypointRelativePos": 4.3003149867373995,
+      "waypointRelativePos": 0.646319569120285,
+      "endWaypointRelativePos": 4.685816876122084,
       "command": null
     },
     {
       "name": "SpinUpShooter",
-      "waypointRelativePos": 5.024345930232558,
+      "waypointRelativePos": 4.858168761220827,
       "endWaypointRelativePos": 6.0,
       "command": null
     }

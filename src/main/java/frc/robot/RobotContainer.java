@@ -545,7 +545,8 @@ public class RobotContainer {
 
     controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
     controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
-    // controller.povUp().whileTrue(Commands.run(() -> intake.intakeTest(), intake));
+    // controller.povUp().whileTrue(Commands.run(() -> intake.intakeTest(),
+    // intake));
 
     controller.b().whileTrue(ClimbCommands.rightClimb(climb));
     controller.a().whileTrue(ClimbCommands.leftClimb(climb));
@@ -710,13 +711,25 @@ public class RobotContainer {
                 kicker));
 
     operatorController
-        .povUp()
+        .povLeft()
         .whileTrue(
             Commands.run(
                 () -> {
                   climb.dutyCycle(1.0);
                 },
                 climb));
+
+    operatorController
+        .povUp()
+        .onTrue(
+            Commands.run(
+                    () -> {
+                      if (!DriverStation.isTest()) {
+                        climb.extend();
+                      }
+                    },
+                    climb)
+                .until(() -> climb.atSetpoint(2)));
 
     operatorController
         .povDown()

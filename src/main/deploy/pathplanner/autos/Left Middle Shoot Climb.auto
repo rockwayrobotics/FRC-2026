@@ -5,19 +5,13 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "ShootInit"
-          }
-        },
-        {
           "type": "race",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Right Trench to Neutral"
+                  "pathName": "Left Trench to Middle"
                 }
               },
               {
@@ -38,13 +32,13 @@
         {
           "type": "named",
           "data": {
-            "name": "RightClimbSequence"
+            "name": "LeftClimbSequence"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Right Normal",
+  "folder": "Left Middle",
   "choreoAuto": false
 }
