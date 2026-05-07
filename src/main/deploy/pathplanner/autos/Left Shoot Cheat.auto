@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootInit"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Delayed Cheat Left Trench to Neutral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootSequenceCompact"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Neutral Run"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
