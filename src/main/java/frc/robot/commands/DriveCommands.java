@@ -35,6 +35,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   public static final double SLOW_MODE_MULTIPLIER = 0.4;
+  public static final double FAST_MODE_MULTIPLIER = 0.8;
 
   private static final double DEADBAND = 0.1;
   public static final double ANGLE_KP = 8.0;
@@ -86,14 +87,17 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
-      BooleanSupplier slowModeSupplier,
+      BooleanSupplier ignoreSlowModeSupplier,
       BooleanSupplier ignoreSlewLimitSupplier) {
     return Commands.run(
         () -> {
           double slowModeMultiplier =
               drive
                   .getSlowModeSlewRateLimiter()
-                  .calculate(slowModeSupplier.getAsBoolean() ? SLOW_MODE_MULTIPLIER : 1.0);
+                  .calculate(
+                      ignoreSlowModeSupplier.getAsBoolean()
+                          ? FAST_MODE_MULTIPLIER
+                          : SLOW_MODE_MULTIPLIER);
 
           // Get linear velocity
           Translation2d linearVelocity =

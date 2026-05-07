@@ -7,39 +7,26 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Millimeters;
-import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.subsystems.vision.VisionConstants.camera_back;
 import static frc.robot.subsystems.vision.VisionConstants.camera_front;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraBack;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCameraFront;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import frc.robot.commands.ClimbCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.IndexerCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.subsystems.climb.Climb;
-import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbNEO2;
 import frc.robot.subsystems.climb.ClimbSimNEO;
@@ -51,7 +38,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
 import frc.robot.subsystems.hood.Hood;
-import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodIO;
 import frc.robot.subsystems.hood.HoodReal;
 import frc.robot.subsystems.hood.HoodSim;
@@ -69,13 +55,11 @@ import frc.robot.subsystems.intakeExtender.IntakeExtenderIO;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderReal;
 import frc.robot.subsystems.intakeExtender.IntakeExtenderSim;
 import frc.robot.subsystems.kicker.Kicker;
-import frc.robot.subsystems.kicker.KickerConstants;
 import frc.robot.subsystems.kicker.KickerIO;
 import frc.robot.subsystems.kicker.KickerReal;
 import frc.robot.subsystems.kicker.KickerSim;
 import frc.robot.subsystems.led.Led;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterReal;
 import frc.robot.subsystems.shooter.ShooterSim;
@@ -83,7 +67,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -104,12 +87,13 @@ public class RobotContainer {
   private final Hood hood;
   private final Climb climb;
 
+  public static final double JOYSTICK_SCALE = 0.2;
+
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final GenericHID operatorButtonBoard = new GenericHID(2);
   // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -182,264 +166,6 @@ public class RobotContainer {
         climb = new Climb(new ClimbIO() {});
         break;
     }
-
-    // Pathplanner Named Commands
-    NamedCommands.registerCommand(
-        "StopShooter",
-        Commands.runOnce(
-            () -> {
-              shooter.stop();
-              hood.stop();
-            },
-            shooter,
-            hood));
-    NamedCommands.registerCommand(
-        "StopIndexer",
-        Commands.runOnce(
-            () -> {
-              indexer.stop();
-              kicker.stop();
-            },
-            indexer,
-            kicker));
-    NamedCommands.registerCommand(
-        "Shoot2", IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(3)));
-    NamedCommands.registerCommand(
-        "ExtendIntake", IntakeCommands.extend(intakeExtender).withTimeout(Seconds.of(1)));
-    NamedCommands.registerCommand(
-        "RetractIntake", IntakeCommands.retract(intakeExtender).withTimeout(Seconds.of(1)));
-    NamedCommands.registerCommand(
-        "IntakeShortTime",
-        Commands.sequence(
-            IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE)
-                .withTimeout(Seconds.of(2)),
-            IntakeCommands.intakeManual(intake, 0.0).withTimeout(Seconds.of(0.1))));
-    NamedCommands.registerCommand(
-        "SetupHubShot",
-        ShooterCommands.setupHubShot(
-            shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false));
-    NamedCommands.registerCommand("Agitate", IndexerCommands.agitate(indexer, kicker));
-
-    NamedCommands.registerCommand(
-        "ShootInit",
-        Commands.sequence(
-            ShooterCommands.setupHubShot(
-                shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false),
-            IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(1)),
-            Commands.runOnce(
-                () -> {
-                  indexer.stop();
-                  kicker.stop();
-                },
-                indexer,
-                kicker),
-            Commands.runOnce(
-                () -> {
-                  shooter.stop();
-                  hood.stop();
-                },
-                shooter,
-                hood)));
-
-    NamedCommands.registerCommand(
-        "ShootSequence",
-        Commands.sequence(
-            ShooterCommands.setupHubShot(
-                shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false),
-            IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(2.2)),
-            Commands.runOnce(
-                () -> {
-                  indexer.stop();
-                  kicker.stop();
-                },
-                indexer,
-                kicker),
-            Commands.runOnce(
-                () -> {
-                  shooter.stop();
-                  hood.stop();
-                },
-                shooter,
-                hood)));
-
-    NamedCommands.registerCommand(
-        "ShootSequenceCompact",
-        Commands.sequence(
-            ShooterCommands.setupHubShot(
-                shooter, hood, drive, () -> 0.0, () -> 0.0, () -> false, () -> false),
-            Commands.race(
-                IndexerCommands.feedShooter(indexer, kicker).withTimeout(Seconds.of(3)),
-                Commands.sequence(
-                    new WaitCommand(0.5), IntakeCommands.trashCompactAuto(intakeExtender, intake))),
-            Commands.runOnce(
-                () -> {
-                  indexer.stop();
-                  kicker.stop();
-                },
-                indexer,
-                kicker),
-            Commands.runOnce(
-                () -> {
-                  shooter.stop();
-                  hood.stop();
-                },
-                shooter,
-                hood)));
-
-    NamedCommands.registerCommand(
-        "Drift",
-        Commands.runOnce(
-            () -> {
-              drive.enableCoastMode();
-            }));
-    NamedCommands.registerCommand("LeftClimbSequence", ClimbCommands.leftAutoLeftClimb(climb));
-    NamedCommands.registerCommand("RightClimbSequence", ClimbCommands.rightClimb(climb));
-
-    new EventTrigger("SpinUpShooter")
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  // Arbitrary spin-up value
-                  shooter.setAutoSetpointRPM(3000);
-                  shooter.setAutoControlled(true);
-                }))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  shooter.setAutoControlled(false);
-                }));
-
-    new EventTrigger("FoldingIntake")
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  intakeExtender.setAutoControlled(true);
-                  intakeExtender.setAutoExtending(false);
-                }))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  intakeExtender.setAutoControlled(false);
-                }));
-
-    new EventTrigger("IntakeZone")
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  intakeExtender.setAutoControlled(true);
-                  intakeExtender.setAutoExtending(true);
-                  intake.setAutoSpin(true);
-                }))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  intake.setAutoSpin(false);
-                  intakeExtender.setAutoControlled(false);
-                }));
-
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Autos", AutoBuilder.buildAutoChooser());
-
-    autoChooser.addOption(
-        "Center Shoot Hub",
-        Commands.sequence(
-            Commands.runOnce(
-                () -> {
-                  if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
-                    drive.setPose(new Pose2d(new Translation2d(3.5, 4), Rotation2d.kZero));
-                  } else {
-                    drive.setPose(new Pose2d(new Translation2d(13, 4), Rotation2d.k180deg));
-                  }
-                }),
-            ShooterCommands.definitiveShoot(
-                shooter,
-                hood,
-                ShooterConstants.kRPMTable.getOutput(1.17),
-                HoodConstants.kHoodTable.getOutput(1.17)),
-            Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
-            NamedCommands.getCommand("Shoot2"),
-            Commands.runOnce(
-                () -> {
-                  shooter.stop();
-                  hood.stop();
-                },
-                shooter,
-                hood)));
-
-    autoChooser.addOption(
-        "Center Shoot Hub Left Climb",
-        Commands.sequence(
-            Commands.runOnce(
-                () -> {
-                  if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
-                    drive.setPose(new Pose2d(new Translation2d(3.5, 4), Rotation2d.kZero));
-                  } else {
-                    drive.setPose(new Pose2d(new Translation2d(13, 4), Rotation2d.k180deg));
-                  }
-                }),
-            ShooterCommands.definitiveShoot(
-                shooter,
-                hood,
-                ShooterConstants.kRPMTable.getOutput(1.17),
-                HoodConstants.kHoodTable.getOutput(1.17)),
-            Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
-            NamedCommands.getCommand("Shoot2"),
-            Commands.runOnce(
-                () -> {
-                  shooter.stop();
-                  hood.stop();
-                },
-                shooter,
-                hood),
-            ClimbCommands.centerLeftClimb(climb)));
-
-    autoChooser.addOption(
-        "Center Shoot Hub Right Climb",
-        Commands.sequence(
-            Commands.runOnce(
-                () -> {
-                  if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
-                    drive.setPose(new Pose2d(new Translation2d(3.5, 4), Rotation2d.kZero));
-                  } else {
-                    drive.setPose(new Pose2d(new Translation2d(13, 4), Rotation2d.k180deg));
-                  }
-                }),
-            ShooterCommands.definitiveShoot(
-                shooter,
-                hood,
-                ShooterConstants.kRPMTable.getOutput(1.17),
-                HoodConstants.kHoodTable.getOutput(1.17)),
-            Commands.waitUntil(() -> shooter.atFlywheelSetpoint(100)),
-            NamedCommands.getCommand("Shoot2"),
-            Commands.runOnce(
-                () -> {
-                  shooter.stop();
-                  hood.stop();
-                },
-                shooter,
-                hood),
-            ClimbCommands.centerAutoRightClimb(climb)));
-
-    // Set up SysId routines
-    // autoChooser.addOption(
-    // "Drive Wheel Radius Characterization",
-    // DriveCommands.wheelRadiusCharacterization(drive));
-    // autoChooser.addOption(
-    // "Drive Simple FF Characterization",
-    // DriveCommands.feedforwardCharacterization(drive));
-    // autoChooser.addOption(
-    // "Drive SysId (Quasistatic Forward)",
-    // drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    // "Drive SysId (Quasistatic Reverse)",
-    // drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    // autoChooser.addOption(
-    // "Drive SysId (Dynamic Forward)",
-    // drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    // autoChooser.addOption(
-    // "Drive SysId (Dynamic Reverse)",
-    // drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-    SmartDashboard.putData("Auto Choices", autoChooser.getSendableChooser());
 
     // Configure the button bindings
     configureButtonBindings();
@@ -540,44 +266,21 @@ public class RobotContainer {
     controller
         .leftTrigger()
         .whileTrue(ShooterCommands.magicTrigger(shooter, hood, drive, controller));
-    controller.y().whileTrue(ShooterCommands.againstHubShot(shooter, hood, controller));
     controller.x().whileTrue(ShooterCommands.dumpShort(shooter, hood, controller));
 
-    controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
-    controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
-    // controller.povUp().whileTrue(Commands.run(() -> intake.intakeTest(),
-    // intake));
-
-    controller.b().whileTrue(ClimbCommands.rightClimb(climb));
-    controller.a().whileTrue(ClimbCommands.leftClimb(climb));
-
-    controller.back().whileTrue(ShooterCommands.testShoot(shooter, hood));
+    controller
+        .back()
+        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE));
 
     controller
-        .start()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  if (DriverStation.isTestEnabled()) {
-                    climb.toggleLimits();
-                  }
-                },
-                climb));
+        .y()
+        .whileTrue(IntakeCommands.intakeManual(intake, IntakeConstants.ROLLER_DUTY_CYCLE));
+    controller.y().whileTrue(IndexerCommands.agitate(indexer, kicker));
+    controller.rightBumper().onTrue(IntakeCommands.extend(intakeExtender));
+    controller.rightBumper().onFalse(IntakeCommands.retract(intakeExtender));
 
-    // Shoot Sequence
+    controller.a().whileTrue(IntakeCommands.trashCompact(intakeExtender, intake));
     controller
-        .rightTrigger()
-        .whileTrue(Commands.parallel(IndexerCommands.feedShooter(indexer, kicker)));
-  }
-
-  private void configureOperatorCommands() {
-    controller
-        .leftTrigger()
-        .negate()
-        .and(operatorController.y())
-        .whileTrue(ShooterCommands.spinUp(shooter, drive));
-    // Reset gyro to 0° when B button is pressed
-    operatorController
         .b()
         .onTrue(
             Commands.runOnce(
@@ -588,216 +291,13 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    // Extend
-    operatorController
-        .rightTrigger()
-        .and(operatorController.rightBumper().negate())
-        .onTrue(IntakeCommands.extend(intakeExtender));
-    // Retract
-    operatorController
-        .rightBumper()
-        .and(operatorController.rightTrigger().negate())
-        .onTrue(IntakeCommands.retract(intakeExtender));
+    controller.povLeft().whileTrue(Commands.run(drive::stopWithX, drive));
+    controller.povRight().whileTrue(Commands.run(drive::stopWithX, drive));
 
-    operatorController
-        .rightTrigger()
-        .and(operatorController.rightBumper())
-        .whileTrue(IntakeCommands.trashCompact(intakeExtender, intake));
-
-    operatorController.povRight().whileTrue(IntakeCommands.trashCompact(intakeExtender, intake));
-
-    operatorController.start().whileTrue(ShooterCommands.unsafeFixHood(hood, operatorController));
-
-    // Manual extend
-    new JoystickButton(operatorButtonBoard, 5)
-        .whileTrue(IntakeCommands.extendManual(intakeExtender, 0.2));
-    // Manual retract
-    new JoystickButton(operatorButtonBoard, 7)
-        .whileTrue(IntakeCommands.extendManual(intakeExtender, -0.2));
-
-    // Manual forward
-    new JoystickButton(operatorButtonBoard, 8)
-        .whileTrue(
-            IntakeCommands.intakeManualWithRumble(
-                intake, IntakeConstants.ROLLER_DUTY_CYCLE, operatorController));
-    // Manual reverse
-    new JoystickButton(operatorButtonBoard, 6)
-        .whileTrue(
-            IntakeCommands.intakeManualWithRumble(
-                intake, -IntakeConstants.ROLLER_DUTY_CYCLE, operatorController));
-
-    // Intake balls
-    operatorController
-        .leftTrigger()
-        .whileTrue(
-            IntakeCommands.intakeManualWithRumble(
-                intake, IntakeConstants.ROLLER_DUTY_CYCLE, operatorController));
+    // Shoot Sequence
     controller
         .rightTrigger()
-        .negate()
-        .and(operatorController.leftTrigger())
-        .whileTrue(IndexerCommands.agitate(indexer, kicker));
-    operatorController
-        .leftBumper()
-        .whileTrue(
-            IntakeCommands.intakeManualWithRumble(
-                intake, IntakeConstants.ROLLER_EJECT_DUTY_CYCLE, operatorController));
-
-    // Agitate
-    // operatorController.a().whileTrue(IndexerCommands.agitate(indexer, kicker));
-    // Unjam - DISABLED
-    // operatorController.b().whileTrue(IndexerCommands.unjam(indexer, kicker));
-
-    // Forward Augers
-    new JoystickButton(operatorButtonBoard, 3).whileTrue(IndexerCommands.augersFeed(indexer));
-    // Reverse Augers
-    new JoystickButton(operatorButtonBoard, 4).whileTrue(IndexerCommands.augersReverse(indexer));
-
-    // XBox controller axes:
-    // 0: left stick X
-    // 1: left stick Y
-    // 2: left trigger
-    // 3: right trigger
-    // 4: right stick X
-    // 5: right stick Y
-    // Y-axes are inverted, so pushing stick forward gives negative value.
-
-    // Manual spin up
-    // Do something with
-    // operatorController.getRightY();
-    operatorController
-        .axisLessThan(5, -0.1) // Axis is negated, so this is up.
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  // Set state so that flywheel maintains speed and doesn't stop.
-                  shooter.setOperatorOverride(true);
-                }));
-
-    operatorController
-        .axisMagnitudeGreaterThan(5, 0.01) // -0.01 - 0.01 deadzone
-        .whileTrue(ShooterCommands.manualFlywheel(shooter, () -> -operatorController.getRightY()));
-
-    // Manual hood pivot
-    // Do something with
-    // operatorController.getLeftY();
-    operatorController
-        .axisMagnitudeGreaterThan(1, 0.1)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  // Set state so that hood maintains position and doesn't fold.
-                  hood.setOperatorOverride(true);
-                }));
-    operatorController
-        .axisMagnitudeGreaterThan(1, 0.01) // -0.01 - 0.01 deadzone
-        .whileTrue(ShooterCommands.manualHood(hood, () -> -operatorController.getLeftY()));
-
-    // Manual kicker forward
-    new JoystickButton(operatorButtonBoard, 2)
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  kicker.setVelocityKicker(KickerConstants.KICKER_FEED_RPM);
-                },
-                kicker));
-    // Reverse kicker
-    new JoystickButton(operatorButtonBoard, 1)
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  kicker.setVelocityKicker(KickerConstants.KICKER_AGITATE_RPM);
-                },
-                kicker));
-
-    operatorController
-        .povLeft()
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  climb.dutyCycle(1.0);
-                },
-                climb));
-
-    operatorController
-        .povUp()
-        .onTrue(
-            Commands.run(
-                    () -> {
-                      if (!DriverStation.isTest()) {
-                        climb.extend();
-                      }
-                    },
-                    climb)
-                .until(() -> climb.atSetpoint(2)));
-
-    operatorController
-        .povDown()
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  climb.dutyCycle(-1.0);
-                },
-                climb));
-
-    // POV Left - retract to 0 - do not do this while hanging on bar
-    new POVButton(operatorButtonBoard, 270)
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  climb.setPos(0, true);
-                },
-                climb));
-    // POV Right - go to extend height (either from hanging to lower robot, or to
-    // prepare for climb)
-    new POVButton(operatorButtonBoard, 90)
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  climb.setPos(ClimbConstants.EXTEND_HEIGHT.in(Millimeters), true);
-                },
-                climb));
-    // POV Down - go from extend height to climb height, raise robot
-    new POVButton(operatorButtonBoard, 180)
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  climb.setPos(ClimbConstants.CLIMB_HEIGHT.in(Millimeters), true);
-                },
-                climb));
-
-    ////////////////////// Testing commands below here ///////////////////////
-
-    /*
-     * operatorController.b().whileTrue(Commands.run(() -> indexer.augersFeed(),
-     * indexer));
-     * operatorController.x().whileTrue(Commands.run(() -> indexer.augersReverse(),
-     * indexer));
-     * operatorController.x().whileTrue(Commands.run(() ->
-     * indexer.setVelocityKicker(100), indexer));
-     *
-     * operatorController.povDown().onTrue(Commands.runOnce(() -> climb.unclimb(),
-     * climb));
-     * operatorController.povUp().onTrue(Commands.runOnce(() -> climb.climb(),
-     * climb));
-     * operatorController.povRight().onTrue(Commands.runOnce(() -> climb.extend(),
-     * climb));
-     * operatorController.povLeft().onTrue(Commands.runOnce(() -> climb.retract(),
-     * climb));
-     *
-     * operatorController.a().whileTrue(Commands.run(() ->
-     * shooter.setVelocityFlywheel(200), shooter));
-     * operatorController
-     * .y()
-     * .whileTrue(
-     * Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(0, Degrees)),
-     * shooter));
-     * operatorController
-     * .povCenter()
-     * .whileTrue(
-     * Commands.run(() -> shooter.setPositionHood(Angle.ofBaseUnits(30, Degrees)),
-     * shooter));
-     */
+        .whileTrue(Commands.parallel(IndexerCommands.feedShooter(indexer, kicker)));
   }
 
   /**
@@ -828,10 +328,9 @@ public class RobotContainer {
     // May want to add this agitate sequence to be part of intaking as well.
     configureDefaultCommands();
     configureDriverCommands();
-    configureOperatorCommands();
 
     /*
-     * // Sad, no weight, no LEDs
+     * // Sad, infinite weight, infinite LEDs
      * LEDPattern base =
      * LEDPattern.progressMaskLayer(
      * () -> {
@@ -848,7 +347,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return null;
   }
 
   public Pose2d getPose() {
