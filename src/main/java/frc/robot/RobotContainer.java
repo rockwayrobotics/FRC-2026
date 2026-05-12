@@ -280,8 +280,9 @@ public class RobotContainer {
     controller.rightBumper().onFalse(IntakeCommands.retract(intakeExtender));
 
     controller.a().whileTrue(IntakeCommands.trashCompact(intakeExtender, intake));
+    controller.b().whileTrue(ShooterCommands.againstHubShot(shooter, hood, controller));
     controller
-        .b()
+        .start()
         .onTrue(
             Commands.runOnce(
                     () -> {
