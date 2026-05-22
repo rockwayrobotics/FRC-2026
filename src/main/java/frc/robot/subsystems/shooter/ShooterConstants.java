@@ -18,7 +18,7 @@ public class ShooterConstants {
 
   public static final double ACCEL_COMP_FACTOR = 0.100; // in units of seconds
 
-  public static final double FLYWHEEL_MAX_RPM = 8000;
+  public static final double FLYWHEEL_MAX_RPM = 2500;
 
   // meters, RPM
   private static final Point2D[] kRPMPoints =

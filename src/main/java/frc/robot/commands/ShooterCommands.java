@@ -32,9 +32,9 @@ public class ShooterCommands {
   private static LinearInterpolationTable m_rpmTable = ShooterConstants.kRPMTable;
 
   private static LoggedNetworkNumber flywheelSpeed =
-      new LoggedNetworkNumber("Shooter/FlywheelSpeedSetter", 4000);
+      new LoggedNetworkNumber("Shooter/FlywheelSpeedSetter", 800);
   private static LoggedNetworkNumber hoodAngle =
-      new LoggedNetworkNumber("Shooter/HoodAngleSetter", 45);
+      new LoggedNetworkNumber("Shooter/HoodAngleSetter", 6);
 
   private static LoggedNetworkNumber flywheelDumpSpeed =
       new LoggedNetworkNumber("Shooter/DumpFlywheelSpeed", 2083.33);
@@ -49,7 +49,7 @@ public class ShooterCommands {
   public static Command testShoot(Shooter shooter, Hood hood) {
     return Commands.run(
         () -> {
-          double rpm = MathUtil.clamp(flywheelSpeed.get(), 2000, ShooterConstants.FLYWHEEL_MAX_RPM);
+          double rpm = MathUtil.clamp(flywheelSpeed.get(), 750, ShooterConstants.FLYWHEEL_MAX_RPM);
           double hoodDegrees =
               MathUtil.clamp(
                   hoodAngle.get(),

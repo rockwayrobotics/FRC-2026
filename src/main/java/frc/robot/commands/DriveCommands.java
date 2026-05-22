@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
-  public static final double SLOW_MODE_MULTIPLIER = 0.4;
+  public static final double SLOW_MODE_MULTIPLIER = 0.2;
   public static final double FAST_MODE_MULTIPLIER = 0.8;
 
   private static final double DEADBAND = 0.1;
