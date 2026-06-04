@@ -16,7 +16,7 @@ public class HoodConstants {
 
   // FIXME: Check these are correct!
   public static final double HOOD_REST_POINT = 20;
-  public static final double HOOD_FORWARD_LIMIT = 48;
+  public static final double HOOD_FORWARD_LIMIT = 45;
   public static final double HOOD_SAFE_FORWARD_LIMIT = 45;
   public static final double HOOD_SAFE_INTERNAL_FORWARD_LIMIT =
       45; // 45 degree hood angle (50.4 max)
