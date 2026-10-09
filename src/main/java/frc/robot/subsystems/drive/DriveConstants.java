@@ -99,7 +99,7 @@ public class DriveConstants {
         .encoderChannel(0)
         .absoluteEncoder(false)
         // .encoderOffset(Rotation2d.fromRadians(0))
-        .encoderOffset(Rotation2d.fromRadians(-3.8368 + Math.PI / 4))
+        .encoderOffset(Rotation2d.fromRadians(-3.8784 + Math.PI / 4))
         .turnInverted(true)
         .encoderInverted(false)
         .build(),
