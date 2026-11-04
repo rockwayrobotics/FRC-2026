@@ -42,9 +42,9 @@ public class ShooterCommands {
       new LoggedNetworkNumber("Shooter/HoodAngleSetter", 45);
 
   private static LoggedNetworkNumber flywheelDumpSpeed =
-      new LoggedNetworkNumber("Shooter/DumpFlywheelSpeed", 2083.33);
+      new LoggedNetworkNumber("Shooter/DumpFlywheelSpeed", 2500.33);
   private static LoggedNetworkNumber hoodDumpAngle =
-      new LoggedNetworkNumber("Shooter/DumpHoodAngle", 45);
+      new LoggedNetworkNumber("Shooter/DumpHoodAngle", 30);
 
   private static LoggedNetworkNumber flywheelScale =
       new LoggedNetworkNumber("Shooter/FlywheelOperatorScale", 8);
