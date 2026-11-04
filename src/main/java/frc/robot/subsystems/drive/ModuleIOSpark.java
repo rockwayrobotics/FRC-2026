@@ -64,7 +64,8 @@ public class ModuleIOSpark implements ModuleIO {
       new Debouncer(0.5, Debouncer.DebounceType.kFalling);
   private final Debouncer turnConnectedDebounce =
       new Debouncer(0.5, Debouncer.DebounceType.kFalling);
-  private int resetCounter = 0;
+  private double absoluteEncoderReadings[] = new double[26];
+  private int absoluteEncoderReadingCount = 0;
 
   public ModuleIOSpark(SwerveModuleConfig module) {
     zeroRotation = module.encoderOffset();
@@ -148,6 +149,7 @@ public class ModuleIOSpark implements ModuleIO {
         () ->
             turnSpark.configure(
                 turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
+    turnSpark.clearFaults();
 
     // Create odometry queues
     timestampQueue = SparkOdometryThread.getInstance().makeTimestampQueue();
@@ -159,22 +161,20 @@ public class ModuleIOSpark implements ModuleIO {
     // turnPositionQueue =
     // SparkOdometryThread.getInstance()
     // .registerSignal(turnSpark, turnEncoder::getVirtualPosition);
-    turnSpark.getEncoder().setPosition(turnEncoder.getVirtualPosition());
+    this.resetEncoder();
   }
 
   @Override
   public void resetEncoder() {
-    turnSpark.getEncoder().setPosition(turnEncoder.getVirtualPosition());
+    var virtualPosition = turnEncoder.getVirtualPosition();
+    tryUntilOk(turnSpark, 5, () -> turnSpark.getEncoder().setPosition(virtualPosition));
+    this.absoluteEncoderReadings[0] = virtualPosition;
+    this.absoluteEncoderReadingCount = 1;
   }
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
-    // Reset the relative encoder every 1 second to match the absolute encoder.
-    resetCounter++;
-    if (resetCounter > 49) {
-      // turnSpark.getEncoder().setPosition(turnEncoder.getVirtualPosition());
-      resetCounter = 0;
-    }
+
     // Update drive inputs
     sparkStickyFault = false;
     ifOk(driveSpark, driveEncoder::getPosition, (value) -> inputs.drivePositionRad = value);
@@ -204,10 +204,32 @@ public class ModuleIOSpark implements ModuleIO {
         (value) ->
             inputs.turnRelativePosition =
                 new Rotation2d(MathUtil.inputModulus(value, 0, Math.PI * 2)));
+    inputs.turnDifference = inputs.turnPosition.minus(inputs.turnRelativePosition).getRadians();
     ifOk(
         turnSpark,
         () -> turnSpark.getEncoder().getVelocity(),
         (value) -> inputs.turnVelocityRadPerSec = value);
+
+    if (absoluteEncoderReadingCount <= 25 && Math.abs(inputs.turnVelocityRadPerSec) > 0.1) {
+      // Turning - don't average absolute encoder readings while spinning.
+      absoluteEncoderReadingCount = 0;
+    }
+    if (this.absoluteEncoderReadingCount < 25) {
+      this.absoluteEncoderReadings[this.absoluteEncoderReadingCount] =
+          turnEncoder.getVirtualPosition();
+      this.absoluteEncoderReadingCount++;
+    } else if (this.absoluteEncoderReadingCount == 25) {
+      double first = absoluteEncoderReadings[0];
+      double sum = 0.0;
+      for (int i = 0; i < 25; i++) {
+        sum += MathUtil.angleModulus(absoluteEncoderReadings[i] - first);
+      }
+      double average = first + sum / 25.0;
+      inputs.turnSeedCorrection = MathUtil.angleModulus(average - turnSpark.getEncoder().getPosition());
+      tryUntilOk(turnSpark, 5, () -> turnSpark.getEncoder().setPosition(average));
+      this.absoluteEncoderReadingCount++;
+    }
+
     ifOk(
         turnSpark,
         new DoubleSupplier[] {turnSpark::getAppliedOutput, turnSpark::getBusVoltage},
@@ -218,12 +240,21 @@ public class ModuleIOSpark implements ModuleIO {
         turnController::getSetpoint,
         (value) -> inputs.turnSetpoint = MathUtil.inputModulus(value, 0, Math.PI * 2));
     inputs.turnConnected = turnConnectedDebounce.calculate(!sparkStickyFault);
-    if (driveConnectedDebounce.calculate(!sparkStickyFault)
-        && turnConnectedDebounce.calculate(!sparkStickyFault)) {
+    if (inputs.driveConnected && inputs.turnConnected) {
       inputs.moduleConnected = true;
     } else {
       inputs.moduleConnected = false;
     }
+
+    var stickyFaults = turnSpark.getStickyFaults();
+    var stickyWarnings = turnSpark.getStickyWarnings();
+    var faults = turnSpark.getFaults();
+    var warnings = turnSpark.getWarnings();
+    inputs.turnStickyFaults = stickyFaults.rawBits;
+    inputs.turnStickyWarnings = stickyWarnings.rawBits;
+    inputs.turnFaults = faults.rawBits;
+    inputs.turnWarnings = warnings.rawBits;
+
     // Update odometry inputs
     inputs.odometryTimestamps =
         timestampQueue.stream().mapToDouble((Double value) -> value).toArray();

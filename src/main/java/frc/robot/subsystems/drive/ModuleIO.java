@@ -27,6 +27,12 @@ public interface ModuleIO {
     public double turnAppliedVolts = 0.0;
     public double turnCurrentAmps = 0.0;
     public double turnSetpoint = 0.0;
+    public double turnDifference = 0.0;
+    public double turnSeedCorrection = 0.0;
+    public int turnFaults = 0;
+    public int turnWarnings = 0;
+    public int turnStickyFaults = 0;
+    public int turnStickyWarnings = 0;
 
     public boolean moduleConnected = false;
 
