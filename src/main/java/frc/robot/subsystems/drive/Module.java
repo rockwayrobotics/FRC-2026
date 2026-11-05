@@ -63,7 +63,7 @@ public class Module {
   public void runSetpoint(SwerveModuleState state) {
     // Optimize velocity setpoint
     state.optimize(getAngle());
-    state.cosineScale(inputs.turnPosition);
+    state.cosineScale(getAngle());
 
     // Apply setpoints
     io.setDriveVelocity(state.speedMetersPerSecond / wheelRadiusMeters);
@@ -94,9 +94,13 @@ public class Module {
     io.setTurnOpenLoop(0.0);
   }
 
-  /** Returns the current turn angle of the module. */
+  /**
+   * Returns the current turn angle of the module, from the relative (motor) encoder that the turn
+   * closed loop actually controls. The absolute encoder (inputs.turnPosition) is only used to seed
+   * the relative encoder and is logged separately for diagnostics.
+   */
   public Rotation2d getAngle() {
-    return inputs.turnPosition;
+    return inputs.turnRelativePosition;
   }
 
   /** Returns the current drive position of the module in meters. */

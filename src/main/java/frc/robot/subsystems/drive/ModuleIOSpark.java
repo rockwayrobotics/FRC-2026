@@ -225,7 +225,8 @@ public class ModuleIOSpark implements ModuleIO {
         sum += MathUtil.angleModulus(absoluteEncoderReadings[i] - first);
       }
       double average = first + sum / 25.0;
-      inputs.turnSeedCorrection = MathUtil.angleModulus(average - turnSpark.getEncoder().getPosition());
+      inputs.turnSeedCorrection =
+          MathUtil.angleModulus(average - turnSpark.getEncoder().getPosition());
       tryUntilOk(turnSpark, 5, () -> turnSpark.getEncoder().setPosition(average));
       this.absoluteEncoderReadingCount++;
     }
